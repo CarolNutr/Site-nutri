@@ -69,6 +69,7 @@ function doPost(e) {
       case "adminPaciente": return saida(adminPaciente(c));
       case "adminAtualizar": return saida(adminAtualizar(c));
       case "adminReenviar": return saida(adminReenviar(c));
+      case "adminRemover": return saida(adminRemover(c));
       case "adminArquivo": return saida(adminArquivo(c));
       case "adminDocumento": return saida(adminDocumento(c));
       case "cadastrar": return saida(cadastrar(c));
@@ -411,6 +412,42 @@ function adminReenviar(c) {
   if (!tentativaPermitida("reenviar_adm_" + p.valores[P.id], 5)) return { ok: false, erro: "muitas_tentativas" };
   enviarEmailDeAcesso(String(p.valores[P.nome]), String(p.valores[P.email]), p.valores[P.token]);
   return { ok: true };
+}
+
+/**
+ * Remove o paciente: apaga a linha dele e as fichas, respostas, exames e documentos na
+ * planilha. A pasta dele no Drive vai para a lixeira (dá para recuperar por 30 dias).
+ */
+function adminRemover(c) {
+  const adm = adminDaSessao(c);
+  if (!adm) return { ok: false, erro: "sessao_expirada" };
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const p = acharPaciente(function (l) { return l[P.id] === texto(c.id, 20); });
+    if (!p) return { ok: false, erro: "nao_encontrado" };
+    const id = p.valores[P.id];
+    [["Fichas", 1], ["Respostas", 1], ["Exames", 1], ["Documentos", 2]].forEach(function (a) {
+      const sh = aba(a[0]);
+      const n = sh.getLastRow();
+      if (n < 2) return;
+      const ids = sh.getRange(2, a[1] + 1, n - 1, 1).getValues();
+      for (let i = ids.length - 1; i >= 0; i--) if (ids[i][0] === id) apagarLinha(sh, i + 2);
+    });
+    const m = String(p.valores[P.pasta] || "").match(/folders\/([\w-]+)/);
+    if (m) { try { DriveApp.getFolderById(m[1]).setTrashed(true); } catch (e) {} }
+    apagarLinha(aba("Pacientes"), p.linha);
+    console.log("Paciente removido por " + adm.por + ": " + id);
+    return { ok: true };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function apagarLinha(sh, linha) {
+  // A planilha não deixa apagar a última linha abaixo do cabeçalho: aí só limpa.
+  if (sh.getMaxRows() - sh.getFrozenRows() <= 1) sh.getRange(linha, 1, 1, sh.getMaxColumns()).clearContent();
+  else sh.deleteRow(linha);
 }
 
 /** Abre um exame ou documento de paciente (só arquivos registrados na planilha). */

@@ -1,5 +1,5 @@
 // Servidorzinho do site de agendamento (sem dependências).
-//   npm start        -> abre em http://localhost:3000 (agendamento) e /paciente/ (área do paciente)
+//   npm start        -> abre em http://localhost:3000 (agendamento), /paciente/ e /admin/
 //   npm run build    -> gera a pasta docs/ (o GitHub Pages publica dela)
 const http = require("http");
 const fs = require("fs");
@@ -13,8 +13,21 @@ const PAGINAS = {
   "/admin/": "admin.html",
 };
 const DADOS = path.join(__dirname, "data", "agendamentos.json");
+// Ícones do site (pasta assets/), copiados para a raiz do site
+const ASSETS = path.join(__dirname, "assets");
+const TIPOS = { ".svg": "image/svg+xml", ".ico": "image/x-icon", ".png": "image/png" };
 
-function montarHtml(arquivo, { servidor }) {
+function icones(caminho) {
+  const pre = "../".repeat(caminho.split("/").filter(Boolean).length);
+  return [
+    `<link rel="icon" href="${pre}favicon.ico" sizes="32x32">`,
+    `<link rel="icon" href="${pre}favicon.svg" type="image/svg+xml">`,
+    `<link rel="apple-touch-icon" href="${pre}apple-touch-icon.png">`,
+    '<meta name="theme-color" content="#5d6e35">',
+  ].join("\n");
+}
+
+function montarHtml(arquivo, { servidor, caminho = "/" }) {
   const fonte = fs.readFileSync(path.join(__dirname, "src", arquivo), "utf8");
   const marca = "<!-- corpo -->";
   const i = fonte.indexOf(marca);
@@ -26,6 +39,7 @@ function montarHtml(arquivo, { servidor }) {
     "<head>",
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
+    icones(caminho),
     servidor ? "<script>window.__NUTRI_SERVER__ = true;</script>" : "",
     cabeca.trim(),
     "</head>",
@@ -72,7 +86,13 @@ const servidor = http.createServer((req, res) => {
       return res.end();
     }
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
-    return res.end(montarHtml(PAGINAS[caminho], { servidor: true }));
+    return res.end(montarHtml(PAGINAS[caminho], { servidor: true, caminho }));
+  }
+
+  const asset = url.pathname.match(/^\/([\w-]+\.(?:svg|ico|png))$/);
+  if (req.method === "GET" && asset && fs.existsSync(path.join(ASSETS, asset[1]))) {
+    res.writeHead(200, { "Content-Type": TIPOS[path.extname(asset[1])] });
+    return res.end(fs.readFileSync(path.join(ASSETS, asset[1])));
   }
 
   if (url.pathname === "/api/agendamentos" && req.method === "GET") {
@@ -109,9 +129,10 @@ if (process.argv[2] === "build") {
   for (const [caminho, arquivo] of Object.entries(PAGINAS)) {
     const destino = path.join(__dirname, "docs", caminho, "index.html");
     fs.mkdirSync(path.dirname(destino), { recursive: true });
-    fs.writeFileSync(destino, montarHtml(arquivo, { servidor: false }));
+    fs.writeFileSync(destino, montarHtml(arquivo, { servidor: false, caminho }));
     console.log("Gerado:", destino);
   }
+  for (const f of fs.readdirSync(ASSETS)) fs.copyFileSync(path.join(ASSETS, f), path.join(__dirname, "docs", f));
   fs.writeFileSync(path.join(__dirname, "docs", ".nojekyll"), "");
 } else {
   servidor.listen(PORT, () => console.log(`Site no ar em http://localhost:${PORT}`));
