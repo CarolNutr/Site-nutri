@@ -21,6 +21,7 @@
   --cta:#5d6e35;
   --cta-hover:#4a5928;
   --wa:#1f9a52;
+  --wa-hover:#18833f;
   --error:#d4492f;
   --error-soft:#fcefeb;
   --off:#c0c3b4;
@@ -87,6 +88,8 @@ svg{flex:none}
 .btn-sec:hover{background:var(--accent-soft)}
 .btn-sec:disabled{opacity:.6;cursor:progress}
 .btn-wa{border-color:var(--wa);color:var(--wa)}
+.btn-wa-cheio{background:var(--wa)}
+.btn-wa-cheio:hover{background:var(--wa-hover)}
 .link{background:none;border:0;padding:0;color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:inherit}
 .voltar{color:var(--muted);font-weight:700;text-decoration:none}
 .voltar:hover{color:var(--accent)}
@@ -357,6 +360,13 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   }
   function esperar(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function linkWhats(cel, t) { var d = digitos(cel); if (d.length <= 11) d = "55" + d; return "https://wa.me/" + d + "?text=" + encodeURIComponent(t); }
+  function msgLink(nome, link, novo) {
+    var primeiro = String(nome).split(" ")[0];
+    return "Olá, " + primeiro + "! Aqui é do consultório da nutricionista Ana Carolina Pereira. " +
+      (novo ? "Seu cadastro está pronto. " : "") +
+      "Este é o link da sua área do paciente, onde você responde a ficha de saúde e envia seus exames:\n" + link +
+      "\nPara entrar, use o e-mail e o celular do seu cadastro." + (novo ? " Mandamos o mesmo link para o seu e-mail." : "");
+  }
   function classeStatus(s) { return { "Novo": "st-novo", "Ficha respondida": "st-ficha", "Em acompanhamento": "st-acomp", "Pausado": "st-pausa", "Alta": "st-alta" }[s] || "st-pausa"; }
   function pillStatus(s) { return '<span class="st ' + classeStatus(s) + '">' + esc(s) + "</span>"; }
   function iniciais(nome) { var p = String(nome || "").trim().split(" "); return ((p[0] || "")[0] || "").toUpperCase() + (p.length > 1 ? (p[p.length - 1][0] || "").toUpperCase() : ""); }
@@ -415,7 +425,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         var p = achar(c.id);
         if (!p) return { ok: false, erro: "nao_encontrado" };
         var copia = JSON.parse(JSON.stringify(p));
-        var out = { ok: true, veSaude: S.veSaude, paciente: { id: copia.id, nome: copia.nome, email: copia.email, celular: copia.celular, nascimento: copia.nascimento, objetivo: copia.objetivo, status: copia.status, cadastro: copia.cadastro, por: copia.por, ultimoAcesso: copia.ultimoAcesso, consentimento: copia.consentimento, pasta: "", anotacoes: S.veSaude ? copia.anotacoes : "" } };
+        var out = { ok: true, veSaude: S.veSaude, paciente: { link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo", id: copia.id, nome: copia.nome, email: copia.email, celular: copia.celular, nascimento: copia.nascimento, objetivo: copia.objetivo, status: copia.status, cadastro: copia.cadastro, por: copia.por, ultimoAcesso: copia.ultimoAcesso, consentimento: copia.consentimento, pasta: "", anotacoes: S.veSaude ? copia.anotacoes : "" } };
         if (S.veSaude) { out.ficha = copia.ficha; out.fichasAnteriores = copia.fichasAnteriores; out.checkins = copia.checkins; out.exames = copia.exames; out.documentos = copia.documentos; }
         return out;
       }
@@ -432,7 +442,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         if (DEMO.pacientes.some(function (o) { return o.email === String(c.email).toLowerCase(); })) return { ok: false, erro: "email_ja_cadastrado" };
         var id = "PEX" + String(DEMO.pacientes.length + 1).padStart(4, "0");
         DEMO.pacientes.unshift({ id: id, nome: c.nome, email: String(c.email).toLowerCase(), celular: mascaraTel(c.celular), nascimento: c.nascimento, objetivo: "", status: "Novo", cadastro: hojeISO(), por: S.por, ultimoAcesso: "", consentimento: "", anotacoes: "", ficha: null, fichasAnteriores: [], checkins: [], exames: [], documentos: [] });
-        return { ok: true, id: id };
+        return { ok: true, id: id, link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo" };
       }
       if (acao === "adminReenviar") return { ok: true };
       if (acao === "adminRemover") { DEMO.pacientes = DEMO.pacientes.filter(function (x) { return x.id !== c.id; }); return { ok: true }; }
@@ -578,8 +588,8 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   function renderCadastro() {
     var c = S.cadastrado;
     if (c) {
-      $("#app").innerHTML = '<div class="sucesso"><span class="ok">' + I.check + '</span><header class="pag-head"><h1 class="h1" tabindex="-1">' + esc(c.nome.split(" ")[0]) + ' foi cadastrada</h1><p class="desc">O e-mail com o link da área do paciente foi enviado para <b>' + esc(c.email) + "</b>. Avise para olhar também a caixa de spam.</p></header>" +
-        '<div class="det-acoes"><a class="btn-sec btn-wa" href="' + linkWhats(c.celular, "Olá, " + c.nome.split(" ")[0] + "! Seu cadastro com a nutricionista Ana Carolina Pereira foi feito. Mandamos para o seu e-mail (" + c.email + ") o link da sua área do paciente. Lá você responde a ficha de saúde e envia seus exames. Se não achar, olhe a caixa de spam.") + '" target="_blank" rel="noopener">' + I.chat + " Avisar pelo WhatsApp</a>" +
+      $("#app").innerHTML = '<div class="sucesso"><span class="ok">' + I.check + '</span><header class="pag-head"><h1 class="h1" tabindex="-1">Cadastro de ' + esc(c.nome.split(" ")[0]) + ' feito</h1><p class="desc">O link da área do paciente foi para o e-mail <b>' + esc(c.email) + "</b>. Para garantir que chegue, mande também pelo WhatsApp.</p></header>" +
+        '<div class="det-acoes">' + (c.link ? '<a class="btn btn-wa-cheio" href="' + linkWhats(c.celular, msgLink(c.nome, c.link, true)) + '" target="_blank" rel="noopener">' + I.chat + " Mandar o link pelo WhatsApp</a>" : "") +
         '<a class="btn-sec" href="#p-' + esc(c.id) + '">Ver paciente</a></div>' +
         '<button type="button" class="btn" data-acao="cadastrar-outro">' + I.mais + " Cadastrar outro paciente</button></div>";
       if (!CONFIG.api) $("#app").insertAdjacentHTML("beforeend", '<p class="nota-previa">Prévia: nenhum e-mail foi enviado de verdade.</p>');
@@ -639,7 +649,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         return;
       }
       S.lista = null;
-      S.cadastrado = { id: r.id, nome: v.nome, email: v.email, celular: v.celular };
+      S.cadastrado = { id: r.id, nome: v.nome, email: v.email, celular: v.celular, link: r.link || "" };
       renderCadastro();
     });
   }
@@ -728,7 +738,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       '<section class="cartao" aria-labelledby="t-cad"><h2 class="h2" id="t-cad">Cadastro</h2><dl class="kv">' +
         "<dt>E-mail</dt><dd>" + esc(p.email) + "</dd><dt>Celular</dt><dd>" + esc(p.celular) + "</dd><dt>Nascimento</dt><dd>" + (p.nascimento ? dataBR(p.nascimento) : "—") + "</dd>" +
         "<dt>Cadastro</dt><dd>" + dataBR(p.cadastro) + (p.por ? " · " + esc(p.por) : "") + "</dd><dt>Último acesso</dt><dd>" + (p.ultimoAcesso ? dataBR(p.ultimoAcesso) : "Ainda não entrou") + "</dd><dt>LGPD</dt><dd>" + (p.consentimento ? "Autorizou em " + dataBR(p.consentimento) : "Ainda não autorizou") + "</dd>" +
-      '</dl><div class="det-acoes"><button type="button" class="btn-sec" data-acao="editar">Editar cadastro</button><button type="button" class="btn-sec" data-acao="reenviar">Reenviar link</button></div>' +
+      '</dl><div class="det-acoes"><button type="button" class="btn-sec" data-acao="editar">Editar cadastro</button>' + (p.link ? '<a class="btn-sec btn-wa" href="' + linkWhats(p.celular, msgLink(p.nome, p.link, false)) + '" target="_blank" rel="noopener">' + I.chat + " Link pelo WhatsApp</a>" : "") + '<button type="button" class="btn-sec" data-acao="reenviar">Reenviar e-mail</button></div>' +
       (d.veSaude && p.pasta ? '<a class="link" href="' + esc(p.pasta) + '" target="_blank" rel="noopener">Abrir pasta no Google Drive</a>' : "") +
       '<div><button type="button" class="link link-perigo" data-acao="pedir-remover" data-id="' + esc(p.id) + '">Remover paciente</button></div>' + "</section>";
 
@@ -916,7 +926,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       chamar("adminReenviar", { id: S.atual.paciente.id }).then(function (r) {
         b.disabled = false;
         if (seExpirou(r)) return;
-        toast(r.ok ? "Link reenviado para " + S.atual.paciente.email + "." : msgErro(r.erro));
+        toast(r.ok ? "E-mail reenviado para " + S.atual.paciente.email + "." : msgErro(r.erro));
       });
     }
     else if (a === "abrir-arq") abrirArquivo(b.dataset.id, b);

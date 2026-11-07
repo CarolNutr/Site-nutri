@@ -161,7 +161,7 @@ function cadastrar(c) {
     linha[P.anotacoes] = "";
     aba("Pacientes").appendRow(linha);
     enviarEmailDeAcesso(nome, email, token);
-    return { ok: true, id: id };
+    return { ok: true, id: id, link: linkDeAcesso(token) };
   } finally {
     lock.releaseLock();
   }
@@ -336,7 +336,8 @@ function adminPaciente(c) {
       cadastro: dataISO(v[P.cadastro]), por: String(v[P.por] || ""), ultimoAcesso: dataISO(v[P.acesso]),
       consentimento: dataISO(v[P.consentimento]),
       pasta: adm.veSaude ? String(v[P.pasta] || "") : "",
-      anotacoes: adm.veSaude ? String(v[P.anotacoes] || "") : ""
+      anotacoes: adm.veSaude ? String(v[P.anotacoes] || "") : "",
+      link: linkDeAcesso(v[P.token])
     }
   };
   if (!adm.veSaude) return out;
@@ -553,22 +554,36 @@ function testarCadastro() {
 
 // ---------------------------------------------------------------- E-mail
 
+function linkDeAcesso(token) {
+  return URL_AREA_PACIENTE + (URL_AREA_PACIENTE.indexOf("?") >= 0 ? "&" : "?") + "p=" + encodeURIComponent(token);
+}
+
+/**
+ * E-mail com o link da área do paciente. Escrito como uma mensagem normal do consultório
+ * (texto simples, assinatura completa, sem cara de aviso automático) para não cair no spam.
+ */
 function enviarEmailDeAcesso(nome, email, token) {
   const primeiro = String(nome).split(" ")[0];
-  const link = URL_AREA_PACIENTE + (URL_AREA_PACIENTE.indexOf("?") >= 0 ? "&" : "?") + "p=" + encodeURIComponent(token);
+  const link = linkDeAcesso(token);
+  const assinatura = ["Ana Carolina dos Santos Pereira", "Nutricionista · CRN-4 23101599", "Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro", "WhatsApp (21) 96693-7967"];
+  const texto =
+    "Olá, " + primeiro + "!\n\n" +
+    "Seu cadastro no consultório da nutricionista Ana Carolina Pereira está pronto.\n\n" +
+    "Pela sua área do paciente você responde a ficha de saúde, envia seus exames e recebe o plano alimentar:\n" + link + "\n\n" +
+    "Para entrar, use o mesmo e-mail e celular que você informou na recepção. Guarde este e-mail para entrar outras vezes.\n\n" +
+    "Qualquer dúvida, é só responder este e-mail ou chamar no WhatsApp (21) 96693-7967.\n\n" +
+    assinatura.join("\n");
   const html =
-    '<div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;color:#2c2f26">' +
-    '<div style="background:#5d6e35;color:#ffffff;padding:20px 24px;border-radius:12px 12px 0 0;font-size:20px;font-weight:bold">Ana Carolina Pereira · Nutricionista</div>' +
-    '<div style="border:1px solid #e0e2d7;border-top:0;padding:24px;border-radius:0 0 12px 12px;line-height:1.6;font-size:16px">' +
+    '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#2c2f26;max-width:560px">' +
     "<p>Olá, " + escHtml(primeiro) + "!</p>" +
-    "<p>Seu cadastro foi feito. Pela sua área do paciente você responde a ficha de saúde, envia seus exames e recebe o plano alimentar e as orientações.</p>" +
-    '<p style="text-align:center;margin:28px 0"><a href="' + link + '" style="background:#5d6e35;color:#ffffff;text-decoration:none;padding:14px 26px;border-radius:6px;font-weight:bold;display:inline-block">Acessar minha área</a></p>' +
-    "<p>Para entrar, confirme o e-mail e o celular que você informou na recepção.</p>" +
-    '<p style="color:#727667;font-size:14px">Este link é pessoal. Não encaminhe este e-mail para outras pessoas. Guarde-o para entrar outras vezes.</p>' +
-    "</div></div>";
-  const texto = "Olá, " + primeiro + "!\n\nSeu cadastro foi feito. Acesse sua área do paciente por este link pessoal:\n" + link +
-    "\n\nPara entrar, confirme o e-mail e o celular que você informou na recepção.\nNão encaminhe este e-mail para outras pessoas.";
-  MailApp.sendEmail({ to: email, subject: "Sua área do paciente · Ana Carolina Pereira", body: texto, htmlBody: html, name: NOME_REMETENTE });
+    "<p>Seu cadastro no consultório da nutricionista Ana Carolina Pereira está pronto.</p>" +
+    "<p>Pela sua área do paciente você responde a ficha de saúde, envia seus exames e recebe o plano alimentar:</p>" +
+    '<p><a href="' + link + '" style="display:inline-block;background:#5d6e35;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;font-weight:bold">Abrir minha área do paciente</a></p>' +
+    "<p>Para entrar, use o mesmo e-mail e celular que você informou na recepção. Guarde este e-mail para entrar outras vezes.</p>" +
+    "<p>Qualquer dúvida, é só responder este e-mail ou chamar no WhatsApp (21) 96693-7967.</p>" +
+    '<p style="margin-top:24px;color:#555">' + assinatura.map(escHtml).join("<br>") + "</p>" +
+    "</div>";
+  MailApp.sendEmail({ to: email, subject: "Seu cadastro com a nutricionista Ana Carolina Pereira", body: texto, htmlBody: html, name: NOME_REMETENTE });
 }
 
 // ---------------------------------------------------------------- Planilha e Drive
