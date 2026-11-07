@@ -282,14 +282,14 @@ svg{flex:none}
       <section class="panel" data-step="1" aria-labelledby="t1">
         <div class="head">
           <h1 class="titulo" id="t1" tabindex="-1">Agendar consulta</h1>
-          <p class="sub">Os atendimentos são aos sábados, das 9h às 17h. Escolha como quer ser atendido e o melhor horário para você.</p>
+          <p class="sub">Presencial aos sábados, das 9h às 17h. Online às segundas e quintas, das 17h às 21h.</p>
         </div>
 
         <div class="field">
           <span class="label" id="l-mod">Atendimento</span>
           <div class="seg" role="radiogroup" aria-labelledby="l-mod">
-            <label class="opt"><input type="radio" name="modalidade" id="mod-presencial" value="presencial" checked><span class="opt-box"><span class="radio"></span><b>Presencial</b><small>No consultório, em Copacabana</small></span></label>
-            <label class="opt"><input type="radio" name="modalidade" id="mod-online" value="online"><span class="opt-box"><span class="radio"></span><b>Online</b><small>Por videochamada</small></span></label>
+            <label class="opt"><input type="radio" name="modalidade" id="mod-presencial" value="presencial" checked><span class="opt-box"><span class="radio"></span><b>Presencial</b><small>Em Copacabana · sábados, das 9h às 17h</small></span></label>
+            <label class="opt"><input type="radio" name="modalidade" id="mod-online" value="online"><span class="opt-box"><span class="radio"></span><b>Online</b><small>Por videochamada · segundas e quintas, das 17h às 21h</small></span></label>
           </div>
         </div>
 
@@ -316,7 +316,7 @@ svg{flex:none}
         <div class="field">
           <span class="label">Horários disponíveis</span>
           <div class="turnos" id="horarios"></div>
-          <p class="hint">Horários riscados já estão ocupados. O horário fica garantido depois da confirmação pelo WhatsApp.</p>
+          <p class="hint">O horário fica garantido depois da confirmação pelo WhatsApp.</p>
         </div>
 
         <p class="err" id="err-horario" hidden>Escolha um dia e um horário para continuar.</p>
@@ -449,10 +449,16 @@ svg{flex:none}
     duracao: { primeira: 60, retorno: 40 },
     // Horários por dia da semana (0 = domingo ... 6 = sábado)
     // Só sábados, das 9h às 17h (último horário começa às 16h para terminar às 17h)
-    agenda: {
-      6: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"]
+    // Horários de início das consultas (0 = domingo ... 6 = sábado)
+    agendas: {
+      presencial: { 6: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
+      online: {
+        1: ["17:00", "18:00", "19:00", "20:00", "21:00"],
+        4: ["17:00", "18:00", "19:00", "20:00", "21:00"]
+      }
     },
-    diasNaAgenda: 8,                    // quantos sábados aparecem para escolher
+    simularOcupados: false,             // true só para prévia (marca alguns horários como ocupados)
+    diasNaAgenda: 8,                    // quantos dias aparecem para escolher
     objetivos: ["Emagrecimento", "Ganho de massa muscular", "Reeducação alimentar", "Saúde intestinal", "Gestação e amamentação", "Nutrição esportiva", "Diabetes ou colesterol", "Alimentação vegetariana"],
     mostrarPrevia: false
   };
@@ -487,6 +493,7 @@ svg{flex:none}
 
   // Na prévia, alguns horários aparecem como ocupados (sempre os mesmos para a mesma data)
   function ocupado(dia, hora) {
+    if (!CONFIG.simularOcupados) return false;
     var s = dia + hora, x = 7;
     for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) >>> 0;
     return x % 10 < 3;
@@ -497,7 +504,7 @@ svg{flex:none}
     d.setHours(0, 0, 0, 0);
     d.setDate(d.getDate() + 1);
     while (out.length < CONFIG.diasNaAgenda) {
-      var hs = CONFIG.agenda[d.getDay()];
+      var hs = (CONFIG.agendas[state.modalidade] || CONFIG.agendas.presencial)[d.getDay()];
       if (hs && hs.length) {
         var key = iso(d);
         out.push({ iso: key, horas: hs, livres: hs.filter(function (h) { return !ocupado(key, h); }).length });
@@ -530,7 +537,8 @@ svg{flex:none}
     if (!d) { box.innerHTML = '<p class="hint">Escolha um dia acima para ver os horários.</p>'; return; }
     var grupos = [
       ["Manhã", d.horas.filter(function (h) { return +h.slice(0, 2) < 12; })],
-      ["Tarde", d.horas.filter(function (h) { return +h.slice(0, 2) >= 12; })]
+      ["Tarde", d.horas.filter(function (h) { return +h.slice(0, 2) >= 12 && +h.slice(0, 2) < 18; })],
+      ["Noite", d.horas.filter(function (h) { return +h.slice(0, 2) >= 18; })]
     ];
     box.innerHTML = grupos.filter(function (g) { return g[1].length; }).map(function (g) {
       return '<div class="turno"><span class="turno-nome">' + g[0] + '</span><div class="slots">' + g[1].map(function (h) {
@@ -571,8 +579,21 @@ svg{flex:none}
   window.addEventListener("resize", atualizaSetas);
 
   $$('input[name="modalidade"], input[name="tipo"]').forEach(function (r) {
-    r.addEventListener("change", function () { state[r.name] = r.value; atualizaResumo(); });
+    r.addEventListener("change", function () {
+      state[r.name] = r.value;
+      if (r.name === "modalidade") trocarAgenda();
+      atualizaResumo();
+    });
   });
+
+  // Presencial e online têm dias e horários diferentes
+  function trocarAgenda() {
+    dias = gerarDias();
+    escolherPrimeiroLivre();
+    renderDias(); renderHorarios();
+    $("#dias").scrollLeft = 0;
+    atualizaSetas();
+  }
 
   /* ===== Etapa 2 ===== */
   $("#objetivos").innerHTML = CONFIG.objetivos.map(function (o, i) {
@@ -722,6 +743,7 @@ svg{flex:none}
     $$(".is-invalid").forEach(function (el) { el.classList.remove("is-invalid"); });
     $$(".err").forEach(function (el) { el.hidden = true; });
     state.modalidade = "presencial"; state.tipo = "primeira";
+    dias = gerarDias();
     escolherPrimeiroLivre();
     renderDias(); renderHorarios(); atualizaSetas();
     irPara(1);

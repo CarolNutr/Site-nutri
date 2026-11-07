@@ -34,17 +34,20 @@ const HORAS_SESSAO = 6;
 const HORAS_SESSAO_ADMIN = 12;
 const STATUS = ["Novo", "Ficha respondida", "Em acompanhamento", "Pausado", "Alta"];
 const ABAS = {
-  Pacientes: ["ID", "Cadastro", "Nome", "E-mail", "Celular", "Nascimento", "Objetivo", "Status", "Cadastrado por", "Token", "Pasta", "Consentimento em", "Último acesso", "Anotações (só a nutricionista)", "Próxima consulta"],
+  Pacientes: ["ID", "Cadastro", "Nome", "E-mail", "Celular", "Nascimento", "Objetivo", "Status", "Cadastrado por", "Token", "Pasta", "Consentimento em", "Último acesso", "Anotações (só a nutricionista)", "Próxima consulta", "Atendimento"],
   Fichas: ["Data", "Paciente", "Tipo", "Valores (JSON)"],
   Respostas: ["Data", "Paciente", "Nome", "Tipo", "Seção", "Pergunta", "Resposta"],
   Exames: ["Data", "Paciente", "Nome", "Arquivo", "Descrição", "Link", "ID no Drive"],
   Documentos: ["ID", "Data", "Paciente", "Título", "Tipo", "Link", "ID no Drive"]
 };
 // Posição das colunas da aba Pacientes (começando em 0)
-const P = { id: 0, cadastro: 1, nome: 2, email: 3, celular: 4, nascimento: 5, objetivo: 6, status: 7, por: 8, token: 9, pasta: 10, consentimento: 11, acesso: 12, anotacoes: 13, consulta: 14 };
-// Atendimento só aos sábados, das 9h às 17h (o último horário começa às 16h)
-const DIAS_ATENDIMENTO = [6];
-const HORARIOS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+const P = { id: 0, cadastro: 1, nome: 2, email: 3, celular: 4, nascimento: 5, objetivo: 6, status: 7, por: 8, token: 9, pasta: 10, consentimento: 11, acesso: 12, anotacoes: 13, consulta: 14, modalidade: 15 };
+// Agenda (0 = domingo ... 6 = sábado) e horários de início das consultas.
+//  Presencial: sábados, das 9h às 17h.  Online: segundas e quintas, das 17h às 21h.
+const AGENDA = {
+  "Presencial": { dias: [6], horarios: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
+  "Online": { dias: [1, 4], horarios: ["17:00", "18:00", "19:00", "20:00", "21:00"] }
+};
 const DIAS_SEMANA = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
 const TIPOS_OK = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 
@@ -141,7 +144,8 @@ function cadastrar(c) {
   const celular = celularNormal(c.celular);
   if (nome.split(" ").length < 2 || !emailValido(email) || celular.length < 10 || !dataValida(c.nascimento)) return { ok: false, erro: "dados_invalidos" };
   const consulta = texto(c.consulta, 20);
-  if (consulta && !consultaValida(consulta)) return { ok: false, erro: "consulta_invalida" };
+  const modalidade = AGENDA[c.modalidade] ? c.modalidade : "Presencial";
+  if (consulta && !consultaValida(consulta, modalidade)) return { ok: false, erro: "consulta_invalida" };
 
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
@@ -167,8 +171,9 @@ function cadastrar(c) {
     linha[P.acesso] = "";
     linha[P.anotacoes] = "";
     linha[P.consulta] = consulta ? "'" + consulta : "";
+    linha[P.modalidade] = consulta ? modalidade : "";
     aba("Pacientes").appendRow(linha);
-    enviarEmailDeAcesso(nome, email, token, consulta);
+    enviarEmailDeAcesso(nome, email, token, consulta, modalidade);
     return { ok: true, id: id, link: linkDeAcesso(token) };
   } finally {
     lock.releaseLock();
@@ -203,7 +208,7 @@ function reenviarLink(c) {
   const email = texto(c.email, 120).toLowerCase();
   if (!emailValido(email) || !tentativaPermitida("reenviar_" + email, 3)) return { ok: true };
   const p = acharPaciente(function (l) { return String(l[P.email]).toLowerCase() === email; });
-  if (p) enviarEmailDeAcesso(String(p.valores[P.nome]), email, p.valores[P.token], String(p.valores[P.consulta] || ""));
+  if (p) enviarEmailDeAcesso(String(p.valores[P.nome]), email, p.valores[P.token], String(p.valores[P.consulta] || ""), String(p.valores[P.modalidade] || ""));
   return { ok: true };
 }
 
@@ -223,7 +228,7 @@ function portal(c) {
   const ultimaFicha = fichas.filter(function (l) { return l[2] === "Ficha"; }).pop();
   return {
     ok: true,
-    paciente: { nome: String(p.valores[P.nome]), objetivo: String(p.valores[P.objetivo] || ""), cadastro: dataISO(p.valores[P.cadastro]), consulta: String(p.valores[P.consulta] || "") },
+    paciente: { nome: String(p.valores[P.nome]), objetivo: String(p.valores[P.objetivo] || ""), cadastro: dataISO(p.valores[P.cadastro]), consulta: String(p.valores[P.consulta] || ""), modalidade: modalidadeDe(p.valores) },
     ficha: ultimaFicha ? { data: dataISO(ultimaFicha[0]), valores: lerJSON(ultimaFicha[3]) } : null,
     checkins: fichas.filter(function (l) { return l[2] === "Como estou"; }).map(function (l) { return { data: dataISO(l[0]), valores: lerJSON(l[3]) }; }),
     exames: linhasDoPaciente("Exames", 1, id).map(function (l) { return { data: dataISO(l[0]), nome: String(l[3]), descricao: String(l[4] || "") }; }),
@@ -323,7 +328,7 @@ function adminPacientes(c) {
         id: id, nome: String(v[P.nome]), email: String(v[P.email]), celular: String(v[P.celular]),
         nascimento: nascISO(v[P.nascimento]), objetivo: String(v[P.objetivo] || ""), status: String(v[P.status] || "Novo"),
         cadastro: dataISO(v[P.cadastro]), por: String(v[P.por] || ""), ultimoAcesso: dataISO(v[P.acesso]),
-        consulta: String(v[P.consulta] || ""),
+        consulta: String(v[P.consulta] || ""), modalidade: modalidadeDe(v),
         ficha: f.ficha || "", checkins: f.checkins || 0, ultimoCheckin: f.ultimoCheckin || "",
         exames: e.n || 0, ultimoExame: e.ultimo || ""
       };
@@ -343,7 +348,7 @@ function adminPaciente(c) {
       id: id, nome: String(v[P.nome]), email: String(v[P.email]), celular: String(v[P.celular]),
       nascimento: nascISO(v[P.nascimento]), objetivo: String(v[P.objetivo] || ""), status: String(v[P.status] || "Novo"),
       cadastro: dataISO(v[P.cadastro]), por: String(v[P.por] || ""), ultimoAcesso: dataISO(v[P.acesso]),
-      consulta: String(v[P.consulta] || ""),
+      consulta: String(v[P.consulta] || ""), modalidade: modalidadeDe(v),
       consentimento: dataISO(v[P.consentimento]),
       pasta: adm.veSaude ? String(v[P.pasta] || "") : "",
       anotacoes: adm.veSaude ? String(v[P.anotacoes] || "") : "",
@@ -400,9 +405,11 @@ function adminAtualizar(c) {
     }
     if (c.consulta !== undefined) {
       const consulta = texto(c.consulta, 20);
-      if (consulta && !consultaValida(consulta)) return { ok: false, erro: "consulta_invalida" };
+      const modalidade = AGENDA[c.modalidade] ? c.modalidade : "Presencial";
+      if (consulta && !consultaValida(consulta, modalidade)) return { ok: false, erro: "consulta_invalida" };
       if (consulta && horarioOcupado(consulta, p.valores[P.id])) return { ok: false, erro: "horario_ocupado" };
       mudar.push([P.consulta, consulta ? "'" + consulta : ""]);
+      mudar.push([P.modalidade, consulta ? modalidade : ""]);
     }
     if (c.status !== undefined) {
       if (STATUS.indexOf(c.status) < 0) return { ok: false, erro: "dados_invalidos" };
@@ -427,7 +434,7 @@ function adminReenviar(c) {
   const p = acharPaciente(function (l) { return l[P.id] === texto(c.id, 20); });
   if (!p) return { ok: false, erro: "nao_encontrado" };
   if (!tentativaPermitida("reenviar_adm_" + p.valores[P.id], 5)) return { ok: false, erro: "muitas_tentativas" };
-  enviarEmailDeAcesso(String(p.valores[P.nome]), String(p.valores[P.email]), p.valores[P.token], String(p.valores[P.consulta] || ""));
+  enviarEmailDeAcesso(String(p.valores[P.nome]), String(p.valores[P.email]), p.valores[P.token], String(p.valores[P.consulta] || ""), String(p.valores[P.modalidade] || ""));
   return { ok: true };
 }
 
@@ -578,16 +585,17 @@ function linkDeAcesso(token) {
  * E-mail com o link da área do paciente. Escrito como uma mensagem normal do consultório
  * (texto simples, assinatura completa, sem cara de aviso automático) para não cair no spam.
  */
-function enviarEmailDeAcesso(nome, email, token, consulta) {
+function enviarEmailDeAcesso(nome, email, token, consulta, modalidade) {
   const primeiro = String(nome).split(" ")[0];
   const link = linkDeAcesso(token);
-  const quando = consulta && consultaValida(consulta) ? consultaPorExtenso(consulta) : "";
-  const local = "Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro";
+  const online = modalidade === "Online";
+  const quando = consulta && consultaValida(consulta, online ? "Online" : "Presencial") ? consultaPorExtenso(consulta) : "";
+  const local = online ? "Consulta online, por videochamada. O link da chamada chega pelo WhatsApp perto do horário." : "Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro";
   const assinatura = ["Ana Carolina dos Santos Pereira", "Nutricionista · CRN-4 23101599", "Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro", "WhatsApp (21) 96693-7967"];
   const texto =
     "Olá, " + primeiro + "!\n\n" +
     "Seu cadastro no consultório da nutricionista Ana Carolina Pereira está pronto.\n\n" +
-    (quando ? "Sua consulta: " + quando + "\n" + local + "\n\n" : "") +
+    (quando ? "Sua consulta" + (online ? " online" : "") + ": " + quando + "\n" + local + "\n\n" : "") +
     "Pela sua área do paciente você responde a ficha de saúde, envia seus exames e recebe o plano alimentar:\n" + link + "\n\n" +
     "Para entrar, use o mesmo e-mail e celular que você informou na recepção. Guarde este e-mail para entrar outras vezes.\n\n" +
     "Qualquer dúvida, é só responder este e-mail ou chamar no WhatsApp (21) 96693-7967.\n\n" +
@@ -596,7 +604,7 @@ function enviarEmailDeAcesso(nome, email, token, consulta) {
     '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#2c2f26;max-width:560px">' +
     "<p>Olá, " + escHtml(primeiro) + "!</p>" +
     "<p>Seu cadastro no consultório da nutricionista Ana Carolina Pereira está pronto.</p>" +
-    (quando ? '<p style="padding:12px 16px;background:#eef1e3;border-radius:8px"><b>Sua consulta: ' + escHtml(quando) + "</b><br>" + escHtml(local) + "</p>" : "") +
+    (quando ? '<p style="padding:12px 16px;background:#eef1e3;border-radius:8px"><b>Sua consulta' + (online ? " online" : "") + ": " + escHtml(quando) + "</b><br>" + escHtml(local) + "</p>" : "") +
     "<p>Pela sua área do paciente você responde a ficha de saúde, envia seus exames e recebe o plano alimentar:</p>" +
     '<p><a href="' + link + '" style="display:inline-block;background:#5d6e35;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;font-weight:bold">Abrir minha área do paciente</a></p>' +
     "<p>Para entrar, use o mesmo e-mail e celular que você informou na recepção. Guarde este e-mail para entrar outras vezes.</p>" +
@@ -627,12 +635,17 @@ function aba(nome) {
   return sh;
 }
 
-// Consulta no formato "aaaa-mm-dd hh:mm", num dia e horário de atendimento
-function consultaValida(s) {
+// Consulta no formato "aaaa-mm-dd hh:mm", num dia e horário da agenda da modalidade
+function consultaValida(s, modalidade) {
   const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})$/);
-  if (!m) return false;
+  const ag = AGENDA[modalidade];
+  if (!m || !ag) return false;
   const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  return DIAS_ATENDIMENTO.indexOf(d.getDay()) >= 0 && HORARIOS.indexOf(m[4]) >= 0;
+  return ag.dias.indexOf(d.getDay()) >= 0 && ag.horarios.indexOf(m[4]) >= 0;
+}
+function modalidadeDe(v) {
+  if (!v[P.consulta]) return "";
+  return AGENDA[v[P.modalidade]] ? String(v[P.modalidade]) : "Presencial";
 }
 function horarioOcupado(consulta, idDoPaciente) {
   return !!acharPaciente(function (l) { return String(l[P.consulta] || "") === consulta && l[P.id] !== idDoPaciente; });
