@@ -10,6 +10,7 @@ Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro �
 | Agendamento | Guardado, fora do ar (ver abaixo) | Quem quer marcar consulta. Termina no WhatsApp. |
 | Área do paciente | https://carolnutr.github.io/Site-nutri/paciente/ | Pacientes cadastrados na recepção (o link pessoal chega por e-mail). |
 | Painel da equipe | https://carolnutr.github.io/Site-nutri/admin/ | Ana Carolina e recepção. |
+| Política de privacidade | https://carolnutr.github.io/Site-nutri/privacidade/ | Pacientes (link no rodapé e na autorização da área do paciente). |
 
 Enquanto a planilha não estiver ligada (`CONFIG.api` vazio), a área do paciente e o
 painel abrem em modo prévia, com pacientes de exemplo, e nada é salvo.
@@ -35,10 +36,21 @@ e rode `npm run build`. Ele volta no endereço principal.
 No painel, a recepção vê só os dados do cadastro. Ficha, exames, evolução e anotações
 ficam só com a nutricionista (dá para mudar em `RECEPCAO_VE_SAUDE`, no código da planilha).
 
+## Segurança
+
+Toda página gerada em `docs/` sai com estas proteções (montadas em `server.js`):
+
+- **Regra de segurança (CSP):** a página só roda os próprios códigos, conferidos um a um,
+  e só conversa com a planilha (Apps Script) e com as fontes do Google.
+- **Link pessoal protegido:** o endereço com o link do paciente não é repassado a outros sites.
+- **Contra moldura:** o site fica escondido se alguém tentar abrir ele dentro de outro site.
+
+Contato de privacidade (LGPD): nutricarol19@gmail.com e WhatsApp (21) 96693-7967.
+
 ## Pastas
 
 - `src/`: as páginas (é aqui que se mexe).
-  - `agendamento.html`, `paciente.html`, `admin.html`
+  - `agendamento.html`, `paciente.html`, `admin.html`, `privacidade.html`
 - `docs/`: o site pronto, gerado a partir de `src/`. O GitHub Pages publica esta pasta.
 - `apps-script/`: código da planilha e o passo a passo para ligar (`LEIA-ME.md`).
 - `server.js`: servidor para testar no computador e gerar a pasta `docs/`.

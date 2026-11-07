@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-t6OJnhp5LuwFckFRy1BxJNf3bBr0CSIelG/vLlxsM44='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<script>if (window.top !== window.self) { document.documentElement.style.display = 'none'; try { window.top.location = window.location.href; } catch (e) {} }</script>
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#5d6e35">
+
+<title>Política de Privacidade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Como a nutricionista Ana Carolina Pereira cuida dos dados dos pacientes, conforme a LGPD.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: faixa musgo no topo e um texto de leitura numa coluna de ~68 caracteres, com índice no começo. Tema único claro, igual aos outros sites. */
+:root{
+  --bg:#ffffff;
+  --ink:#2c2f26;
+  --muted:#727667;
+  --line:#e0e2d7;
+  --soft:#f5f6f0;
+  --brand:#5d6e35;
+  --on-brand:#ffffff;
+  --accent:#56672f;
+  --font-ui:"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-brand:"Fraunces",Georgia,"Times New Roman",serif;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:17px;line-height:1.65}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+a{color:var(--accent);font-weight:700;text-underline-offset:3px}
+.topo{background:var(--brand);color:var(--on-brand)}
+.topo-in{max-width:1120px;margin:0 auto;padding-block:16px;padding-left:var(--gutter-l);padding-right:var(--gutter-r);display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;font-weight:400}
+.logo-mark{width:42px;height:42px;border-radius:12px;border:2px solid currentColor;display:grid;place-items:center}
+.logo-txt{display:grid;line-height:1.15}
+.logo-nome{font-family:var(--font-brand);font-size:22px;font-weight:600}
+.logo-sub{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.92}
+.wrap{max-width:760px;margin:0 auto;padding-block:40px 72px;padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+.eyebrow{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--font-brand);font-weight:600;font-size:40px;line-height:1.15;margin:6px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.data{margin:0;color:var(--muted);font-size:15px}
+.resumo{margin:28px 0;padding:20px 22px;border-radius:14px;background:var(--soft)}
+.resumo p{margin:0}
+.indice{margin:0 0 8px;padding:18px 22px;border:1px solid var(--line);border-radius:14px}
+.indice h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-family:var(--font-ui);font-weight:800}
+.indice ol{margin:0;padding-left:22px;display:grid;gap:2px}
+.indice a{font-weight:600}
+section{padding-top:28px;scroll-margin-top:16px}
+section h2{font-family:var(--font-brand);font-weight:600;font-size:26px;line-height:1.25;margin:0 0 10px;text-wrap:balance}
+section p,section li{max-width:68ch}
+section ul{padding-left:22px;display:grid;gap:6px}
+.contato{display:grid;gap:4px;padding:16px 20px;border-left:0;border-radius:12px;background:var(--soft)}
+.rodape{border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.rodape-in{max-width:1120px;margin:0 auto;padding-block:22px;padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+@media (max-width:560px){h1{font-size:32px}section h2{font-size:22px}body{font-size:16px}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-in">
+    <a class="logo" href="../paciente/" aria-label="Ana Carolina Pereira, área do paciente">
+      <span class="logo-mark" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 18.5C5.5 10.5 10.5 5 19 5c0 8.5-5.5 13.5-13.5 13.5z"/><path d="M5.5 18.5c2.6-3.6 5.6-6.1 9.2-8.2"/></svg>
+      </span>
+      <span class="logo-txt"><span class="logo-nome">Ana Carolina Pereira</span><span class="logo-sub">Nutricionista</span></span>
+    </a>
+  </div>
+</header>
+
+<main class="wrap">
+  <span class="eyebrow">LGPD · Lei 13.709/2018</span>
+  <h1>Política de privacidade</h1>
+  <p class="data">Atualizada em 7 de novembro de 2026.</p>
+
+  <div class="resumo">
+    <p><b>Em resumo:</b> seus dados de saúde são usados só para o seu acompanhamento nutricional. Eles não são vendidos, não são usados para propaganda e só a nutricionista vê a sua ficha e os seus exames. Você pode pedir para ver, corrigir ou apagar seus dados a qualquer momento.</p>
+  </div>
+
+  <nav class="indice" aria-labelledby="t-indice">
+    <h2 id="t-indice">Nesta página</h2>
+    <ol>
+      <li><a href="#quem">Quem cuida dos seus dados</a></li>
+      <li><a href="#quais">Quais dados guardamos</a></li>
+      <li><a href="#para-que">Para que usamos</a></li>
+      <li><a href="#base">Por que podemos usar (base legal)</a></li>
+      <li><a href="#acesso">Quem tem acesso</a></li>
+      <li><a href="#onde">Onde os dados ficam</a></li>
+      <li><a href="#tempo">Por quanto tempo</a></li>
+      <li><a href="#seguranca">Como protegemos</a></li>
+      <li><a href="#cookies">Cookies e armazenamento no navegador</a></li>
+      <li><a href="#direitos">Seus direitos e como pedir</a></li>
+      <li><a href="#mudancas">Mudanças nesta política</a></li>
+    </ol>
+  </nav>
+
+  <section id="quem">
+    <h2>1. Quem cuida dos seus dados</h2>
+    <p>A responsável pelos seus dados (a "controladora", nos termos da LGPD) é a nutricionista <b>Ana Carolina dos Santos Pereira</b>, CRN-4 23101599, com consultório na Av. Nossa Senhora de Copacabana, 540, sala 1105, Copacabana, Rio de Janeiro – RJ.</p>
+    <div class="contato">
+      <span>Para qualquer assunto sobre os seus dados:</span>
+      <span>E-mail: <a href="mailto:nutricarol19@gmail.com">nutricarol19@gmail.com</a></span>
+      <span>WhatsApp: <a href="https://wa.me/5521966937967" target="_blank" rel="noopener">(21) 96693-7967</a></span>
+    </div>
+  </section>
+
+  <section id="quais">
+    <h2>2. Quais dados guardamos</h2>
+    <ul>
+      <li><b>Cadastro:</b> nome, e-mail, celular e data de nascimento, informados na recepção.</li>
+      <li><b>Consultas:</b> dia, horário e tipo de atendimento (presencial ou online).</li>
+      <li><b>Ficha de saúde:</b> as respostas que você dá na área do paciente, como uso de medicamentos, condições de saúde, peso e altura.</li>
+      <li><b>Exames:</b> os arquivos que você envia (PDF ou foto) e a descrição que você escreve.</li>
+      <li><b>Acompanhamento:</b> os registros de "como você está" (peso, como se sentiu, se seguiu o plano) e os documentos que a nutricionista envia para você, como o plano alimentar.</li>
+      <li><b>Dados de acesso:</b> a data em que você autorizou o uso dos dados e a data do seu último acesso.</li>
+    </ul>
+    <p>Esses são dados pessoais <b>sensíveis</b>, porque falam da sua saúde. Por isso o cuidado com eles é maior.</p>
+  </section>
+
+  <section id="para-que">
+    <h2>3. Para que usamos</h2>
+    <ul>
+      <li>Fazer o seu acompanhamento nutricional e preparar as suas consultas.</li>
+      <li>Marcar, lembrar e remarcar consultas, inclusive com o link da videochamada nas consultas online.</li>
+      <li>Enviar o link de acesso da sua área do paciente e os documentos da nutricionista.</li>
+      <li>Falar com você por e-mail ou WhatsApp sobre o seu atendimento.</li>
+    </ul>
+    <p>Não usamos seus dados para propaganda, não vendemos e não repassamos para outras empresas fazerem publicidade.</p>
+  </section>
+
+  <section id="base">
+    <h2>4. Por que podemos usar (base legal)</h2>
+    <p>Usamos seus dados de saúde com base no seu <b>consentimento</b>, que você dá ao marcar a autorização na área do paciente (art. 11, I, da LGPD), e para a <b>tutela da saúde</b>, em atendimento feito por profissional de saúde (art. 11, II, "f", da LGPD). Você pode retirar o consentimento quando quiser, como explicado na parte 10.</p>
+  </section>
+
+  <section id="acesso">
+    <h2>5. Quem tem acesso</h2>
+    <ul>
+      <li><b>A nutricionista</b> tem acesso a todos os seus dados, para fazer o seu atendimento.</li>
+      <li><b>A recepção</b> vê só os dados do cadastro e da agenda (nome, contato e horário da consulta). A ficha de saúde, os exames e o acompanhamento ficam só com a nutricionista.</li>
+      <li>Ninguém mais tem acesso, a não ser que a lei ou uma ordem judicial exija.</li>
+    </ul>
+  </section>
+
+  <section id="onde">
+    <h2>6. Onde os dados ficam</h2>
+    <p>Os dados ficam guardados na conta Google da nutricionista: Planilhas Google (cadastro, respostas e registros), Google Drive (exames e documentos, numa pasta privada), Gmail (e-mails de acesso), Google Agenda e Google Meet (consultas e videochamadas). Os servidores do Google podem ficar fora do Brasil; o Google segue regras próprias de segurança e de proteção de dados.</p>
+    <p>O site em si fica hospedado no GitHub Pages e <b>não guarda nenhum dado de paciente</b>. As letras do site vêm do Google Fonts, então o seu navegador busca essas fontes nos servidores do Google.</p>
+  </section>
+
+  <section id="tempo">
+    <h2>7. Por quanto tempo</h2>
+    <p>Guardamos seus dados enquanto durar o seu acompanhamento. Depois disso, eles ficam guardados pelo prazo exigido pelas normas do Conselho Federal de Nutricionistas para os registros de atendimento. Passado esse prazo, os dados são apagados.</p>
+  </section>
+
+  <section id="seguranca">
+    <h2>8. Como protegemos</h2>
+    <ul>
+      <li>Cada paciente recebe um link de acesso pessoal e, para entrar, ainda confirma o e-mail e o celular do cadastro.</li>
+      <li>O acesso fica bloqueado por alguns minutos depois de várias tentativas erradas, e a sessão termina sozinha depois de algumas horas.</li>
+      <li>O painel da equipe tem senha, e a senha não fica guardada no código do site.</li>
+      <li>Os exames e documentos ficam numa pasta privada do Google Drive, sem link público.</li>
+      <li>O site só se comunica com a planilha do consultório e não carrega códigos de terceiros, como anúncios ou rastreadores.</li>
+    </ul>
+    <p>Se acontecer algum incidente de segurança que possa afetar você, avisaremos você e a Autoridade Nacional de Proteção de Dados (ANPD), como pede a lei.</p>
+  </section>
+
+  <section id="cookies">
+    <h2>9. Cookies e armazenamento no navegador</h2>
+    <p>O site <b>não usa cookies de rastreamento, de publicidade ou de estatística</b>.</p>
+    <p>A única coisa guardada no seu navegador é a sua sessão de acesso, para você não precisar entrar de novo a cada página. Ela fica só naquela aba e é apagada quando você toca em "Sair" ou fecha o navegador. Isso é necessário para o site funcionar, por isso não pedimos uma autorização separada.</p>
+  </section>
+
+  <section id="direitos">
+    <h2>10. Seus direitos e como pedir</h2>
+    <p>Pela LGPD (art. 18), você pode, a qualquer momento:</p>
+    <ul>
+      <li>confirmar se temos dados seus e pedir uma cópia deles;</li>
+      <li>corrigir dados incompletos ou errados;</li>
+      <li>pedir que seus dados sejam apagados, respeitando o prazo de guarda obrigatória da parte 7;</li>
+      <li>retirar o seu consentimento;</li>
+      <li>saber com quem seus dados são compartilhados.</li>
+    </ul>
+    <p>Para pedir, escreva para <a href="mailto:nutricarol19@gmail.com">nutricarol19@gmail.com</a> ou chame no WhatsApp <a href="https://wa.me/5521966937967" target="_blank" rel="noopener">(21) 96693-7967</a>. Respondemos em até 15 dias. Se não ficar satisfeito, você também pode reclamar na Autoridade Nacional de Proteção de Dados, pelo site <a href="https://www.gov.br/anpd" target="_blank" rel="noopener">gov.br/anpd</a>.</p>
+  </section>
+
+  <section id="mudancas">
+    <h2>11. Mudanças nesta política</h2>
+    <p>Se esta política mudar, a data no topo da página será atualizada. Mudanças importantes serão avisadas na área do paciente.</p>
+  </section>
+</main>
+
+<footer class="rodape">
+  <div class="rodape-in">© 2026 Ana Carolina dos Santos Pereira · Nutricionista · CRN-4 23101599</div>
+</footer>
+</body>
+</html>

@@ -264,6 +264,7 @@ svg{flex:none}
 
 /* Rodapé */
 .rodape{border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.rodape a,.check a{color:var(--accent);font-weight:700}
 .rodape-in{max-width:1120px;margin:0 auto;padding-block:22px;padding-left:var(--gutter-l);padding-right:var(--gutter-r);display:flex;justify-content:space-between;gap:8px 24px;flex-wrap:wrap}
 @media (max-width:899px){body.logado .rodape{display:none}}
 </style>
@@ -292,7 +293,7 @@ svg{flex:none}
 <footer class="rodape">
   <div class="rodape-in">
     <span>© 2026 Ana Carolina dos Santos Pereira · Nutricionista · CRN-4 23101599</span>
-    <span>Seus dados são protegidos pela LGPD</span>
+    <a href="../privacidade/">Política de privacidade</a>
   </div>
 </footer>
 
@@ -562,7 +563,7 @@ svg{flex:none}
         '<p class="q-erro" hidden></p></div>' +
         '<p class="ok-msg" id="reenviado" hidden>Se este e-mail estiver cadastrado, o link chega em alguns minutos. Olhe também a caixa de spam.</p>' +
       "</form>" +
-      '<p class="sigilo">' + I.cadeado + "<span>Suas informações de saúde são sigilosas. Só a nutricionista e a equipe dela têm acesso.</span></p>" +
+      '<p class="sigilo">' + I.cadeado + '<span>Suas informações de saúde são sigilosas. Só a nutricionista e a equipe dela têm acesso. <a href="../privacidade/">Política de privacidade</a></span></p>' +
       '<p class="sigilo">' + I.chat + '<span>Problemas para entrar? <a href="' + linkWhats("Olá! Estou com problema para entrar na área do paciente.") + '" target="_blank" rel="noopener">Fale com a recepção no WhatsApp</a></span></p>' +
       "</div></div>";
   }
@@ -576,7 +577,7 @@ svg{flex:none}
       '<form class="campos" id="form-entrar" novalidate>' +
         '<div class="campo" data-bloco="email"><label class="lbl" for="e-email">E-mail</label><input class="input" id="e-email" type="email" inputmode="email" autocomplete="email" value="' + (previa ? DEMO.email : "") + '"><p class="q-erro" hidden></p></div>' +
         '<div class="campo" data-bloco="celular"><label class="lbl" for="e-cel">Celular</label><div class="phone"><span class="ddi">' + FLAG + ' +55</span><input class="input" id="e-cel" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(21) 99999-9999" value="' + (previa ? mascaraTel(DEMO.celular) : "") + '"></div><p class="q-erro" hidden></p></div>' +
-        '<div class="campo" data-bloco="aceite"><label class="check" for="e-aceite"><input type="checkbox" id="e-aceite"' + (previa ? " checked" : "") + '><span>Autorizo o uso das minhas informações de saúde e dos meus exames somente para o meu acompanhamento nutricional com a nutricionista Ana Carolina Pereira, conforme a LGPD.</span></label><p class="q-erro" hidden></p></div>' +
+        '<div class="campo" data-bloco="aceite"><label class="check" for="e-aceite"><input type="checkbox" id="e-aceite"' + (previa ? " checked" : "") + '><span>Autorizo o uso das minhas informações de saúde e dos meus exames somente para o meu acompanhamento nutricional com a nutricionista Ana Carolina Pereira, conforme a LGPD e a <a href="../privacidade/" target="_blank" rel="noopener">política de privacidade</a>.</span></label><p class="q-erro" hidden></p></div>' +
         '<div id="aviso-entrar"></div>' +
         '<button type="submit" class="btn btn-cheio" id="btn-entrar">Entrar ' + I.seta + "</button>" +
       "</form>" +

@@ -2,6 +2,7 @@
 //   npm start        -> abre em http://localhost:3000 (agendamento), /paciente/ e /admin/
 //   npm run build    -> gera a pasta docs/ (o GitHub Pages publica dela)
 const http = require("http");
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
@@ -16,6 +17,7 @@ const PAGINAS = {
   "/": "agendamento.html",
   "/paciente/": "paciente.html",
   "/admin/": "admin.html",
+  "/privacidade/": "privacidade.html",
 };
 const DADOS = path.join(__dirname, "data", "agendamentos.json");
 // Ícones do site (pasta assets/), copiados para a raiz do site
@@ -32,18 +34,52 @@ function icones(caminho) {
   ].join("\n");
 }
 
+// ---- Proteções do site (entram em todas as páginas geradas) ----
+// Impede que o site seja aberto escondido dentro de outro site (clickjacking).
+const ANTI_MOLDURA = "if (window.top !== window.self) { document.documentElement.style.display = 'none'; try { window.top.location = window.location.href; } catch (e) {} }";
+
+// Regra de segurança (CSP): só roda os códigos do próprio site (conferidos por hash) e só
+// conversa com a planilha (Apps Script) e com as fontes do Google. O link pessoal do
+// paciente não vaza para outros sites (referrer).
+function protecoes(html, { servidor }) {
+  const hashes = [];
+  html.replace(/<script>([\s\S]*?)<\/script>/g, (tudo, codigo) => {
+    hashes.push("'sha256-" + crypto.createHash("sha256").update(codigo, "utf8").digest("base64") + "'");
+    return tudo;
+  });
+  const regras = [
+    "default-src 'self'",
+    "script-src " + (hashes.length ? hashes.join(" ") : "'none'"),
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src https://fonts.gstatic.com",
+    "img-src 'self' data: blob:",
+    "connect-src 'self' https://script.google.com https://script.googleusercontent.com",
+    "object-src 'none'",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "frame-src 'none'",
+  ];
+  if (!servidor) regras.push("upgrade-insecure-requests");
+  return html.replace("<!--protecoes-->", [
+    `<meta http-equiv="Content-Security-Policy" content="${regras.join("; ")}">`,
+    '<meta name="referrer" content="no-referrer">',
+  ].join("\n"));
+}
+
 function montarHtml(arquivo, { servidor, caminho = "/" }) {
   const fonte = fs.readFileSync(path.join(__dirname, "src", arquivo), "utf8");
   const marca = "<!-- corpo -->";
   const i = fonte.indexOf(marca);
   const cabeca = i >= 0 ? fonte.slice(0, i) : "";
   const corpo = i >= 0 ? fonte.slice(i + marca.length) : fonte;
-  return [
+  return protecoes([
     "<!doctype html>",
     '<html lang="pt-BR">',
     "<head>",
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
+    "<!--protecoes-->",
+    `<script>${ANTI_MOLDURA}</script>`,
     icones(caminho),
     servidor ? "<script>window.__NUTRI_SERVER__ = true;</script>" : "",
     cabeca.trim(),
@@ -53,17 +89,18 @@ function montarHtml(arquivo, { servidor, caminho = "/" }) {
     "</body>",
     "</html>",
     "",
-  ].join("\n");
+  ].join("\n"), { servidor });
 }
 
 function paginaQueLevaParaPaciente() {
-  return [
+  return protecoes([
     "<!doctype html>",
     '<html lang="pt-BR">',
     "<head>",
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1">',
     '<meta name="robots" content="noindex">',
+    "<!--protecoes-->",
     '<meta http-equiv="refresh" content="0; url=paciente/">',
     icones("/"),
     "<title>Ana Carolina Pereira · Nutricionista</title>",
@@ -72,7 +109,7 @@ function paginaQueLevaParaPaciente() {
     '<body><p><a href="paciente/">Abrir a área do paciente</a></p></body>',
     "</html>",
     "",
-  ].join("\n");
+  ].join("\n"), { servidor: false });
 }
 
 function lerAgendamentos() {
