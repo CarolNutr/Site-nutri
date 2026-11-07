@@ -1,0 +1,1071 @@
+<title>Área do Paciente</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Área do paciente da nutricionista Ana Carolina Pereira: ficha de saúde, exames e acompanhamento.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: faixa musgo no topo; depois de entrar, menu das seções à esquerda (no celular vira barra fixa embaixo, como app) e a página da seção ao lado. Antes de entrar, um cartão central de acesso. Tema único claro, todo branco. */
+:root{
+  --bg:#ffffff;
+  --ink:#2c2f26;
+  --muted:#727667;
+  --line:#e0e2d7;
+  --soft:#f5f6f0;
+  --brand:#5d6e35;
+  --on-brand:#ffffff;
+  --on-brand-line:rgba(255,255,255,.6);
+  --accent:#56672f;
+  --accent-soft:#eef1e3;
+  --cta:#5d6e35;
+  --cta-hover:#4a5928;
+  --wa:#1f9a52;
+  --wa-hover:#18833f;
+  --error:#d4492f;
+  --error-soft:#fcefeb;
+  --off:#c0c3b4;
+  --font-ui:"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-brand:"Fraunces",Georgia,"Times New Roman",serif;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:16px;line-height:1.5}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+svg{flex:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
+
+/* Topo */
+.topo{background:var(--brand);color:var(--on-brand)}
+.topo-in{max-width:1120px;margin:0 auto;padding-block:16px;padding-left:var(--gutter-l);padding-right:var(--gutter-r);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;min-width:0}
+.logo-mark{width:42px;height:42px;border-radius:12px;border:2px solid currentColor;display:grid;place-items:center}
+.logo-txt{display:grid;line-height:1.15;min-width:0}
+.logo-nome{font-family:var(--font-brand);font-size:22px;font-weight:600;letter-spacing:-.01em}
+.logo-sub{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.92}
+.topo-user{display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--on-brand);color:var(--brand);display:grid;place-items:center;font-weight:800;font-size:14px}
+.topo-nome{font-weight:700}
+.topo-sair{background:none;border:1.5px solid var(--on-brand-line);color:var(--on-brand);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px;cursor:pointer}
+.topo-sair:hover{background:var(--on-brand-line)}
+@media (max-width:560px){.topo-nome{display:none}.logo-nome{font-size:19px}}
+
+/* Estrutura */
+.wrap{max-width:1120px;margin:0 auto;padding-block:32px 64px;padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+.portal{display:grid;gap:32px}
+@media (min-width:900px){.portal{grid-template-columns:232px minmax(0,1fr);gap:56px}}
+.pagina{min-width:0;display:grid;gap:32px;align-content:start;max-width:780px}
+
+/* Menu: lateral no computador, barra embaixo no celular */
+.menu{display:grid;gap:4px;align-content:start}
+.menu-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600}
+.menu-item:hover{background:var(--soft);color:var(--ink)}
+.menu-item[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:800}
+.menu-ico{display:grid;place-items:center;position:relative}
+.ponto{position:absolute;top:-2px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--error);border:2px solid var(--bg)}
+.l-curto{display:none}
+.menu-ajuda{margin-top:20px;padding:16px;border-radius:12px;background:var(--soft);font-size:14px;display:grid;gap:4px}
+.menu-ajuda strong{font-size:15px}
+.menu-ajuda a{color:var(--accent);font-weight:700}
+.ajuda-m{display:none;margin:0;padding:16px 18px;border-radius:12px;background:var(--soft);font-size:15px}
+.ajuda-m a,.sigilo a{color:var(--accent);font-weight:700}
+@media (min-width:900px){.menu{position:sticky;top:24px}}
+@media (max-width:899px){
+  .menu{position:fixed;z-index:30;left:0;right:0;bottom:0;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;background:var(--bg);border-top:1px solid var(--line);padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom, 0px));padding-left:max(4px, env(safe-area-inset-left, 0px));padding-right:max(4px, env(safe-area-inset-right, 0px))}
+  .menu-item{flex-direction:column;gap:2px;padding:4px 2px;font-size:11.5px;line-height:1.2;text-align:center}
+  .menu-item:hover{background:none}
+  .menu-item[aria-current="page"]{background:none}
+  .menu-item .menu-ico{padding:4px 16px;border-radius:999px}
+  .menu-item[aria-current="page"] .menu-ico{background:var(--accent-soft)}
+  .l-longo{display:none}
+  .l-curto{display:block}
+  .menu-ajuda{display:none}
+  .ajuda-m{display:block}
+  body.logado .wrap{padding-bottom:110px}
+}
+
+/* Tipografia das páginas */
+.pag-head{display:grid;gap:8px}
+.eyebrow{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.h1{font-family:var(--font-brand);font-weight:600;font-size:34px;line-height:1.15;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.h1:focus{outline:none}
+.h2{font-size:19px;font-weight:800;margin:0;text-wrap:balance}
+.desc{margin:0;color:var(--muted);font-size:17px;max-width:62ch}
+.bloco{display:grid;gap:14px}
+.bloco-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.chips-info{display:flex;flex-wrap:wrap;gap:8px}
+.chip-info{padding:5px 12px;border-radius:999px;background:var(--soft);font-size:14px;font-weight:600}
+.chip-info b{color:var(--accent)}
+.vazio-txt{margin:0;color:var(--muted);padding:18px 20px;border:1px dashed var(--line);border-radius:12px}
+.nota-previa{margin:0;font-size:14px;color:var(--muted);padding:10px 14px;border:1px dashed var(--line);border-radius:8px}
+@media (max-width:560px){.h1{font-size:28px}.desc{font-size:16px}}
+
+/* Botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:0 24px;border:0;border-radius:6px;background:var(--cta);color:var(--on-brand);font-size:17px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--cta-hover)}
+.btn:disabled{opacity:.6;cursor:progress}
+.btn-cheio{width:100%}
+.btn-sec{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border:1.5px solid var(--brand);border-radius:6px;background:var(--bg);color:var(--accent);font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn-sec:hover{background:var(--accent-soft)}
+.btn-wa{background:var(--wa)}
+.btn-wa:hover{background:var(--wa-hover)}
+.btn-voltar{background:none;border:0;padding:10px 0;color:var(--muted);font-weight:700;cursor:pointer}
+.btn-voltar:hover{color:var(--accent)}
+.link{background:none;border:0;padding:0;color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+
+/* Campos */
+.campos{display:grid;gap:22px}
+.campo{display:grid;gap:8px;min-width:0}
+.lbl{font-weight:700;font-size:16px}
+.input{width:100%;height:48px;border:1px solid var(--line);border-radius:6px;padding:0 14px;background:var(--bg);color:var(--ink);font-size:16px}
+.input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--accent-soft)}
+.input::placeholder{color:var(--off)}
+.area{height:auto;min-height:92px;padding:12px 14px;resize:vertical;line-height:1.5}
+.phone{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg)}
+.phone:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--accent-soft)}
+.phone .input{border:0;border-radius:0;box-shadow:none;flex:1;min-width:0}
+.ddi{display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--soft);border-right:1px solid var(--line);font-weight:700;font-size:15px}
+.is-erro .input,.is-erro .phone,.is-erro .unid{border-color:var(--error)}
+.q-erro{margin:0;color:var(--error);font-size:14px;font-weight:600}
+.q-ajuda{margin:0;font-size:14px;color:var(--muted)}
+.check{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:15px}
+.check input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--brand);flex:none}
+.linha-form{display:flex;gap:10px;flex-wrap:wrap}
+.linha-form .input{flex:1 1 220px;width:auto}
+
+/* Perguntas */
+.perguntas{display:grid}
+.q{display:grid;gap:12px;padding-block:22px;border-top:1px solid var(--line)}
+.q:first-child{border-top:0;padding-top:4px}
+.q-head{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 10px;align-items:baseline}
+.q-num{font-size:14px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.q-txt{font-size:18px;font-weight:700;line-height:1.4}
+.q-txt small{font-weight:400;color:var(--muted);font-size:15px}
+.q-head .q-ajuda{grid-column:2}
+.q-corpo{padding-left:44px;display:grid;gap:10px}
+@media (max-width:560px){.q-corpo{padding-left:0}.q-txt{font-size:17px}}
+.opcoes{display:flex;flex-wrap:wrap;gap:10px}
+.pill{position:relative}
+.pill input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.pill span{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:9px 18px;border:1.5px solid var(--line);border-radius:999px;font-weight:600;background:var(--bg)}
+.pill:hover span{border-color:var(--brand)}
+.pill input[type="radio"]:checked + span{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.pill input[type="checkbox"]:checked + span{background:var(--accent-soft);border-color:var(--brand);color:var(--accent)}
+.pill input[type="checkbox"]:checked + span::before{content:"";width:6px;height:11px;border:solid currentColor;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-2px)}
+.pill input:focus-visible + span{outline:2px solid var(--brand);outline-offset:2px}
+.escala{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:400px}
+.escala .pill span{width:100%;justify-content:center;border-radius:10px;font-size:18px;font-weight:800;padding-inline:0}
+.escala-rot{display:flex;justify-content:space-between;gap:12px;max-width:400px;font-size:13px;color:var(--muted)}
+.unid{display:flex;max-width:200px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.unid:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--accent-soft)}
+.unid .input{border:0;border-radius:0;box-shadow:none;flex:1;min-width:0}
+.unid span{display:grid;place-items:center;padding:0 14px;background:var(--soft);color:var(--muted);font-weight:700;border-left:1px solid var(--line)}
+.medidas{display:flex;flex-wrap:wrap;gap:16px 20px}
+.medida{display:grid;gap:6px}
+.medida .unid{width:180px}
+.detalhe{display:grid;gap:6px;max-width:520px}
+.lbl-det{font-weight:700;font-size:15px}
+.area-curta{min-height:64px}
+.q-nota{margin:0;padding:10px 14px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:15px;max-width:520px}
+
+/* Assistente da ficha */
+.prog{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--brand);border-radius:inherit}
+.wiz-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;color:var(--muted);font-weight:700}
+.barra{position:sticky;bottom:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:14px;padding-bottom:calc(14px + env(safe-area-inset-bottom, 0px));background:var(--bg);border-top:1px solid var(--line)}
+@media (max-width:899px){body.logado .barra{bottom:calc(64px + env(safe-area-inset-bottom, 0px))}}
+.partes{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.partes li{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:10px;background:var(--soft);font-weight:600}
+.partes li span{color:var(--muted);font-weight:400}
+
+/* Revisão */
+.rev{display:grid;gap:12px;padding-top:20px;border-top:1px solid var(--line)}
+.rev:first-child{border-top:0;padding-top:0}
+.rev-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.rev-top h2{font-family:var(--font-brand);font-size:22px;font-weight:600;margin:0}
+.dl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:10px 24px;margin:0}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;font-weight:600;overflow-wrap:anywhere;white-space:pre-line}
+.vazio{color:var(--off);font-weight:400}
+@media (max-width:600px){.dl{grid-template-columns:1fr;gap:2px}.dl dd{margin-bottom:12px}}
+
+/* Início */
+.tarefas{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:14px}
+.tarefa{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:16px 18px}
+.tarefa + .tarefa{border-top:1px solid var(--line)}
+.t-ico{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:var(--brand)}
+.tarefa.is-feito .t-ico{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.tarefa.is-pend .t-ico{border-color:var(--brand);border-style:dashed}
+.t-txt strong{display:block;font-size:17px}
+.t-txt span{color:var(--muted);font-size:15px}
+@media (max-width:560px){.tarefa{grid-template-columns:34px minmax(0,1fr)}.t-acao{grid-column:2;justify-self:start;margin-top:6px}}
+
+/* Documentos e exames */
+.docs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.doc{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:12px}
+.doc-ico{width:44px;height:44px;border-radius:10px;background:var(--accent-soft);color:var(--brand);display:grid;place-items:center;font-size:11px;font-weight:800;letter-spacing:.04em}
+.doc strong{display:block;overflow-wrap:anywhere}
+.meta{font-size:14px;color:var(--muted)}
+.doc-nota{grid-column:2 / -1;margin:0;font-size:14px;color:var(--muted)}
+@media (max-width:480px){.doc{grid-template-columns:44px minmax(0,1fr)}.doc .btn-sec{grid-column:2;justify-self:start}}
+.drop{display:grid;justify-items:center;gap:8px;padding:32px 20px;border:2px dashed var(--line);border-radius:16px;text-align:center;cursor:pointer}
+.drop:hover,.drop.is-over{border-color:var(--brand);background:var(--accent-soft)}
+.drop:focus-within .btn-sec{outline:2px solid var(--brand);outline-offset:2px}
+.drop-ico{width:56px;height:56px;border-radius:50%;background:var(--accent-soft);color:var(--brand);display:grid;place-items:center}
+.drop strong{font-size:18px}
+.drop p{margin:0;color:var(--muted);font-size:14px}
+.arquivos{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.arq{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:8px 14px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+.arq-nome{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arq-x{width:36px;height:36px;border-radius:50%;border:0;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+.arq-x:hover{background:var(--error-soft);color:var(--error)}
+.arq-desc{grid-column:2 / -1;height:42px;font-size:15px}
+.arq-status{grid-column:2 / -1;margin:0;font-size:14px;font-weight:700;color:var(--muted)}
+.arq.is-ok .arq-status{color:var(--accent)}
+.arq.is-erro .arq-status{color:var(--error)}
+@media (max-width:480px){.arq-desc{grid-column:1 / -1}.arq-status{grid-column:1 / -1}}
+
+/* Linha do tempo */
+.tempo{list-style:none;margin:0;padding:0;display:grid}
+.ev{display:grid;grid-template-columns:78px 18px minmax(0,1fr);gap:0 12px;padding-bottom:22px}
+.ev-data{font-size:14px;font-weight:700;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.ev-linha{position:relative;display:flex;justify-content:center}
+.ev-linha::before{content:"";position:absolute;top:8px;bottom:-22px;width:2px;background:var(--line)}
+.ev:last-child .ev-linha::before{display:none}
+.ev-ponto{position:relative;width:14px;height:14px;border-radius:50%;background:var(--bg);border:3px solid var(--brand);margin-top:4px}
+.ev.is-nutri .ev-ponto{background:var(--brand)}
+.ev-txt strong{display:block;font-weight:700}
+.ev-txt span{font-size:14px;color:var(--muted)}
+
+/* Cartões e avisos */
+.cartao{border:1px solid var(--line);border-radius:14px;padding:20px 22px;display:grid;gap:14px}
+.cartao.is-destaque{background:var(--soft);border-color:transparent}
+.aviso{display:grid;gap:10px;padding:14px 16px;border-radius:10px;background:var(--error-soft);border:1px solid var(--error);font-size:15px}
+.aviso p{margin:0}
+.toast{position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom, 0px) + 24px);background:var(--ink);color:var(--on-brand);padding:12px 20px;border-radius:999px;font-weight:700;font-size:15px;max-width:calc(100vw - 32px);text-align:center}
+@media (max-width:899px){body.logado .toast{bottom:calc(env(safe-area-inset-bottom, 0px) + 84px)}}
+
+/* Acesso */
+.acesso{display:grid;justify-items:center;padding-block:16px}
+.acesso-card{width:100%;max-width:480px;display:grid;gap:22px}
+.sigilo{display:flex;gap:10px;align-items:flex-start;margin:0;font-size:14px;color:var(--muted)}
+.ok-msg{margin:0;padding:12px 14px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:15px}
+.carregando{display:grid;justify-items:center;gap:14px;padding-block:80px;color:var(--muted);font-weight:700}
+.roda{width:32px;height:32px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brand);animation:gira .8s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.roda{animation:none}}
+
+/* Rodapé */
+.rodape{border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.rodape-in{max-width:1120px;margin:0 auto;padding-block:22px;padding-left:var(--gutter-l);padding-right:var(--gutter-r);display:flex;justify-content:space-between;gap:8px 24px;flex-wrap:wrap}
+@media (max-width:899px){body.logado .rodape{display:none}}
+</style>
+<!-- corpo -->
+<header class="topo">
+  <div class="topo-in">
+    <a class="logo" href="#inicio" aria-label="Ana Carolina Pereira, área do paciente">
+      <span class="logo-mark" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 18.5C5.5 10.5 10.5 5 19 5c0 8.5-5.5 13.5-13.5 13.5z"/><path d="M5.5 18.5c2.6-3.6 5.6-6.1 9.2-8.2"/></svg>
+      </span>
+      <span class="logo-txt">
+        <span class="logo-nome">Ana Carolina Pereira</span>
+        <span class="logo-sub">Área do paciente</span>
+      </span>
+    </a>
+    <div class="topo-user" id="topo-user" hidden>
+      <span class="avatar" id="avatar" aria-hidden="true"></span>
+      <span class="topo-nome" id="topo-nome"></span>
+      <button type="button" class="topo-sair" data-acao="sair">Sair</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<footer class="rodape">
+  <div class="rodape-in">
+    <span>© 2026 Ana Carolina dos Santos Pereira · Nutricionista · CRN-4 23101599</span>
+    <span>Seus dados são protegidos pela LGPD</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ===== Configuração ===== */
+  var CONFIG = {
+    api: "",                         // link do App da Web do Apps Script (termina em /exec). Vazio = prévia com paciente de exemplo.
+    nomeCurto: "Ana Carolina",
+    whatsapp: "5521966937967",       // DDI + DDD + número
+    maxArquivoMB: 10,
+    maxArquivosPorVez: 10
+  };
+
+  /* ===== Perguntas da ficha (da Ana Carolina) =====
+     tipos: texto, texto-longo, numero, escolha, multi, escala, medidas.
+     Em "escolha": detalhe = campo que aparece quando a resposta é "Sim";
+     notaSe = aviso que aparece para uma resposta. */
+  var SECOES = [
+    { id: "saude", titulo: "Sua saúde", desc: "Marque Sim ou Não e, quando for o caso, conte os detalhes.", perguntas: [
+      { id: "exames", tipo: "escolha", texto: "Possui exames bioquímicos recentes?", opcoes: ["Sim", "Não"], ajuda: "Exames de sangue, como hemograma, glicemia e colesterol.", notaSe: { Sim: "Depois de enviar a ficha, você anexa os exames na parte Meus exames." } },
+      { id: "medicamentos", tipo: "escolha", texto: "Faz uso de algum medicamento?", opcoes: ["Sim", "Não"], detalhe: "Qual(is)?" },
+      { id: "comorbidades", tipo: "escolha", texto: "Possui alguma comorbidade ou condição de saúde?", opcoes: ["Sim", "Não"], detalhe: "Qual(is)?", ajudaDetalhe: "Ex.: diabetes, pressão alta, hipotireoidismo" },
+      { id: "medidas", tipo: "medidas", texto: "Peso e altura atuais", ajuda: "Se não souber o exato, coloque o aproximado.", campos: [
+        { id: "peso", rotulo: "Peso", unidade: "kg", min: 20, max: 400, exemplo: "68,5" },
+        { id: "altura", rotulo: "Altura", unidade: "m", min: 1, max: 2.5, exemplo: "1,65" }
+      ]},
+      { id: "suplementos", tipo: "escolha", texto: "Faz uso de suplementos?", opcoes: ["Sim", "Não"], detalhe: "Quais?" }
+    ]}
+  ];
+  function totalPerguntas() { return SECOES.reduce(function (t, s) { return t + s.perguntas.length; }, 0); }
+
+  var CHECKIN = { id: "checkin", titulo: "Como você está", perguntas: [
+    { id: "peso_hoje", tipo: "numero", texto: "Qual é o seu peso hoje?", unidade: "kg", min: 20, max: 400, exemplo: "68,5", opcional: true },
+    { id: "sentiu", tipo: "escala", texto: "Como você se sentiu nos últimos dias?", rotulos: ["Muito mal", "Muito bem"] },
+    { id: "plano", tipo: "escolha", texto: "Conseguiu seguir o plano alimentar?", opcoes: ["Segui quase tudo", "Segui em parte", "Tive bastante dificuldade", "Ainda não recebi o plano"] },
+    { id: "mudancas", tipo: "texto-longo", texto: "Teve alguma mudança na saúde ou nos remédios?", opcional: true },
+    { id: "recado", tipo: "texto-longo", texto: "Quer contar mais alguma coisa para a nutricionista?", opcional: true }
+  ]};
+
+  /* ===== Paciente de exemplo (só na prévia) ===== */
+  var DEMO = {
+    email: "maria@exemplo.com", celular: "21987654321",
+    paciente: { nome: "Maria Exemplo da Silva", objetivo: "Emagrecimento", cadastro: "2026-10-31" },
+    ficha: null,
+    checkins: [],
+    exames: [{ data: "2026-11-05", nome: "Hemograma completo.pdf", descricao: "Hemograma" }],
+    documentos: [{ id: "d1", data: "2026-11-01", titulo: "Orientações para a primeira consulta", tipo: "Orientações" }]
+  };
+
+  /* ===== Utilidades ===== */
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var reduz = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var reEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function pad2(n) { return String(n).padStart(2, "0"); }
+  function digitos(v) { return String(v || "").replace(/\D/g, ""); }
+  function hojeISO() { var d = new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+  function dataBR(iso) { return iso ? iso.split("-").reverse().join("/") : ""; }
+  function dataCurta(iso) { var p = iso.split("-"); return p[2] + "/" + p[1]; }
+  function tamanho(b) { return b < 1048576 ? Math.max(1, Math.round(b / 1024)) + " KB" : (b / 1048576).toFixed(1).replace(".", ",") + " MB"; }
+  function mascaraTel(v) {
+    var d = digitos(v).slice(0, 11);
+    if (!d.length) return "";
+    if (d.length <= 2) return "(" + d;
+    if (d.length <= 6) return "(" + d.slice(0, 2) + ") " + d.slice(2);
+    if (d.length <= 10) return "(" + d.slice(0, 2) + ") " + d.slice(2, 6) + "-" + d.slice(6);
+    return "(" + d.slice(0, 2) + ") " + d.slice(2, 7) + "-" + d.slice(7);
+  }
+  function esperar(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function linkWhats(t) { return "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(t); }
+
+  var I = {
+    seta: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>',
+    check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+    x: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+    casa: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/></svg>',
+    ficha: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 14h7M8.5 18h4"/></svg>',
+    exame: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14h6"/></svg>',
+    folha: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 18.5C5.5 10.5 10.5 5 19 5c0 8.5-5.5 13.5-13.5 13.5z"/><path d="M5.5 18.5c2.6-3.6 5.6-6.1 9.2-8.2"/></svg>',
+    grafico: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16"/><path d="m5 15 4-4 3 3 6-7"/></svg>',
+    subir: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 16v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg>',
+    cadeado: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>',
+    chat: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.2-4.3A8.5 8.5 0 1 1 20.5 12z"/></svg>'
+  };
+  var FLAG = '<svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><rect width="22" height="16" rx="2" fill="#229e45"/><path d="M11 2.2 19.6 8 11 13.8 2.4 8z" fill="#f8e509"/><circle cx="11" cy="8" r="3.4" fill="#2b49a3"/></svg>';
+
+  var ERROS = {
+    nao_confere: "O e-mail ou o celular não bate com o seu cadastro. Confira os dados ou fale com a recepção.",
+    link_invalido: "Este link de acesso não vale mais. Peça um link novo com o seu e-mail.",
+    muitas_tentativas: "Muitas tentativas seguidas. Espere 10 minutos e tente de novo.",
+    sessao_expirada: "Sua sessão terminou. Abra de novo o link do seu e-mail.",
+    arquivo_grande: "O arquivo passa de " + CONFIG.maxArquivoMB + " MB.",
+    tipo_invalido: "Envie só PDF ou foto (JPG, PNG ou HEIC).",
+    dados_invalidos: "Alguns dados vieram incompletos. Confira e tente de novo.",
+    previa: "Na prévia os documentos são de exemplo. No site de verdade, o arquivo abre aqui.",
+    rede: "Não consegui conectar. Confira a internet e tente de novo.",
+    falha_interna: "Algo deu errado do nosso lado. Tente de novo em instantes."
+  };
+  function msgErro(cod) { return ERROS[cod] || ERROS.falha_interna; }
+
+  /* ===== Estado ===== */
+  var S = { tela: "entrada", token: null, sessao: null, nome: "", P: null, aba: "inicio", wiz: null, novos: [], enviandoExames: false, checkinAberto: false, checkinVals: {}, docAviso: null };
+  var seq = 0;
+  var ABAS = ["inicio", "ficha", "exames", "nutricionista", "acompanhamento"];
+
+  function guardar(chave, valor) { try { if (valor == null) sessionStorage.removeItem(chave); else sessionStorage.setItem(chave, JSON.stringify(valor)); } catch (e) {} }
+  function ler(chave) { try { return JSON.parse(sessionStorage.getItem(chave) || "null"); } catch (e) { return null; } }
+
+  /* ===== Conversa com a planilha (ou com a paciente de exemplo) ===== */
+  function chamar(acao, corpo) {
+    if (!CONFIG.api) return demo(acao, corpo || {});
+    return fetch(CONFIG.api, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ acao: acao }, corpo || {})) })
+      .then(function (r) { return r.json(); })
+      .catch(function () { return { ok: false, erro: "rede" }; });
+  }
+  function demo(acao, c) {
+    var ms = acao === "arquivo" ? 900 : 500;
+    return esperar(ms).then(function () {
+      if (acao === "entrar") {
+        var ok = String(c.email || "").trim().toLowerCase() === DEMO.email && digitos(c.celular) === DEMO.celular;
+        return ok ? { ok: true, sessao: "previa", nome: DEMO.paciente.nome } : { ok: false, erro: "nao_confere" };
+      }
+      if (acao === "reenviarLink") return { ok: true };
+      if (acao === "portal") return { ok: true, paciente: DEMO.paciente, ficha: DEMO.ficha, checkins: DEMO.checkins.slice(), exames: DEMO.exames.slice(), documentos: DEMO.documentos.slice() };
+      if (acao === "ficha") { DEMO.ficha = { data: hojeISO(), valores: c.valores }; return { ok: true, data: hojeISO() }; }
+      if (acao === "checkin") { DEMO.checkins.push({ data: hojeISO(), valores: c.valores }); return { ok: true, data: hojeISO() }; }
+      if (acao === "arquivo") { var ex = { data: hojeISO(), nome: c.nome, descricao: c.descricao }; DEMO.exames.push(ex); return { ok: true, exame: ex }; }
+      if (acao === "documento") return { ok: false, erro: "previa" };
+      return { ok: false, erro: "falha_interna" };
+    });
+  }
+
+  /* ===== Perguntas ===== */
+  function acharQ(id) {
+    var todas = SECOES.concat([CHECKIN]);
+    for (var i = 0; i < todas.length; i++) for (var j = 0; j < todas[i].perguntas.length; j++) if (todas[i].perguntas[j].id === id) return todas[i].perguntas[j];
+    return null;
+  }
+  function numeroInicial(sec) {
+    var n = 1;
+    for (var i = 0; i < SECOES.length; i++) { if (SECOES[i] === sec) return n; n += SECOES[i].perguntas.length; }
+    return 1;
+  }
+  function vazio(v) { return v == null || (Array.isArray(v) ? !v.length : !String(v).trim()); }
+  function fmt(q, vals) {
+    if (q.tipo === "medidas") {
+      return q.campos.filter(function (c) { return !vazio(vals[c.id]); }).map(function (c) { return c.rotulo + ": " + String(vals[c.id]).trim().replace(".", ",") + " " + c.unidade; }).join(" · ");
+    }
+    var v = vals[q.id];
+    if (vazio(v)) return "";
+    if (q.detalhe && v === "Sim") { var det = String(vals[q.id + "__detalhe"] || "").trim(); return det ? "Sim: " + det : "Sim"; }
+    var outro = String(vals[q.id + "__outro"] || "").trim();
+    var nomeOutro = function (x) { return x === "__outro" ? "Outro" + (outro ? ": " + outro : "") : x; };
+    if (q.tipo === "multi") return v.map(nomeOutro).join(", ");
+    if (q.tipo === "escolha") return nomeOutro(v);
+    if (q.tipo === "escala") return v + " de 5";
+    if (q.tipo === "numero") return String(v).trim().replace(".", ",") + (q.unidade ? " " + q.unidade : "");
+    return String(v).trim();
+  }
+  function errosSecao(sec, vals) {
+    var m = {};
+    sec.perguntas.forEach(function (q) {
+      if (q.tipo === "medidas") {
+        q.campos.some(function (c) {
+          var bruto = vals[c.id];
+          if (vazio(bruto)) { if (!q.opcional) m[q.id] = "Preencha o " + c.rotulo.toLowerCase() + " para continuar."; return !q.opcional; }
+          var n = parseFloat(String(bruto).replace(",", "."));
+          if (c.unidade === "m" && n >= 100 && n <= 250) { m[q.id] = "Escreva a altura em metros, por exemplo " + c.exemplo + "."; return true; }
+          if (isNaN(n) || n < c.min || n > c.max) { m[q.id] = "Confira o " + c.rotulo.toLowerCase() + ". Use só algarismos, por exemplo " + c.exemplo + "."; return true; }
+          return false;
+        });
+        return;
+      }
+      var v = vals[q.id];
+      if (q.detalhe && v === "Sim" && !String(vals[q.id + "__detalhe"] || "").trim()) { m[q.id] = "Conte " + q.detalhe.toLowerCase().replace("?", "") + " no campo abaixo."; return; }
+      if (vazio(v)) {
+        if (!q.opcional) m[q.id] = (q.tipo === "escolha" || q.tipo === "multi" || q.tipo === "escala") ? "Escolha uma opção para continuar." : "Responda para continuar.";
+        return;
+      }
+      if (q.tipo === "numero") {
+        var n = parseFloat(String(v).replace(",", "."));
+        if (isNaN(n) || (q.min != null && n < q.min) || (q.max != null && n > q.max)) m[q.id] = "Confira o número. Use só algarismos, por exemplo " + q.exemplo + ".";
+      }
+      if (q.outro && [].concat(v).indexOf("__outro") >= 0 && !String(vals[q.id + "__outro"] || "").trim()) m[q.id] = "Conte qual é no campo abaixo.";
+    });
+    return m;
+  }
+  function respostasPara(secoes, vals) {
+    var out = [];
+    secoes.forEach(function (s) { s.perguntas.forEach(function (q) { var r = fmt(q, vals); if (r) out.push({ secao: s.titulo, pergunta: q.texto, resposta: r }); }); });
+    return out;
+  }
+
+  function htmlPergunta(q, n, vals) {
+    var id = "q-" + q.id, v = vals[q.id], corpo = "";
+    var txt = esc(q.texto) + (q.opcional ? " <small>(opcional)</small>" : "");
+    var simples = q.tipo === "texto" || q.tipo === "texto-longo" || q.tipo === "numero";
+    var rotulo = simples ? '<label class="q-txt" for="' + id + '" id="' + id + '-l">' + txt + "</label>" : '<span class="q-txt" id="' + id + '-l">' + txt + "</span>";
+    if (q.tipo === "texto") {
+      corpo = '<input class="input" id="' + id + '" data-q="' + q.id + '" value="' + esc(v || "") + '"' + (q.placeholder ? ' placeholder="' + esc(q.placeholder) + '"' : "") + ">";
+    } else if (q.tipo === "texto-longo") {
+      corpo = '<textarea class="input area" id="' + id + '" data-q="' + q.id + '" rows="3">' + esc(v || "") + "</textarea>";
+    } else if (q.tipo === "numero") {
+      corpo = '<div class="unid"><input class="input" id="' + id + '" data-q="' + q.id + '" inputmode="decimal" autocomplete="off" value="' + esc(v || "") + '" placeholder="' + esc(q.exemplo || "") + '"><span>' + esc(q.unidade || "") + "</span></div>";
+    } else if (q.tipo === "escolha" || q.tipo === "multi") {
+      var multi = q.tipo === "multi";
+      var ops = q.opcoes.slice();
+      if (q.outro) ops.push("__outro");
+      if (q.exclusiva) ops.push(q.exclusiva);
+      var marcados = [].concat(v || []);
+      corpo = '<div class="opcoes" role="' + (multi ? "group" : "radiogroup") + '" aria-labelledby="' + id + '-l">' + ops.map(function (o, i) {
+        return '<label class="pill"><input type="' + (multi ? "checkbox" : "radio") + '" name="' + id + '" id="' + id + "-" + i + '" value="' + esc(o) + '" data-q="' + q.id + '"' + (marcados.indexOf(o) >= 0 ? " checked" : "") + "><span>" + (o === "__outro" ? "Outro" : esc(o)) + "</span></label>";
+      }).join("") + "</div>";
+      if (q.outro) corpo += '<input class="input" id="' + id + '-outro" data-q-outro="' + q.id + '" placeholder="Qual?" aria-label="' + esc(q.texto) + ' Qual?" value="' + esc(vals[q.id + "__outro"] || "") + '"' + (marcados.indexOf("__outro") >= 0 ? "" : " hidden") + ">";
+      if (q.detalhe) corpo += '<div class="detalhe" id="' + id + '-det"' + (v === "Sim" ? "" : " hidden") + '><label class="lbl-det" for="' + id + '-detalhe">' + esc(q.detalhe) + '</label><textarea class="input area area-curta" id="' + id + '-detalhe" data-q-detalhe="' + q.id + '" rows="2"' + (q.ajudaDetalhe ? ' placeholder="' + esc(q.ajudaDetalhe) + '"' : "") + ">" + esc(vals[q.id + "__detalhe"] || "") + "</textarea></div>";
+      if (q.notaSe) Object.keys(q.notaSe).forEach(function (op) { corpo += '<p class="q-nota" data-nota="' + q.id + '" data-se="' + esc(op) + '"' + (v === op ? "" : " hidden") + ">" + esc(q.notaSe[op]) + "</p>"; });
+    } else if (q.tipo === "medidas") {
+      corpo = '<div class="medidas">' + q.campos.map(function (c) {
+        return '<div class="medida"><label class="lbl-det" for="q-' + c.id + '">' + esc(c.rotulo) + '</label><div class="unid"><input class="input" id="q-' + c.id + '" data-q="' + c.id + '" data-medida="' + q.id + '" inputmode="decimal" autocomplete="off" value="' + esc(vals[c.id] || "") + '" placeholder="' + esc(c.exemplo) + '"><span>' + esc(c.unidade) + "</span></div></div>";
+      }).join("") + "</div>";
+    } else if (q.tipo === "escala") {
+      corpo = '<div class="escala" role="radiogroup" aria-labelledby="' + id + '-l">' + [1, 2, 3, 4, 5].map(function (k) {
+        return '<label class="pill"><input type="radio" name="' + id + '" value="' + k + '" data-q="' + q.id + '"' + (String(v) === String(k) ? " checked" : "") + ' aria-label="' + k + " de 5" + (k === 1 ? ", " + esc(q.rotulos[0]) : k === 5 ? ", " + esc(q.rotulos[1]) : "") + '"><span>' + k + "</span></label>";
+      }).join("") + '</div><div class="escala-rot" aria-hidden="true"><span>1 · ' + esc(q.rotulos[0]) + "</span><span>5 · " + esc(q.rotulos[1]) + "</span></div>";
+    }
+    return '<div class="q" data-bloco="' + q.id + '"><div class="q-head"><span class="q-num">' + pad2(n) + "</span>" + rotulo + (q.ajuda ? '<p class="q-ajuda">' + esc(q.ajuda) + "</p>" : "") + '</div><div class="q-corpo">' + corpo + '<p class="q-erro" hidden></p></div></div>';
+  }
+
+  function mostrarErros(m, raiz) {
+    var primeiro = null;
+    $$(".is-erro", raiz).forEach(function (b) { b.classList.remove("is-erro"); var p = $(".q-erro", b); if (p) p.hidden = true; });
+    Object.keys(m).forEach(function (k) {
+      var b = $('[data-bloco="' + k + '"]', raiz);
+      if (!b) return;
+      b.classList.add("is-erro");
+      var p = $(".q-erro", b); p.textContent = m[k]; p.hidden = false;
+      if (!primeiro) primeiro = b;
+    });
+    if (!primeiro) return true;
+    primeiro.scrollIntoView({ block: "center", behavior: reduz ? "auto" : "smooth" });
+    var f = $("input:not([hidden]), textarea", primeiro);
+    if (f) f.focus({ preventScroll: true });
+    return false;
+  }
+  function limparErro(k, raiz) {
+    var b = $('[data-bloco="' + k + '"]', raiz || document);
+    if (!b || !b.classList.contains("is-erro")) return;
+    b.classList.remove("is-erro");
+    $(".q-erro", b).hidden = true;
+  }
+
+  /* ===== Telas de acesso ===== */
+  function htmlEntrada() {
+    return '<div class="acesso"><div class="acesso-card">' +
+      '<header class="pag-head"><span class="eyebrow">Área do paciente</span><h1 class="h1" tabindex="-1">Entre pelo link do seu e-mail</h1>' +
+      '<p class="desc">Depois do seu cadastro na recepção, você recebe um e-mail com o seu link de acesso. É só abrir o e-mail e tocar em "Acessar minha área".</p></header>' +
+      (S.msgEntrada ? '<div class="aviso"><p>' + esc(S.msgEntrada) + "</p></div>" : "") +
+      '<form class="cartao is-destaque" id="form-reenviar" novalidate>' +
+        '<div class="campo" data-bloco="email"><label class="lbl" for="r-email">Não achou o e-mail? Digite o seu e-mail e mandamos o link de novo.</label>' +
+        '<div class="linha-form"><input class="input" id="r-email" type="email" inputmode="email" autocomplete="email" placeholder="seu@email.com"><button type="submit" class="btn">Enviar link</button></div>' +
+        '<p class="q-erro" hidden></p></div>' +
+        '<p class="ok-msg" id="reenviado" hidden>Se este e-mail estiver cadastrado, o link chega em alguns minutos. Olhe também a caixa de spam.</p>' +
+      "</form>" +
+      '<p class="sigilo">' + I.cadeado + "<span>Suas informações de saúde são sigilosas. Só a nutricionista e a equipe dela têm acesso.</span></p>" +
+      '<p class="sigilo">' + I.chat + '<span>Problemas para entrar? <a href="' + linkWhats("Olá! Estou com problema para entrar na área do paciente.") + '" target="_blank" rel="noopener">Fale com a recepção no WhatsApp</a></span></p>' +
+      "</div></div>";
+  }
+
+  function htmlConfirmar() {
+    var previa = !CONFIG.api;
+    return '<div class="acesso"><div class="acesso-card">' +
+      '<header class="pag-head"><span class="eyebrow">Área do paciente</span><h1 class="h1" tabindex="-1">Confirme seus dados</h1>' +
+      '<p class="desc">Para sua segurança, digite o e-mail e o celular que você informou na recepção.</p></header>' +
+      (previa ? '<p class="nota-previa">Prévia: esta é a tela que abre pelo link do e-mail. Já deixamos tudo preenchido com a paciente de exemplo. É só tocar em Entrar.</p>' : "") +
+      '<form class="campos" id="form-entrar" novalidate>' +
+        '<div class="campo" data-bloco="email"><label class="lbl" for="e-email">E-mail</label><input class="input" id="e-email" type="email" inputmode="email" autocomplete="email" value="' + (previa ? DEMO.email : "") + '"><p class="q-erro" hidden></p></div>' +
+        '<div class="campo" data-bloco="celular"><label class="lbl" for="e-cel">Celular</label><div class="phone"><span class="ddi">' + FLAG + ' +55</span><input class="input" id="e-cel" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(21) 99999-9999" value="' + (previa ? mascaraTel(DEMO.celular) : "") + '"></div><p class="q-erro" hidden></p></div>' +
+        '<div class="campo" data-bloco="aceite"><label class="check" for="e-aceite"><input type="checkbox" id="e-aceite"' + (previa ? " checked" : "") + '><span>Autorizo o uso das minhas informações de saúde e dos meus exames somente para o meu acompanhamento nutricional com a nutricionista Ana Carolina Pereira, conforme a LGPD.</span></label><p class="q-erro" hidden></p></div>' +
+        '<div id="aviso-entrar"></div>' +
+        '<button type="submit" class="btn btn-cheio" id="btn-entrar">Entrar ' + I.seta + "</button>" +
+      "</form>" +
+      '<p class="sigilo">' + I.cadeado + "<span>Seu acesso é pessoal. Não encaminhe o e-mail com o link para outras pessoas.</span></p>" +
+      '<p class="sigilo">' + I.chat + '<span>Problemas para entrar? <a href="' + linkWhats("Olá! Estou com problema para entrar na área do paciente.") + '" target="_blank" rel="noopener">Fale com a recepção no WhatsApp</a></span></p>' +
+      "</div></div>";
+  }
+
+  function entrar() {
+    var form = $("#form-entrar");
+    var email = $("#e-email").value.trim(), cel = digitos($("#e-cel").value), m = {};
+    if (!email) m.email = "Digite o seu e-mail.";
+    else if (!reEmail.test(email)) m.email = "Confira o e-mail. Ele deve ficar assim: nome@exemplo.com";
+    if (!cel) m.celular = "Digite o seu celular.";
+    else if (cel.length < 10) m.celular = "Digite o celular com DDD, por exemplo (21) 99999-9999.";
+    if (!$("#e-aceite").checked) m.aceite = "Marque a autorização para continuar.";
+    $("#aviso-entrar").innerHTML = "";
+    if (!mostrarErros(m, form)) return;
+    var b = $("#btn-entrar"); b.disabled = true; b.textContent = "Entrando…";
+    chamar("entrar", { token: S.token, email: email, celular: cel, consentimento: true }).then(function (r) {
+      if (!r.ok) {
+        b.disabled = false; b.innerHTML = "Entrar " + I.seta;
+        var extra = r.erro === "link_invalido" ? ' <button type="button" class="link" data-acao="pedir-link">Pedir link novo</button>' : "";
+        $("#aviso-entrar").innerHTML = '<div class="aviso" role="alert"><p>' + esc(msgErro(r.erro)) + extra + "</p></div>";
+        return;
+      }
+      S.sessao = r.sessao; S.nome = r.nome;
+      guardar("nutri:sessao", { sessao: S.sessao, nome: S.nome });
+      carregarPortal();
+    });
+  }
+
+  function reenviar() {
+    var form = $("#form-reenviar"), email = $("#r-email").value.trim(), m = {};
+    if (!email) m.email = "Digite o seu e-mail.";
+    else if (!reEmail.test(email)) m.email = "Confira o e-mail. Ele deve ficar assim: nome@exemplo.com";
+    if (!mostrarErros(m, form)) return;
+    var b = $("button[type=submit]", form); b.disabled = true;
+    chamar("reenviarLink", { email: email }).then(function () {
+      b.disabled = false;
+      $("#reenviado").hidden = false;
+    });
+  }
+
+  /* ===== Portal ===== */
+  function carregarPortal() {
+    S.tela = "carregando"; render();
+    chamar("portal", { sessao: S.sessao }).then(function (r) {
+      if (!r.ok) {
+        if (r.erro === "sessao_expirada") { sair(msgErro("sessao_expirada")); return; }
+        S.tela = "erro"; S.erroMsg = msgErro(r.erro); render(); return;
+      }
+      S.P = { paciente: r.paciente, ficha: r.ficha || null, checkins: r.checkins || [], exames: r.exames || [], documentos: r.documentos || [] };
+      S.tela = "portal";
+      S.aba = abaDoHash();
+      render();
+    });
+  }
+  function sair(msg) {
+    guardar("nutri:sessao", null);
+    S.sessao = null; S.P = null; S.wiz = null; S.novos = []; S.checkinAberto = false; S.checkinVals = {};
+    S.msgEntrada = msg || "";
+    S.tela = S.token ? "confirmar" : "entrada";
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+    render();
+  }
+  function abaDoHash() { var h = location.hash.replace("#", ""); return ABAS.indexOf(h) >= 0 ? h : "inicio"; }
+
+  function htmlMenu() {
+    var P = S.P;
+    var itens = [
+      ["inicio", I.casa, "Início", "Início", false],
+      ["ficha", I.ficha, "Ficha de saúde", "Ficha", !P.ficha],
+      ["exames", I.exame, "Meus exames", "Exames", false],
+      ["nutricionista", I.folha, "Da nutricionista", "Da nutri", false],
+      ["acompanhamento", I.grafico, "Acompanhamento", "Evolução", false]
+    ];
+    return '<nav class="menu" aria-label="Seções da área do paciente">' + itens.map(function (it) {
+      return '<a class="menu-item" href="#' + it[0] + '"' + (S.aba === it[0] ? ' aria-current="page"' : "") + '><span class="menu-ico">' + it[1] + (it[4] ? '<i class="ponto" aria-label="pendente"></i>' : "") + '</span><span class="l-longo">' + it[2] + '</span><span class="l-curto">' + it[3] + "</span></a>";
+    }).join("") +
+    '<div class="menu-ajuda"><strong>Precisa de ajuda?</strong><span>Fale com a equipe da ' + esc(CONFIG.nomeCurto) + '.</span><a href="' + linkWhats("Olá! Sou paciente e preciso de ajuda com a área do paciente.") + '" target="_blank" rel="noopener">Chamar no WhatsApp</a></div></nav>';
+  }
+
+  function renderPagina() {
+    var pg = $("#pagina");
+    if (!pg) return;
+    var h = { inicio: htmlInicio, ficha: htmlFicha, exames: htmlExames, nutricionista: htmlNutri, acompanhamento: htmlAcomp }[S.aba]();
+    pg.innerHTML = h;
+    var menu = $(".menu");
+    if (menu) menu.outerHTML = htmlMenu();
+    if (S.aba === "exames") ligarExames();
+    var t = $("#pagina .h1");
+    if (t) t.focus({ preventScroll: true });
+  }
+
+  /* Início */
+  function primeiroNome() { return (S.P.paciente.nome || "").trim().split(" ")[0]; }
+  function htmlInicio() {
+    var P = S.P, fichaOk = !!P.ficha, nEx = P.exames.length;
+    var tarefas = [
+      { cls: fichaOk ? "is-feito" : "is-pend", ico: fichaOk ? I.check : "", t: "Ficha de saúde", d: fichaOk ? "Respondida em " + dataBR(P.ficha.data) + ". Se algo mudou, você pode atualizar." : "São " + totalPerguntas() + " perguntas rápidas sobre a sua saúde.", a: fichaOk ? "Ver respostas" : "Responder agora", h: "#ficha" },
+      { cls: nEx ? "is-feito" : "is-pend", ico: nEx ? I.check : "", t: "Exames", d: nEx ? nEx + (nEx === 1 ? " exame enviado" : " exames enviados") + ". Fez outros? Envie também." : "Envie seus exames de sangue e outros que a nutricionista pediu.", a: nEx ? "Enviar mais" : "Enviar exames", h: "#exames" },
+      { cls: "", ico: I.grafico, t: "Como você está", d: P.checkins.length ? "Último registro em " + dataBR(P.checkins[P.checkins.length - 1].data) + ". Conte como foram os últimos dias." : "Conte como foram os últimos dias. A nutricionista acompanha por aqui.", a: "Contar", h: "#acompanhamento" }
+    ];
+    var docs = P.documentos.slice().sort(function (a, b) { return b.data < a.data ? -1 : 1; }).slice(0, 2);
+    var evs = linhaDoTempo().slice(0, 3);
+    return '<header class="pag-head"><span class="eyebrow">Área do paciente</span><h1 class="h1" tabindex="-1">Olá, ' + esc(primeiroNome()) + "</h1>" +
+      '<div class="chips-info">' + (P.paciente.objetivo ? '<span class="chip-info">Objetivo: <b>' + esc(P.paciente.objetivo) + "</b></span>" : "") + '<span class="chip-info">Paciente desde ' + dataBR(P.paciente.cadastro) + "</span></div></header>" +
+      (!CONFIG.api ? '<p class="nota-previa">Prévia com a paciente de exemplo. Pode testar à vontade: nada é enviado de verdade.</p>' : "") +
+      '<section class="bloco"><h2 class="h2">Para fazer</h2><ul class="tarefas">' + tarefas.map(function (t) {
+        return '<li class="tarefa ' + t.cls + '"><span class="t-ico">' + t.ico + '</span><div class="t-txt"><strong>' + t.t + "</strong><span>" + esc(t.d) + '</span></div><a class="btn-sec t-acao" href="' + t.h + '">' + t.a + "</a></li>";
+      }).join("") + "</ul></section>" +
+      '<section class="bloco"><div class="bloco-top"><h2 class="h2">Da nutricionista</h2><a class="link" href="#nutricionista">Ver tudo</a></div>' + (docs.length ? htmlDocs(docs) : '<p class="vazio-txt">Quando a ' + esc(CONFIG.nomeCurto) + " enviar seu plano alimentar ou orientações, eles aparecem aqui.</p>") + "</section>" +
+      '<section class="bloco"><div class="bloco-top"><h2 class="h2">Últimas atualizações</h2><a class="link" href="#acompanhamento">Ver acompanhamento</a></div>' + htmlTempo(evs) + "</section>" +
+      '<p class="ajuda-m">Precisa de ajuda? <a href="' + linkWhats("Olá! Sou paciente e preciso de ajuda com a área do paciente.") + '" target="_blank" rel="noopener">Chamar no WhatsApp</a></p>';
+  }
+
+  /* Ficha de saúde */
+  function htmlFicha() {
+    var P = S.P;
+    if (S.wiz) return htmlWiz();
+    if (P.ficha) {
+      return '<header class="pag-head"><span class="eyebrow">Ficha de saúde</span><h1 class="h1" tabindex="-1">Suas respostas</h1><p class="desc">Respondida em ' + dataBR(P.ficha.data) + ". Se algo mudou na sua saúde ou na rotina, atualize para a nutricionista saber.</p></header>" +
+        (P.ficha.valores && P.ficha.valores.exames === "Sim" && !P.exames.length ? '<section class="cartao is-destaque"><h2 class="h2">Anexe seus exames</h2><p class="q-ajuda" style="font-size:15px">Você disse que tem exames bioquímicos recentes. Anexe para a ' + esc(CONFIG.nomeCurto) + ' ver antes da consulta.</p><div><a class="btn" href="#exames">Anexar exames</a></div></section>' : "") +
+        '<div><button type="button" class="btn-sec" data-acao="ficha-editar">Atualizar minhas respostas</button></div>' +
+        SECOES.map(function (s) { return htmlRevSecao(s, P.ficha.valores, null); }).join("");
+    }
+    return '<header class="pag-head"><span class="eyebrow">Ficha de saúde</span><h1 class="h1" tabindex="-1">Conte um pouco sobre você</h1><p class="desc">São só ' + totalPerguntas() + " perguntas rápidas. Com elas a " + esc(CONFIG.nomeCurto) + " chega na consulta já sabendo o principal sobre a sua saúde. Depois você pode alterar as respostas.</p></header>" +
+      (SECOES.length > 1 ? '<ul class="partes">' + SECOES.map(function (s) { return "<li>" + esc(s.titulo) + "<span>" + s.perguntas.length + " perguntas</span></li>"; }).join("") + "</ul>" : "") +
+      '<div><button type="button" class="btn" data-acao="ficha-comecar">Começar a ficha ' + I.seta + "</button></div>";
+  }
+  function htmlWiz() {
+    var w = S.wiz, total = SECOES.length, rev = w.passo === total;
+    var pct = Math.round(((w.passo + (rev ? 0 : 0.5)) / total) * 100);
+    var topo = '<div class="wiz-top"><button type="button" class="btn-voltar" data-acao="wiz-sair">‹ Sair da ficha</button><span>' + (rev ? "Revisão" : total > 1 ? "Parte " + (w.passo + 1) + " de " + total : "Ficha de saúde") + '</span></div><div class="prog" aria-hidden="true"><i style="width:' + pct + '%"></i></div>';
+    if (rev) {
+      return topo + '<header class="pag-head"><h1 class="h1" tabindex="-1">Confira antes de enviar</h1><p class="desc">Se algo estiver errado, toque em Alterar.</p></header>' +
+        SECOES.map(function (s, k) { return htmlRevSecao(s, w.valores, k); }).join("") +
+        '<div id="aviso-ficha"></div>' +
+        '<div class="barra"><button type="button" class="btn-voltar" data-acao="wiz-voltar">‹ Voltar</button><button type="button" class="btn" data-acao="wiz-enviar" id="btn-ficha">Enviar ficha ' + I.seta + "</button></div>";
+    }
+    var s = SECOES[w.passo], n0 = numeroInicial(s);
+    return topo + '<header class="pag-head"><h1 class="h1" tabindex="-1">' + esc(s.titulo) + '</h1><p class="desc">' + esc(s.desc) + "</p></header>" +
+      '<div class="perguntas" data-form="wiz">' + s.perguntas.map(function (q, i) { return htmlPergunta(q, n0 + i, w.valores); }).join("") + "</div>" +
+      '<div class="barra"><button type="button" class="btn-voltar" data-acao="wiz-voltar">‹ ' + (w.passo ? "Voltar" : "Sair") + '</button><button type="button" class="btn" data-acao="wiz-avancar">' + (w.passo === total - 1 ? "Revisar" : "Continuar") + " " + I.seta + "</button></div>";
+  }
+  function htmlRevSecao(s, vals, k) {
+    return '<section class="rev"><div class="rev-top"><h2>' + esc(s.titulo) + "</h2>" + (k != null ? '<button type="button" class="link" data-acao="wiz-ir" data-passo="' + k + '">Alterar</button>' : "") + '</div><dl class="dl">' +
+      s.perguntas.map(function (q) { var r = fmt(q, vals); return "<dt>" + esc(q.texto) + "</dt><dd>" + (r ? esc(r) : '<span class="vazio">Não respondida</span>') + "</dd>"; }).join("") + "</dl></section>";
+  }
+  function wizIr(passo) {
+    S.wiz.passo = passo;
+    renderPagina();
+    var t = $("#pagina");
+    if (t) { var top = t.getBoundingClientRect().top + window.scrollY - 16; if (window.scrollY > top) window.scrollTo({ top: top, behavior: reduz ? "auto" : "smooth" }); }
+  }
+  function wizAvancar() {
+    var s = SECOES[S.wiz.passo];
+    if (!mostrarErros(errosSecao(s, S.wiz.valores), $("#pagina"))) return;
+    wizIr(S.wiz.passo + 1);
+  }
+  function wizEnviar() {
+    for (var k = 0; k < SECOES.length; k++) {
+      if (Object.keys(errosSecao(SECOES[k], S.wiz.valores)).length) { wizIr(k); mostrarErros(errosSecao(SECOES[k], S.wiz.valores), $("#pagina")); return; }
+    }
+    var b = $("#btn-ficha"); b.disabled = true; b.textContent = "Enviando…";
+    var vals = S.wiz.valores;
+    chamar("ficha", { sessao: S.sessao, valores: vals, respostas: respostasPara(SECOES, vals) }).then(function (r) {
+      if (!r.ok) {
+        if (r.erro === "sessao_expirada") return sair(msgErro(r.erro));
+        b.disabled = false; b.innerHTML = "Enviar ficha " + I.seta;
+        $("#aviso-ficha").innerHTML = '<div class="aviso" role="alert"><p>' + esc(msgErro(r.erro)) + "</p></div>";
+        return;
+      }
+      S.P.ficha = { data: r.data || hojeISO(), valores: vals };
+      S.wiz = null;
+      renderPagina();
+      window.scrollTo({ top: 0, behavior: reduz ? "auto" : "smooth" });
+      toast(vals.exames === "Sim" && !S.P.exames.length ? "Ficha enviada. Agora anexe seus exames." : "Ficha enviada. Obrigada!");
+    });
+  }
+
+  /* Exames */
+  var TIPOS_OK = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+  function tipoDoArquivo(f) {
+    var t = (f.type || "").toLowerCase();
+    if (!t) { if (/\.pdf$/i.test(f.name)) t = "application/pdf"; else if (/\.hei[cf]$/i.test(f.name)) t = "image/heic"; }
+    return t;
+  }
+  function htmlExames() {
+    var P = S.P;
+    var enviados = P.exames.slice().reverse();
+    return '<header class="pag-head"><span class="eyebrow">Meus exames</span><h1 class="h1" tabindex="-1">Envie seus exames</h1><p class="desc">Exames de sangue, bioimpedância ou qualquer outro que a nutricionista pediu. Pode ser PDF ou foto bem nítida.</p></header>' +
+      '<div class="bloco">' +
+        '<div class="drop" id="drop"><span class="drop-ico">' + I.subir + '</span><strong>Arraste seus exames para cá</strong><p>ou</p>' +
+        '<label class="btn-sec" for="arq-input">Escolher arquivos</label><input type="file" id="arq-input" class="sr-only" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.pdf,.heic" multiple>' +
+        "<p>PDF ou foto · até " + CONFIG.maxArquivoMB + " MB cada</p></div>" +
+        '<p class="q-erro" id="err-arq" hidden></p>' +
+        '<ul class="arquivos" id="novos">' + htmlNovos() + "</ul>" +
+        '<div id="acao-envio">' + htmlAcaoEnvio() + "</div>" +
+      "</div>" +
+      '<section class="bloco"><h2 class="h2">Já enviados</h2>' + (enviados.length ? '<ul class="docs">' + enviados.map(function (e) {
+        var ext = /\.pdf$/i.test(e.nome) ? "PDF" : "FOTO";
+        return '<li class="doc"><span class="doc-ico" aria-hidden="true">' + ext + '</span><div><strong>' + esc(e.descricao || e.nome) + '</strong><span class="meta">' + (e.descricao ? esc(e.nome) + " · " : "") + "Enviado em " + dataBR(e.data) + "</span></div></li>";
+      }).join("") + "</ul>" : '<p class="vazio-txt">Nenhum exame enviado ainda.</p>') + "</section>";
+  }
+  function htmlNovos() {
+    return S.novos.map(function (a) {
+      var ext = a.tipo === "application/pdf" ? "PDF" : "FOTO";
+      var st = a.estado === "indo" ? "Enviando…" : a.estado === "ok" ? "Enviado" : a.estado === "erro" ? a.msg : "";
+      return '<li class="arq' + (a.estado ? " is-" + a.estado : "") + '"><span class="doc-ico" aria-hidden="true">' + ext + '</span><div style="min-width:0"><span class="arq-nome">' + esc(a.nome) + '</span><span class="meta">' + tamanho(a.tamanho) + "</span></div>" +
+        (a.estado === "indo" ? "<span></span>" : '<button type="button" class="arq-x" data-acao="remover" data-id="' + a.id + '" aria-label="Remover ' + esc(a.nome) + '">' + I.x + "</button>") +
+        '<input class="input arq-desc" data-arq-desc="' + a.id + '" value="' + esc(a.descricao) + '" placeholder="Que exame é este? Ex.: hemograma, glicemia" aria-label="Que exame é ' + esc(a.nome) + '?"' + (a.estado === "indo" ? " disabled" : "") + ">" +
+        (st ? '<p class="arq-status" role="status">' + esc(st) + "</p>" : "") + "</li>";
+    }).join("");
+  }
+  function htmlAcaoEnvio() {
+    var n = S.novos.filter(function (a) { return a.estado !== "ok"; }).length;
+    if (!n) return "";
+    return '<button type="button" class="btn" data-acao="enviar-exames"' + (S.enviandoExames ? " disabled" : "") + ">" + (S.enviandoExames ? "Enviando…" : "Enviar " + (n === 1 ? "1 exame" : n + " exames")) + "</button>";
+  }
+  function atualizarNovos() { var u = $("#novos"); if (u) u.innerHTML = htmlNovos(); var a = $("#acao-envio"); if (a) a.innerHTML = htmlAcaoEnvio(); }
+  function adicionarArquivos(lista) {
+    var erros = [];
+    Array.prototype.forEach.call(lista, function (f) {
+      var t = tipoDoArquivo(f);
+      if (S.novos.length >= CONFIG.maxArquivosPorVez) { erros.push("Envie no máximo " + CONFIG.maxArquivosPorVez + " arquivos de cada vez."); return; }
+      if (TIPOS_OK.indexOf(t) < 0) { erros.push(f.name + ": envie só PDF ou foto."); return; }
+      if (f.size > CONFIG.maxArquivoMB * 1048576) { erros.push(f.name + ": passa de " + CONFIG.maxArquivoMB + " MB."); return; }
+      if (S.novos.some(function (a) { return a.nome === f.name && a.tamanho === f.size; })) return;
+      S.novos.push({ id: ++seq, file: f, nome: f.name, tamanho: f.size, tipo: t, descricao: "", estado: "" });
+    });
+    var e = $("#err-arq");
+    if (e) { e.textContent = erros.filter(function (x, i) { return erros.indexOf(x) === i; }).join(" "); e.hidden = !erros.length; }
+    atualizarNovos();
+  }
+  function ligarExames() {
+    var drop = $("#drop");
+    if (!drop) return;
+    ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("is-over"); }); });
+    ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("is-over"); }); });
+    drop.addEventListener("drop", function (e) { if (e.dataTransfer && e.dataTransfer.files) adicionarArquivos(e.dataTransfer.files); });
+    drop.addEventListener("click", function (e) { if (e.target.closest("label, input")) return; $("#arq-input").click(); });
+  }
+  function lerBase64(f) {
+    return new Promise(function (ok, falha) {
+      var r = new FileReader();
+      r.onload = function () { ok(String(r.result).split(",")[1] || ""); };
+      r.onerror = function () { falha(r.error); };
+      r.readAsDataURL(f);
+    });
+  }
+  async function enviarExames() {
+    if (S.enviandoExames) return;
+    S.enviandoExames = true;
+    var fila = S.novos.filter(function (a) { return a.estado !== "ok"; });
+    for (var i = 0; i < fila.length; i++) {
+      var a = fila[i];
+      a.estado = "indo"; atualizarNovos();
+      var r;
+      try {
+        var b64 = CONFIG.api ? await lerBase64(a.file) : "";
+        r = await chamar("arquivo", { sessao: S.sessao, nome: a.nome, tipo: a.tipo, descricao: a.descricao.trim(), base64: b64 });
+      } catch (e) { r = { ok: false, erro: "rede" }; }
+      if (r.ok) {
+        a.estado = "ok";
+        if (CONFIG.api) S.P.exames.push(r.exame || { data: hojeISO(), nome: a.nome, descricao: a.descricao.trim() });
+        else S.P.exames = DEMO.exames.slice();
+      } else {
+        if (r.erro === "sessao_expirada") { S.enviandoExames = false; return sair(msgErro(r.erro)); }
+        a.estado = "erro"; a.msg = msgErro(r.erro) + " Toque em Enviar para tentar de novo.";
+      }
+      atualizarNovos();
+    }
+    S.enviandoExames = false;
+    var falhas = S.novos.filter(function (a) { return a.estado === "erro"; }).length;
+    var ok = fila.length - falhas;
+    S.novos = S.novos.filter(function (a) { return a.estado !== "ok"; });
+    if (S.aba === "exames") renderPagina();
+    if (ok) toast(ok === 1 ? "Exame enviado." : ok + " exames enviados.");
+  }
+
+  /* Da nutricionista */
+  function htmlDocs(docs) {
+    return '<ul class="docs">' + docs.map(function (d) {
+      return '<li class="doc"><span class="doc-ico">' + I.folha + '</span><div><strong>' + esc(d.titulo) + '</strong><span class="meta">' + esc(d.tipo || "Documento") + " · " + dataBR(d.data) + '</span></div><button type="button" class="btn-sec" data-acao="doc-abrir" data-id="' + esc(d.id) + '">Abrir</button>' +
+        (S.docAviso && S.docAviso.id === d.id ? '<p class="doc-nota" role="status">' + esc(S.docAviso.msg) + "</p>" : "") + "</li>";
+    }).join("") + "</ul>";
+  }
+  function htmlNutri() {
+    var docs = S.P.documentos.slice().sort(function (a, b) { return b.data < a.data ? -1 : 1; });
+    return '<header class="pag-head"><span class="eyebrow">Da nutricionista</span><h1 class="h1" tabindex="-1">Seus planos e orientações</h1><p class="desc">Plano alimentar, lista de compras, receitas e pedidos de exame que a ' + esc(CONFIG.nomeCurto) + " separou para você.</p></header>" +
+      (docs.length ? htmlDocs(docs) : '<p class="vazio-txt">Ainda não tem nada aqui. Depois da sua consulta, o seu plano alimentar aparece nesta página.</p>');
+  }
+  function abrirDoc(id, botao) {
+    botao.disabled = true;
+    chamar("documento", { sessao: S.sessao, id: id }).then(function (r) {
+      botao.disabled = false;
+      if (!r.ok) {
+        if (r.erro === "sessao_expirada") return sair(msgErro(r.erro));
+        S.docAviso = { id: id, msg: msgErro(r.erro) }; renderPagina(); return;
+      }
+      var bytes = atob(r.base64), arr = new Uint8Array(bytes.length);
+      for (var i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+      var url = URL.createObjectURL(new Blob([arr], { type: r.tipo || "application/pdf" }));
+      var a = document.createElement("a");
+      a.href = url; a.download = r.nome || "documento.pdf"; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+    });
+  }
+
+  /* Acompanhamento */
+  function linhaDoTempo() {
+    var P = S.P, ev = [];
+    ev.push({ data: P.paciente.cadastro, t: "Cadastro feito na recepção", d: "" });
+    if (P.ficha) ev.push({ data: P.ficha.data, t: "Ficha de saúde respondida", d: "" });
+    var porDia = {};
+    P.exames.forEach(function (e) { (porDia[e.data] = porDia[e.data] || []).push(e.descricao || e.nome); });
+    Object.keys(porDia).forEach(function (d) { var l = porDia[d]; ev.push({ data: d, t: l.length === 1 ? "Exame enviado" : l.length + " exames enviados", d: l.join(", ") }); });
+    P.documentos.forEach(function (d) { ev.push({ data: d.data, t: "A nutricionista enviou: " + d.titulo, d: d.tipo || "", nutri: true }); });
+    P.checkins.forEach(function (c) { ev.push({ data: c.data, t: "Você contou como está", d: resumoCheckin(c.valores) }); });
+    return ev.map(function (e, i) { e.i = i; return e; }).sort(function (a, b) { return a.data === b.data ? b.i - a.i : (a.data < b.data ? 1 : -1); });
+  }
+  function resumoCheckin(v) {
+    var p = [];
+    if (!vazio(v.peso_hoje)) p.push("Peso " + String(v.peso_hoje).replace(".", ",") + " kg");
+    if (!vazio(v.sentiu)) p.push("Como se sentiu: " + v.sentiu + " de 5");
+    if (!vazio(v.plano)) p.push(v.plano);
+    return p.join(" · ");
+  }
+  function htmlTempo(evs) {
+    if (!evs.length) return '<p class="vazio-txt">Nada por aqui ainda.</p>';
+    return '<ol class="tempo">' + evs.map(function (e) {
+      return '<li class="ev' + (e.nutri ? " is-nutri" : "") + '"><span class="ev-data">' + dataCurta(e.data) + '</span><span class="ev-linha"><i class="ev-ponto"></i></span><div class="ev-txt"><strong>' + esc(e.t) + "</strong>" + (e.d ? "<span>" + esc(e.d) + "</span>" : "") + "</div></li>";
+    }).join("") + "</ol>";
+  }
+  function htmlAcomp() {
+    var card;
+    if (S.checkinAberto) {
+      card = '<section class="cartao" data-form="checkin"><h2 class="h2">Como você está?</h2><div class="perguntas">' +
+        CHECKIN.perguntas.map(function (q, i) { return htmlPergunta(q, i + 1, S.checkinVals); }).join("") +
+        '</div><div id="aviso-checkin"></div><div class="linha-form" style="justify-content:space-between;align-items:center"><button type="button" class="btn-voltar" data-acao="checkin-cancelar">Cancelar</button><button type="button" class="btn" data-acao="checkin-enviar" id="btn-checkin">Enviar ' + I.seta + "</button></div></section>";
+    } else {
+      card = '<section class="cartao is-destaque"><h2 class="h2">Como você está?</h2><p class="q-ajuda" style="font-size:15px">Conte como foram os últimos dias: peso, disposição e como foi seguir o plano. Leva 1 minuto.</p><div><button type="button" class="btn" data-acao="checkin-abrir">Contar como estou</button></div></section>';
+    }
+    return '<header class="pag-head"><span class="eyebrow">Acompanhamento</span><h1 class="h1" tabindex="-1">Sua evolução</h1><p class="desc">Tudo o que aconteceu no seu acompanhamento, do mais recente para o mais antigo.</p></header>' +
+      card + '<section class="bloco"><h2 class="h2">Linha do tempo</h2>' + htmlTempo(linhaDoTempo()) + "</section>";
+  }
+  function enviarCheckin() {
+    var raiz = $('[data-form="checkin"]');
+    if (!mostrarErros(errosSecao(CHECKIN, S.checkinVals), raiz)) return;
+    var b = $("#btn-checkin"); b.disabled = true; b.textContent = "Enviando…";
+    var vals = S.checkinVals;
+    chamar("checkin", { sessao: S.sessao, valores: vals, respostas: respostasPara([CHECKIN], vals) }).then(function (r) {
+      if (!r.ok) {
+        if (r.erro === "sessao_expirada") return sair(msgErro(r.erro));
+        b.disabled = false; b.innerHTML = "Enviar " + I.seta;
+        $("#aviso-checkin").innerHTML = '<div class="aviso" role="alert"><p>' + esc(msgErro(r.erro)) + "</p></div>";
+        return;
+      }
+      S.P.checkins.push({ data: r.data || hojeISO(), valores: vals });
+      S.checkinAberto = false; S.checkinVals = {};
+      renderPagina();
+      toast("Obrigada! A nutricionista vai ver.");
+    });
+  }
+
+  /* ===== Render geral ===== */
+  function render() {
+    var logado = S.tela === "portal";
+    document.body.classList.toggle("logado", logado);
+    $("#topo-user").hidden = !logado;
+    if (logado) {
+      var partes = S.P.paciente.nome.trim().split(" ");
+      $("#avatar").textContent = (partes[0][0] + (partes.length > 1 ? partes[partes.length - 1][0] : "")).toUpperCase();
+      $("#topo-nome").textContent = partes[0];
+    }
+    var app = $("#app");
+    if (S.tela === "entrada") app.innerHTML = htmlEntrada();
+    else if (S.tela === "confirmar") app.innerHTML = htmlConfirmar();
+    else if (S.tela === "carregando") app.innerHTML = '<div class="carregando" role="status"><span class="roda" aria-hidden="true"></span>Abrindo sua área…</div>';
+    else if (S.tela === "erro") app.innerHTML = '<div class="acesso"><div class="acesso-card"><h1 class="h1" tabindex="-1">Não deu para abrir</h1><div class="aviso"><p>' + esc(S.erroMsg) + '</p></div><button type="button" class="btn" data-acao="recarregar">Tentar de novo</button></div></div>';
+    else { app.innerHTML = '<div class="portal">' + htmlMenu() + '<div class="pagina" id="pagina"></div></div>'; renderPagina(); return; }
+    var t = $("#app .h1");
+    if (t) t.focus({ preventScroll: true });
+  }
+
+  var tToast;
+  function toast(msg) {
+    var t = $("#toast"); t.textContent = msg; t.hidden = false;
+    clearTimeout(tToast); tToast = setTimeout(function () { t.hidden = true; }, 3500);
+  }
+
+  /* ===== Eventos ===== */
+  function valsDe(el) {
+    var f = el.closest("[data-form]");
+    if (!f) return null;
+    return f.dataset.form === "checkin" ? S.checkinVals : (S.wiz ? S.wiz.valores : null);
+  }
+  function aoMudar(e) {
+    var el = e.target;
+    if (el.id === "e-cel" && e.type === "input") { el.value = mascaraTel(el.value); limparErro("celular"); return; }
+    if (el.id === "e-email" || el.id === "r-email") { limparErro("email"); return; }
+    if (el.id === "e-aceite") { limparErro("aceite"); return; }
+    if (el.id === "arq-input" && e.type === "change") { adicionarArquivos(el.files); el.value = ""; return; }
+    if (el.dataset.arqDesc) { S.novos.forEach(function (a) { if (a.id === +el.dataset.arqDesc) a.descricao = el.value; }); return; }
+    var vals = valsDe(el);
+    if (!vals) return;
+    if (el.dataset.qOutro) { vals[el.dataset.qOutro + "__outro"] = el.value; limparErro(el.dataset.qOutro); return; }
+    if (el.dataset.qDetalhe) { vals[el.dataset.qDetalhe + "__detalhe"] = el.value; limparErro(el.dataset.qDetalhe); return; }
+    if (el.dataset.medida) { vals[el.dataset.q] = el.value; limparErro(el.dataset.medida); return; }
+    if (!el.dataset.q) return;
+    var qid = el.dataset.q, q = acharQ(qid);
+    if (el.type === "checkbox") {
+      if (e.type !== "change") return;
+      var caixas = $$('input[data-q="' + qid + '"]', el.closest("[data-form]"));
+      if (q.exclusiva && el.checked) caixas.forEach(function (c) { if (c !== el && (el.value === q.exclusiva || c.value === q.exclusiva)) c.checked = false; });
+      vals[qid] = caixas.filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+    } else if (el.type === "radio") {
+      if (!el.checked) return;
+      vals[qid] = el.value;
+    } else {
+      vals[qid] = el.value;
+    }
+    if (q.outro) {
+      var o = $("#q-" + qid + "-outro"), marcado = [].concat(vals[qid] || []).indexOf("__outro") >= 0;
+      if (o) { o.hidden = !marcado; if (marcado && el.value === "__outro" && e.type === "change") o.focus(); }
+    }
+    if (q.detalhe) {
+      var dt = $("#q-" + qid + "-det");
+      if (dt) { dt.hidden = vals[qid] !== "Sim"; if (!dt.hidden && e.type === "change") $("textarea", dt).focus(); }
+    }
+    if (q.notaSe) $$('[data-nota="' + qid + '"]').forEach(function (n) { n.hidden = n.dataset.se !== vals[qid]; });
+    limparErro(qid);
+  }
+  document.addEventListener("input", aoMudar);
+  document.addEventListener("change", aoMudar);
+
+  document.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (e.target.id === "form-entrar") entrar();
+    else if (e.target.id === "form-reenviar") reenviar();
+  });
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-acao]");
+    if (!b) return;
+    var a = b.dataset.acao;
+    if (a === "sair") sair("");
+    else if (a === "recarregar") carregarPortal();
+    else if (a === "pedir-link") { S.tela = "entrada"; render(); }
+    else if (a === "ficha-comecar") { S.wiz = { passo: 0, valores: {} }; renderPagina(); }
+    else if (a === "ficha-editar") { S.wiz = { passo: 0, valores: JSON.parse(JSON.stringify(S.P.ficha.valores || {})) }; renderPagina(); }
+    else if (a === "wiz-sair") { S.wiz = null; renderPagina(); }
+    else if (a === "wiz-voltar") { if (S.wiz.passo === 0) { S.wiz = null; renderPagina(); } else wizIr(S.wiz.passo - 1); }
+    else if (a === "wiz-avancar") wizAvancar();
+    else if (a === "wiz-ir") wizIr(+b.dataset.passo);
+    else if (a === "wiz-enviar") wizEnviar();
+    else if (a === "remover") { S.novos = S.novos.filter(function (x) { return x.id !== +b.dataset.id; }); atualizarNovos(); }
+    else if (a === "enviar-exames") enviarExames();
+    else if (a === "doc-abrir") abrirDoc(b.dataset.id, b);
+    else if (a === "checkin-abrir") { S.checkinAberto = true; renderPagina(); var c = $('[data-form="checkin"]'); if (c) c.scrollIntoView({ block: "start", behavior: reduz ? "auto" : "smooth" }); }
+    else if (a === "checkin-cancelar") { S.checkinAberto = false; S.checkinVals = {}; renderPagina(); }
+    else if (a === "checkin-enviar") enviarCheckin();
+  });
+
+  window.addEventListener("hashchange", function () {
+    if (S.tela !== "portal") return;
+    var nova = abaDoHash();
+    if (nova === S.aba) return;
+    S.aba = nova; S.docAviso = null;
+    renderPagina();
+    window.scrollTo({ top: 0 });
+  });
+  // Arquivo solto fora da área de envio não abre no navegador
+  window.addEventListener("dragover", function (e) { e.preventDefault(); });
+  window.addEventListener("drop", function (e) { e.preventDefault(); });
+  window.addEventListener("beforeunload", function (e) { if (S.enviandoExames) { e.preventDefault(); e.returnValue = ""; } });
+
+  /* ===== Início ===== */
+  (function iniciar() {
+    var token = null;
+    try { token = new URLSearchParams(location.search).get("p"); } catch (e) {}
+    if (token) {
+      guardar("nutri:token", token);
+      try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
+    } else token = ler("nutri:token");
+    S.token = token || (CONFIG.api ? null : "previa");
+    var sess = ler("nutri:sessao");
+    if (sess && sess.sessao) { S.sessao = sess.sessao; S.nome = sess.nome; carregarPortal(); return; }
+    S.tela = S.token ? "confirmar" : "entrada";
+    render();
+  })();
+})();
+</script>

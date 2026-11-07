@@ -1,0 +1,11 @@
+{
+  "name": "nutri-agenda",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Site de agendamento da nutricionista Ana Carolina dos Santos Pereira",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node server.js build"
+  },
+  "engines": { "node": ">=18" }
+}

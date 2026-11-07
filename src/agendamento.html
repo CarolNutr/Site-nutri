@@ -1,0 +1,827 @@
+<title>Agenda Nutri</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Agende sua consulta com a nutricionista Ana Carolina Pereira, em Copacabana ou online.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: faixa verde no topo; abaixo, formulário em etapas à esquerda e quadro de detalhes fixo à direita (no celular o quadro vem logo abaixo das etapas). Tema único claro, todo branco. */
+:root{
+  --bg:#ffffff;
+  --ink:#2c2f26;
+  --muted:#727667;
+  --line:#e0e2d7;
+  --soft:#f5f6f0;
+  --brand:#5d6e35;       /* verde musgo */
+  --on-brand:#ffffff;
+  --on-brand-line:rgba(255,255,255,.6);
+  --cta:#5d6e35;
+  --cta-hover:#4a5928;
+  --wa:#1f9a52;
+  --wa-hover:#18833f;
+  --accent:#56672f;
+  --accent-soft:#eef1e3;
+  --card:#5d6e35;
+  --card-2:#4d5c2b;
+  --card-ink:#ffffff;
+  --card-muted:rgba(255,255,255,.82);
+  --card-line:rgba(255,255,255,.22);
+  --slot-off:#c0c3b4;
+  --error:#d4492f;
+  --font-ui:"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-brand:"Fraunces",Georgia,"Times New Roman",serif;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
+}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:16px;line-height:1.5}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg{flex:none}
+
+/* Topo */
+.topo{background:var(--brand);color:var(--on-brand)}
+.topo-in{max-width:1180px;margin:0 auto;padding-block:20px;padding-left:var(--gutter-l);padding-right:var(--gutter-r);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;min-width:0}
+.logo-mark{width:46px;height:46px;border-radius:13px;border:2px solid currentColor;display:grid;place-items:center}
+.logo-txt{display:grid;line-height:1.15;min-width:0}
+.logo-nome{font-family:var(--font-brand);font-size:24px;font-weight:600;letter-spacing:-.01em}
+.logo-sub{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.92}
+.topo-link{color:inherit;font-weight:700;font-size:15px;text-decoration:none;display:flex;align-items:center;gap:8px;padding:9px 16px;border:1.5px solid var(--on-brand-line);border-radius:999px;white-space:nowrap}
+.topo-link:hover{background:var(--on-brand-line);}
+
+/* Estrutura */
+.wrap{max-width:1180px;margin:0 auto;padding-block:36px 72px;padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+.layout{display:grid;gap:28px;grid-template-areas:"steps" "card" "form"}
+.stepper{grid-area:steps}
+.card{grid-area:card}
+.form{grid-area:form;min-width:0}
+@media (min-width:980px){
+  .layout{grid-template-columns:minmax(0,1fr) 370px;grid-template-rows:auto 1fr;column-gap:80px;row-gap:40px;grid-template-areas:"steps card" "form card"}
+  .card{position:sticky;top:24px;align-self:start}
+}
+
+/* Etapas */
+.stepper{list-style:none;margin:0 auto;padding:0;width:100%;max-width:620px;display:grid;grid-template-columns:repeat(4,1fr)}
+.step{position:relative;display:grid;justify-items:center;gap:10px;text-align:center}
+.step:not(:first-child)::before{content:"";position:absolute;top:17px;right:50%;width:100%;height:2px;background:var(--line)}
+.step.is-active::before,.step.is-done::before{background:var(--accent)}
+.dot{position:relative;z-index:1;width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;font-weight:700;font-size:14px;color:var(--muted)}
+.step.is-active .dot{background:var(--accent);border-color:var(--accent);color:var(--card-ink)}
+.step.is-done .dot{border-color:var(--accent);color:var(--accent)}
+.step-nome{font-size:15px;color:var(--muted);line-height:1.25}
+.step.is-active .step-nome{color:var(--accent);font-weight:600}
+
+/* Painéis */
+.panel{display:grid;gap:28px}
+.head{display:grid;gap:6px}
+.titulo{margin:0;font-size:28px;line-height:1.2;font-weight:800;color:var(--accent);text-wrap:balance}
+.titulo:focus{outline:none}
+.sub{margin:0;color:var(--muted);font-size:16px;max-width:60ch}
+.field{display:grid;gap:8px;min-width:0}
+.label{color:var(--accent);font-size:18px;font-weight:600;line-height:1.35}
+.label small{color:var(--muted);font-weight:400;font-size:15px}
+.label-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.err{margin:0;color:var(--error);font-size:14px}
+.row-2{display:grid;gap:28px}
+@media (min-width:640px){.row-2{grid-template-columns:1fr 1fr;gap:20px}}
+
+.input{width:100%;height:48px;border:1px solid var(--line);border-radius:4px;padding:0 14px;background:var(--bg);color:var(--ink);font-size:16px}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.input.is-invalid,.phone.is-invalid{border-color:var(--error)}
+.area{height:auto;min-height:96px;padding:12px 14px;resize:vertical;line-height:1.5}
+.input::placeholder{color:var(--slot-off)}
+.phone{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--bg)}
+.phone:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.phone .input{border:0;border-radius:0;box-shadow:none;flex:1;min-width:0}
+.ddi{display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--soft);border-right:1px solid var(--line);font-weight:700;font-size:15px;color:var(--ink)}
+
+/* Escolhas (atendimento / tipo) */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{position:relative;cursor:pointer}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt-box{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;height:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg)}
+.opt-box b{font-weight:700;line-height:1.3}
+.opt-box small{grid-column:2;color:var(--muted);font-size:14px;line-height:1.35}
+.radio{grid-row:span 2;width:18px;height:18px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center}
+.opt input:checked + .opt-box{border-color:var(--accent);background:var(--accent-soft)}
+.opt input:checked + .opt-box .radio{border-color:var(--accent)}
+.opt input:checked + .opt-box .radio::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.opt input:focus-visible + .opt-box{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Dias */
+.dias-nav{display:flex;align-items:center;gap:6px}
+.mes{font-weight:700;color:var(--ink);font-size:15px}
+.seta{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg);display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.seta:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.seta:disabled{opacity:.35;cursor:default}
+.sem-rolagem .seta{display:none}
+.dias{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 6px;scroll-snap-type:x proximity;scrollbar-width:none}
+.dias::-webkit-scrollbar{display:none}
+.dia{flex:0 0 auto;width:70px;padding:10px 0 9px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);display:grid;justify-items:center;gap:1px;cursor:pointer;scroll-snap-align:start;color:var(--ink)}
+.dia:hover:not(:disabled){border-color:var(--accent)}
+.dia .dw{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.dia .dn{font-size:24px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
+.dia .dm{font-size:12px;color:var(--muted)}
+.dia[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--card-ink)}
+.dia[aria-pressed="true"] .dw,.dia[aria-pressed="true"] .dm{color:var(--card-muted)}
+.dia:disabled{cursor:not-allowed;background:var(--soft);border-color:transparent;color:var(--slot-off)}
+.dia:disabled .dw,.dia:disabled .dm{color:var(--slot-off)}
+
+/* Horários */
+.turnos{display:grid;gap:16px}
+.turno{display:grid;gap:8px}
+.turno-nome{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px}
+.slot{height:44px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer;color:var(--ink)}
+.slot:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.slot[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--card-ink)}
+.slot:disabled{cursor:not-allowed;background:var(--soft);border-color:transparent;color:var(--slot-off);text-decoration:line-through}
+
+/* Objetivos */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border:1.5px solid var(--line);border-radius:999px;font-size:15px;font-weight:600;background:var(--bg)}
+.chip input:checked + span{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.chip input:checked + span::before{content:"";width:6px;height:11px;border:solid currentColor;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-2px)}
+.chip input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Botões */
+.actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:0 26px;border:0;border-radius:4px;background:var(--cta);color:var(--on-brand);font-size:18px;font-weight:700;cursor:pointer;text-decoration:none;margin-left:auto}
+.btn:hover{background:var(--cta-hover)}
+.btn-voltar{background:none;border:0;padding:10px 0;color:var(--muted);font-weight:700;cursor:pointer}
+.btn-voltar:hover{color:var(--accent)}
+.btn-wa{background:var(--wa);margin-left:0;width:100%;max-width:440px}
+.btn-wa:hover{background:var(--wa-hover)}
+.link{background:none;border:0;padding:0;color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:520px){.actions .btn{width:100%}.actions{flex-direction:column-reverse;align-items:stretch}.btn-voltar{align-self:center}}
+
+/* Revisão */
+.review{display:grid;gap:16px}
+.rev{border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:12px}
+.rev-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.rev h2{margin:0;font-size:17px;font-weight:800;color:var(--accent)}
+.dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 16px;margin:0}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;overflow-wrap:anywhere;font-weight:600}
+@media (max-width:520px){.dl{grid-template-columns:1fr;gap:0}.dl dt{font-size:14px;margin-top:8px}.dl dt:first-child{margin-top:0}}
+.check{display:flex;gap:12px;align-items:flex-start;cursor:pointer;color:var(--ink)}
+.check input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+
+/* Final */
+.final-top{display:flex;gap:18px;align-items:flex-start}
+.ok{width:56px;height:56px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;flex:none}
+.msg{font-family:var(--font-ui);white-space:pre-wrap;overflow-wrap:anywhere;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:16px 18px;font-size:15px;line-height:1.6;max-height:300px;overflow:auto;margin:0}
+.final-links{display:flex;gap:24px;flex-wrap:wrap}
+.final-links a{color:var(--accent)}
+.nota-previa{margin:0;font-size:14px;color:var(--muted);padding:10px 14px;border:1px dashed var(--line);border-radius:8px}
+
+/* Quadro de detalhes */
+.card{background:var(--card);color:var(--card-ink);border-radius:18px;padding:40px 24px 36px;display:grid;gap:22px;align-content:start}
+.card h2{margin:0;padding-inline:18px;font-size:20px;font-weight:800}
+.card-pro{background:var(--card-2);border-radius:8px;padding:16px 18px;display:grid;gap:2px}
+.card-row{padding:20px 18px 0;border-top:1px solid var(--card-line);display:grid;gap:4px}
+.card-pro + .card-row{border-top:0;padding-top:0}
+.k{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--card-muted)}
+.card strong{font-size:19px;font-weight:700;line-height:1.45}
+.card .v{font-size:17px;line-height:1.55}
+.card .v-sm{font-size:14px;color:var(--card-muted);letter-spacing:.02em}
+.card-link{justify-self:start;background:none;border:0;padding:0;color:inherit;font-size:16px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.card-link:focus-visible{outline-color:var(--card-ink)}
+.card a.card-link{color:inherit}
+@media (max-width:979px){
+  .card{padding:22px 8px 24px;gap:16px;border-radius:14px}
+  .card h2{font-size:18px}
+  .card strong{font-size:17px}
+  .card .v{font-size:15px}
+  .card-row{padding-top:14px}
+  .card-row-tipo{display:none}
+}
+
+/* Rodapé */
+.rodape{border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.rodape-in{max-width:1180px;margin:0 auto;padding-block:22px;padding-left:var(--gutter-l);padding-right:var(--gutter-r);display:flex;justify-content:space-between;gap:8px 24px;flex-wrap:wrap}
+
+@media (max-width:640px){.topo-link{display:none}.logo-nome{font-size:21px}.titulo{font-size:24px}.step-nome{font-size:13px}.wrap{padding-block:24px 56px}}
+@media (prefers-reduced-motion:no-preference){
+  .slot,.dia,.opt-box,.chip span,.btn,.seta{transition:background-color .15s ease,border-color .15s ease,color .15s ease}
+  .panel{animation:entra .22s ease-out}
+  @keyframes entra{from{transform:translateY(6px)}to{transform:none}}
+}
+</style>
+<!-- corpo -->
+<header class="topo">
+  <div class="topo-in">
+    <a class="logo" href="#" aria-label="Ana Carolina Pereira, nutricionista">
+      <span class="logo-mark" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 18.5C5.5 10.5 10.5 5 19 5c0 8.5-5.5 13.5-13.5 13.5z"/><path d="M5.5 18.5c2.6-3.6 5.6-6.1 9.2-8.2"/></svg>
+      </span>
+      <span class="logo-txt">
+        <span class="logo-nome" id="marca-nome">Ana Carolina Pereira</span>
+        <span class="logo-sub">Nutricionista</span>
+      </span>
+    </a>
+    <a class="topo-link" id="topo-wa" href="#" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.2-4.3A8.5 8.5 0 1 1 20.5 12z"/></svg>
+      Dúvidas? Fale no WhatsApp
+    </a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="layout">
+    <ol class="stepper" aria-label="Etapas do agendamento">
+      <li class="step is-active"><span class="dot">1</span><span class="step-nome">Horário</span></li>
+      <li class="step"><span class="dot">2</span><span class="step-nome">Seus dados</span></li>
+      <li class="step"><span class="dot">3</span><span class="step-nome">Conferir</span></li>
+      <li class="step"><span class="dot">4</span><span class="step-nome">Confirmação</span></li>
+    </ol>
+
+    <aside class="card" aria-labelledby="card-titulo">
+      <h2 id="card-titulo">Detalhes da consulta</h2>
+      <div class="card-pro">
+        <span class="k">Profissional</span>
+        <strong id="r-prof">Ana Carolina dos S. Pereira</strong>
+        <span class="v-sm" id="r-crn">CRN-4 23101599</span>
+      </div>
+      <div class="card-row">
+        <span class="k">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          Local
+        </span>
+        <strong id="r-local">Av. Nossa Senhora de Copacabana, 540</strong>
+        <span class="v" id="r-end">Sala 1105 · Copacabana<br>Rio de Janeiro – RJ</span>
+        <a class="card-link" id="r-mapa" href="#" target="_blank" rel="noopener">Ver no mapa</a>
+      </div>
+      <div class="card-row">
+        <span class="k">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+          Data
+        </span>
+        <strong id="r-data">Escolha um dia e horário</strong>
+        <button type="button" class="card-link" id="r-mudar" data-ir="1">Modificar data ou horário</button>
+      </div>
+      <div class="card-row card-row-tipo">
+        <span class="k">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+          Consulta
+        </span>
+        <strong id="r-tipo">Primeira consulta</strong>
+        <span class="v" id="r-dur">Presencial · cerca de 60 min</span>
+      </div>
+    </aside>
+
+    <form class="form" id="form" novalidate>
+      <!-- Etapa 1: horário -->
+      <section class="panel" data-step="1" aria-labelledby="t1">
+        <div class="head">
+          <h1 class="titulo" id="t1" tabindex="-1">Agendar consulta</h1>
+          <p class="sub">Os atendimentos são aos sábados, das 9h às 17h. Escolha como quer ser atendido e o melhor horário para você.</p>
+        </div>
+
+        <div class="field">
+          <span class="label" id="l-mod">Atendimento</span>
+          <div class="seg" role="radiogroup" aria-labelledby="l-mod">
+            <label class="opt"><input type="radio" name="modalidade" id="mod-presencial" value="presencial" checked><span class="opt-box"><span class="radio"></span><b>Presencial</b><small>No consultório, em Copacabana</small></span></label>
+            <label class="opt"><input type="radio" name="modalidade" id="mod-online" value="online"><span class="opt-box"><span class="radio"></span><b>Online</b><small>Por videochamada</small></span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label" id="l-tipo">Tipo de consulta</span>
+          <div class="seg" role="radiogroup" aria-labelledby="l-tipo">
+            <label class="opt"><input type="radio" name="tipo" id="tipo-primeira" value="primeira" checked><span class="opt-box"><span class="radio"></span><b>Primeira consulta</b><small>Cerca de 60 min</small></span></label>
+            <label class="opt"><input type="radio" name="tipo" id="tipo-retorno" value="retorno"><span class="opt-box"><span class="radio"></span><b>Retorno</b><small>Cerca de 40 min</small></span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <span class="label" id="l-dia">Escolha o dia</span>
+            <div class="dias-nav">
+              <span class="mes" id="mes">novembro de 2026</span>
+              <button type="button" class="seta" id="dias-ant" aria-label="Dias anteriores"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+              <button type="button" class="seta" id="dias-prox" aria-label="Próximos dias"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+            </div>
+          </div>
+          <div class="dias" id="dias" role="group" aria-labelledby="l-dia"></div>
+        </div>
+
+        <div class="field">
+          <span class="label">Horários disponíveis</span>
+          <div class="turnos" id="horarios"></div>
+          <p class="hint">Horários riscados já estão ocupados. O horário fica garantido depois da confirmação pelo WhatsApp.</p>
+        </div>
+
+        <p class="err" id="err-horario" hidden>Escolha um dia e um horário para continuar.</p>
+        <div class="actions">
+          <button type="submit" class="btn">Ir para próxima etapa <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+        </div>
+      </section>
+
+      <!-- Etapa 2: dados -->
+      <section class="panel" data-step="2" aria-labelledby="t2" hidden>
+        <div class="head">
+          <h1 class="titulo" id="t2" tabindex="-1">Seus dados</h1>
+          <p class="sub">Usamos esses dados só para confirmar e preparar a sua consulta.</p>
+        </div>
+
+        <div class="field">
+          <label class="label" for="nome">Nome completo <small>(obrigatório)</small></label>
+          <input class="input" id="nome" name="nome" autocomplete="name" autocapitalize="words">
+          <p class="err" id="err-nome" hidden></p>
+        </div>
+
+        <div class="field">
+          <label class="label" for="email">E-mail <small>(obrigatório)</small></label>
+          <input class="input" id="email" name="email" type="email" inputmode="email" autocomplete="email">
+          <p class="err" id="err-email" hidden></p>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label class="label" for="celular">Celular (WhatsApp) <small>(obrigatório)</small></label>
+            <div class="phone" id="phone-box">
+              <span class="ddi" aria-hidden="true">
+                <svg width="22" height="16" viewBox="0 0 22 16"><rect width="22" height="16" rx="2" fill="#229e45"/><path d="M11 2.2 19.6 8 11 13.8 2.4 8z" fill="#f8e509"/><circle cx="11" cy="8" r="3.4" fill="#2b49a3"/></svg>
+                +55
+              </span>
+              <input class="input" id="celular" name="celular" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(21) 99999-9999">
+            </div>
+            <p class="err" id="err-celular" hidden></p>
+          </div>
+          <div class="field">
+            <label class="label" for="nascimento">Data de nascimento <small>(obrigatório)</small></label>
+            <input class="input" id="nascimento" name="nascimento" type="date" min="1900-01-01">
+            <p class="err" id="err-nascimento" hidden></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label" id="l-obj">O que você busca com a consulta? <small>(opcional)</small></span>
+          <div class="chips" id="objetivos" role="group" aria-labelledby="l-obj"></div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="obs">Existe mais alguma informação que você deseja compartilhar com a nutricionista?</label>
+          <textarea class="input area" id="obs" name="obs" rows="3" placeholder="Ex.: alergias, restrições alimentares, medicamentos, exames recentes"></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-voltar" data-ir="1">‹ Voltar</button>
+          <button type="submit" class="btn">Ir para próxima etapa <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+        </div>
+      </section>
+
+      <!-- Etapa 3: conferir -->
+      <section class="panel" data-step="3" aria-labelledby="t3" hidden>
+        <div class="head">
+          <h1 class="titulo" id="t3" tabindex="-1">Confira seus dados</h1>
+          <p class="sub">Se algo estiver errado, é só alterar antes de confirmar.</p>
+        </div>
+        <div class="review" id="revisao"></div>
+        <label class="check" for="aceite"><input type="checkbox" id="aceite"><span>Estou ciente de que remarcações e cancelamentos devem ser avisados com pelo menos 24 horas de antecedência.</span></label>
+        <p class="err" id="err-aceite" hidden>Marque a caixa acima para continuar.</p>
+        <div class="actions">
+          <button type="button" class="btn-voltar" data-ir="2">‹ Voltar</button>
+          <button type="submit" class="btn">Confirmar agendamento <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+        </div>
+      </section>
+
+      <!-- Etapa 4: WhatsApp -->
+      <section class="panel" data-step="4" aria-labelledby="t4" hidden>
+        <div class="final-top">
+          <span class="ok" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
+          <div class="head">
+            <h1 class="titulo" id="t4" tabindex="-1">Quase lá!</h1>
+            <p class="sub">Seu pré-agendamento foi registrado. Para garantir o horário, envie a confirmação pelo WhatsApp. A resposta da nutricionista chega por lá.</p>
+          </div>
+        </div>
+        <a class="btn btn-wa" id="btn-wa" href="#" target="_blank" rel="noopener">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.2-4.3A8.5 8.5 0 1 1 20.5 12z"/></svg>
+          Enviar confirmação pelo WhatsApp
+        </a>
+        <div class="field">
+          <div class="label-row">
+            <span class="label" id="l-msg">Mensagem que será enviada</span>
+            <button type="button" class="link" id="copiar">Copiar mensagem</button>
+          </div>
+          <pre class="msg" id="msg" aria-labelledby="l-msg"></pre>
+          <p class="hint" id="copiado" aria-live="polite"></p>
+        </div>
+        <div class="final-links">
+          <a class="link" id="btn-agenda" href="#" target="_blank" rel="noopener">Adicionar ao Google Agenda</a>
+          <button type="button" class="link" id="novo">Fazer outro agendamento</button>
+        </div>
+        <p class="nota-previa" data-previa>Prévia: o número de WhatsApp ainda é de exemplo. Quando a Ana Carolina passar o número dela, a mensagem vai direto para ela.</p>
+      </section>
+    </form>
+  </div>
+</main>
+
+<footer class="rodape">
+  <div class="rodape-in">
+    <span id="rodape-nome">© 2026 Ana Carolina dos Santos Pereira · Nutricionista · CRN-4 23101599</span>
+    <span>Av. Nossa Senhora de Copacabana, 540, sala 1105 · Rio de Janeiro – RJ</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ===== Configuração: troque aqui os dados da nutricionista ===== */
+  var CONFIG = {
+    nomeCurto: "Ana Carolina Pereira",
+    nomeCompleto: "Ana Carolina dos Santos Pereira",
+    nomeQuadro: "Ana Carolina dos S. Pereira",
+    crn: "CRN-4 23101599",
+    endereco: "Av. Nossa Senhora de Copacabana, 540",
+    complemento: "Sala 1105 · Copacabana",
+    cidade: "Rio de Janeiro – RJ",
+    whatsapp: "5521966937967",          // DDI + DDD + número, só dígitos
+    duracao: { primeira: 60, retorno: 40 },
+    // Horários por dia da semana (0 = domingo ... 6 = sábado)
+    // Só sábados, das 9h às 17h (último horário começa às 16h para terminar às 17h)
+    agenda: {
+      6: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"]
+    },
+    diasNaAgenda: 8,                    // quantos sábados aparecem para escolher
+    objetivos: ["Emagrecimento", "Ganho de massa muscular", "Reeducação alimentar", "Saúde intestinal", "Gestação e amamentação", "Nutrição esportiva", "Diabetes ou colesterol", "Alimentação vegetariana"],
+    mostrarPrevia: false
+  };
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var reduz = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var ICON_CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+
+  var state = { step: 1, modalidade: "presencial", tipo: "primeira", data: null, hora: null };
+
+  /* ===== Datas ===== */
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function iso(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function deISO(s) { var p = s.split("-").map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+  function maiuscula(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  function dataLonga(s, h) {
+    var t = maiuscula(deISO(s).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }));
+    return h ? t + " às " + h : t;
+  }
+  function dataCurta(s, h) {
+    var d = deISO(s);
+    var dw = d.toLocaleDateString("pt-BR", { weekday: "long" });
+    return maiuscula(dw) + ", " + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear() + (h ? " às " + h : "");
+  }
+  function idade(s) {
+    var n = deISO(s), h = new Date();
+    var a = h.getFullYear() - n.getFullYear();
+    if (h.getMonth() < n.getMonth() || (h.getMonth() === n.getMonth() && h.getDate() < n.getDate())) a--;
+    return a;
+  }
+
+  // Na prévia, alguns horários aparecem como ocupados (sempre os mesmos para a mesma data)
+  function ocupado(dia, hora) {
+    var s = dia + hora, x = 7;
+    for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) >>> 0;
+    return x % 10 < 3;
+  }
+
+  function gerarDias() {
+    var out = [], d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 1);
+    while (out.length < CONFIG.diasNaAgenda) {
+      var hs = CONFIG.agenda[d.getDay()];
+      if (hs && hs.length) {
+        var key = iso(d);
+        out.push({ iso: key, horas: hs, livres: hs.filter(function (h) { return !ocupado(key, h); }).length });
+      }
+      d.setDate(d.getDate() + 1);
+    }
+    return out;
+  }
+  var dias = gerarDias();
+
+  /* ===== Etapa 1 ===== */
+  function renderDias() {
+    $("#dias").innerHTML = dias.map(function (d) {
+      var dt = deISO(d.iso);
+      var dw = dt.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "");
+      var dm = dt.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "");
+      var label = dataLonga(d.iso) + (d.livres ? ", " + d.livres + " horários livres" : ", lotado");
+      return '<button type="button" class="dia" data-dia="' + d.iso + '" aria-pressed="' + (d.iso === state.data) + '" aria-label="' + label + '"' + (d.livres ? "" : " disabled") + '>' +
+        '<span class="dw">' + dw + '</span><span class="dn">' + dt.getDate() + '</span><span class="dm">' + (d.livres ? dm : "lotado") + "</span></button>";
+    }).join("");
+    atualizaMes();
+  }
+  function atualizaMes() {
+    var ref = state.data ? deISO(state.data) : deISO(dias[0].iso);
+    $("#mes").textContent = maiuscula(ref.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }));
+  }
+  function renderHorarios() {
+    var box = $("#horarios");
+    var d = dias.filter(function (x) { return x.iso === state.data; })[0];
+    if (!d) { box.innerHTML = '<p class="hint">Escolha um dia acima para ver os horários.</p>'; return; }
+    var grupos = [
+      ["Manhã", d.horas.filter(function (h) { return +h.slice(0, 2) < 12; })],
+      ["Tarde", d.horas.filter(function (h) { return +h.slice(0, 2) >= 12; })]
+    ];
+    box.innerHTML = grupos.filter(function (g) { return g[1].length; }).map(function (g) {
+      return '<div class="turno"><span class="turno-nome">' + g[0] + '</span><div class="slots">' + g[1].map(function (h) {
+        var oc = ocupado(d.iso, h);
+        return '<button type="button" class="slot" data-hora="' + h + '" aria-pressed="' + (state.hora === h) + '"' + (oc ? ' disabled aria-label="' + h + ', ocupado"' : "") + ">" + h + "</button>";
+      }).join("") + "</div></div>";
+    }).join("");
+  }
+
+  $("#dias").addEventListener("click", function (e) {
+    var b = e.target.closest(".dia");
+    if (!b || b.disabled) return;
+    if (state.data !== b.dataset.dia) { state.data = b.dataset.dia; state.hora = null; }
+    $$(".dia").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    atualizaMes(); renderHorarios(); atualizaResumo();
+  });
+  $("#horarios").addEventListener("click", function (e) {
+    var b = e.target.closest(".slot");
+    if (!b || b.disabled) return;
+    state.hora = b.dataset.hora;
+    $$(".slot").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    $("#err-horario").hidden = true;
+    atualizaResumo();
+  });
+  function rolarDias(dir) {
+    var box = $("#dias");
+    box.scrollBy({ left: dir * Math.max(240, box.clientWidth * 0.8), behavior: reduz ? "auto" : "smooth" });
+  }
+  $("#dias-ant").addEventListener("click", function () { rolarDias(-1); });
+  $("#dias-prox").addEventListener("click", function () { rolarDias(1); });
+  function atualizaSetas() {
+    var box = $("#dias"), max = box.scrollWidth - box.clientWidth;
+    $("#dias-ant").disabled = box.scrollLeft <= 2;
+    $("#dias-prox").disabled = box.scrollLeft >= max - 2;
+    $(".dias-nav").classList.toggle("sem-rolagem", max <= 2);
+  }
+  $("#dias").addEventListener("scroll", atualizaSetas, { passive: true });
+  window.addEventListener("resize", atualizaSetas);
+
+  $$('input[name="modalidade"], input[name="tipo"]').forEach(function (r) {
+    r.addEventListener("change", function () { state[r.name] = r.value; atualizaResumo(); });
+  });
+
+  /* ===== Etapa 2 ===== */
+  $("#objetivos").innerHTML = CONFIG.objetivos.map(function (o, i) {
+    return '<label class="chip"><input type="checkbox" id="obj-' + i + '" value="' + o + '"><span>' + o + "</span></label>";
+  }).join("");
+
+  var hoje = iso(new Date());
+  $("#nascimento").max = hoje;
+
+  function mascaraTel(v) {
+    var d = v.replace(/\D/g, "").slice(0, 11);
+    if (!d.length) return "";
+    if (d.length <= 2) return "(" + d;
+    if (d.length <= 6) return "(" + d.slice(0, 2) + ") " + d.slice(2);
+    if (d.length <= 10) return "(" + d.slice(0, 2) + ") " + d.slice(2, 6) + "-" + d.slice(6);
+    return "(" + d.slice(0, 2) + ") " + d.slice(2, 7) + "-" + d.slice(7);
+  }
+  $("#celular").addEventListener("input", function (e) { e.target.value = mascaraTel(e.target.value); });
+
+  function erro(campo, msg) {
+    var p = $("#err-" + campo), el = campo === "celular" ? $("#phone-box") : $("#" + campo);
+    p.textContent = msg || ""; p.hidden = !msg;
+    el.classList.toggle("is-invalid", !!msg);
+    $("#" + campo).setAttribute("aria-invalid", msg ? "true" : "false");
+    if (msg) $("#" + campo).setAttribute("aria-describedby", "err-" + campo); else $("#" + campo).removeAttribute("aria-describedby");
+  }
+  ["nome", "email", "celular", "nascimento"].forEach(function (c) {
+    $("#" + c).addEventListener("input", function () { if (!$("#err-" + c).hidden) erro(c, ""); });
+  });
+
+  function validar2() {
+    var falhas = [];
+    var nome = $("#nome").value.trim().replace(/\s+/g, " ");
+    var email = $("#email").value.trim();
+    var cel = $("#celular").value.replace(/\D/g, "");
+    var nasc = $("#nascimento").value;
+    var m = {};
+    if (!nome) m.nome = "É necessário preencher o nome";
+    else if (nome.split(" ").length < 2) m.nome = "Digite o nome e o sobrenome";
+    if (!email) m.email = "É necessário preencher o e-mail";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) m.email = "Confira o e-mail. Ele deve ficar assim: nome@exemplo.com";
+    if (!cel) m.celular = "É necessário preencher o telefone";
+    else if (cel.length < 10) m.celular = "Digite o celular com DDD, por exemplo (21) 99999-9999";
+    if (!nasc) m.nascimento = "É necessário preencher a data de nascimento";
+    else if (nasc > hoje) m.nascimento = "A data de nascimento não pode ser no futuro";
+    else if (idade(nasc) > 120) m.nascimento = "Confira o ano de nascimento";
+    ["nome", "email", "celular", "nascimento"].forEach(function (c) { erro(c, m[c]); if (m[c]) falhas.push(c); });
+    if (falhas.length) { $("#" + falhas[0]).focus(); return false; }
+    return true;
+  }
+
+  function dados() {
+    return {
+      nome: $("#nome").value.trim().replace(/\s+/g, " "),
+      email: $("#email").value.trim(),
+      celular: $("#celular").value.trim(),
+      nascimento: $("#nascimento").value,
+      objetivos: $$("#objetivos input:checked").map(function (i) { return i.value; }),
+      obs: $("#obs").value.trim()
+    };
+  }
+
+  /* ===== Etapa 3 ===== */
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
+  }
+  function txtTipo() { return state.tipo === "primeira" ? "Primeira consulta" : "Retorno"; }
+  function txtMod() { return state.modalidade === "online" ? "Online" : "Presencial"; }
+  function txtLocal() { return state.modalidade === "online" ? "Online, por videochamada" : CONFIG.endereco + ", " + CONFIG.complemento.replace(" · ", ", ") + ", " + CONFIG.cidade; }
+  function nascBR(s) { return s.split("-").reverse().join("/"); }
+
+  function renderRevisao() {
+    var d = dados();
+    var linha = function (k, v) { return "<dt>" + k + "</dt><dd>" + v + "</dd>"; };
+    $("#revisao").innerHTML =
+      '<div class="rev"><div class="rev-top"><h2>Consulta</h2><button type="button" class="link" data-ir="1">Alterar</button></div><dl class="dl">' +
+        linha("Data", esc(dataLonga(state.data, state.hora))) +
+        linha("Consulta", esc(txtTipo() + " · cerca de " + CONFIG.duracao[state.tipo] + " min")) +
+        linha("Atendimento", esc(txtMod())) +
+        linha("Local", esc(txtLocal())) +
+      "</dl></div>" +
+      '<div class="rev"><div class="rev-top"><h2>Seus dados</h2><button type="button" class="link" data-ir="2">Alterar</button></div><dl class="dl">' +
+        linha("Nome", esc(d.nome)) +
+        linha("E-mail", esc(d.email)) +
+        linha("Celular", esc("+55 " + d.celular)) +
+        linha("Nascimento", esc(nascBR(d.nascimento) + " (" + idade(d.nascimento) + " anos)")) +
+        (d.objetivos.length ? linha("Objetivo", esc(d.objetivos.join(", "))) : "") +
+        (d.obs ? linha("Observações", esc(d.obs)) : "") +
+      "</dl></div>";
+  }
+
+  /* ===== Etapa 4 ===== */
+  function mensagem() {
+    var d = dados();
+    var l = [
+      "Olá, Ana Carolina! Fiz um pré-agendamento pelo site e gostaria de confirmar.",
+      "",
+      "*Consulta:* " + txtTipo() + " · " + txtMod(),
+      "*Data:* " + dataCurta(state.data, state.hora),
+      "",
+      "*Nome:* " + d.nome,
+      "*Celular:* " + d.celular,
+      "*E-mail:* " + d.email,
+      "*Nascimento:* " + nascBR(d.nascimento) + " (" + idade(d.nascimento) + " anos)"
+    ];
+    if (d.objetivos.length) l.push("*Objetivo:* " + d.objetivos.join(", "));
+    if (d.obs) l.push("*Observações:* " + d.obs);
+    return l.join("\n");
+  }
+  function linkWhats(texto) { return "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(texto); }
+  function linkAgenda() {
+    var p = state.data.split("-").map(Number), h = state.hora.split(":").map(Number);
+    var ini = new Date(p[0], p[1] - 1, p[2], h[0], h[1]);
+    var fim = new Date(ini.getTime() + CONFIG.duracao[state.tipo] * 60000);
+    var f = function (t) { return "" + t.getFullYear() + pad(t.getMonth() + 1) + pad(t.getDate()) + "T" + pad(t.getHours()) + pad(t.getMinutes()) + "00"; };
+    var q = new URLSearchParams({
+      action: "TEMPLATE",
+      text: "Consulta com " + CONFIG.nomeCurto + " (nutricionista)",
+      dates: f(ini) + "/" + f(fim),
+      ctz: "America/Sao_Paulo",
+      details: "Pré-agendamento feito pelo site. A confirmação é feita pelo WhatsApp.",
+      location: state.modalidade === "online" ? "Online (o link chega pelo WhatsApp)" : txtLocal()
+    });
+    return "https://calendar.google.com/calendar/render?" + q.toString();
+  }
+  function renderFinal() {
+    var texto = mensagem();
+    var primeiro = dados().nome.split(" ")[0];
+    $("#t4").textContent = "Quase lá, " + primeiro + "!";
+    $("#msg").textContent = texto;
+    $("#btn-wa").href = linkWhats(texto);
+    $("#btn-agenda").href = linkAgenda();
+    $("#copiado").textContent = "";
+  }
+  $("#copiar").addEventListener("click", function () {
+    var texto = $("#msg").textContent;
+    var ok = function () { $("#copiado").textContent = "Mensagem copiada."; };
+    var falha = function () {
+      var r = document.createRange(); r.selectNodeContents($("#msg"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      $("#copiado").textContent = "Texto selecionado. Use Ctrl+C para copiar.";
+    };
+    try { navigator.clipboard.writeText(texto).then(ok, falha); } catch (e) { falha(); }
+  });
+  $("#novo").addEventListener("click", function () {
+    $("#form").reset();
+    $$(".is-invalid").forEach(function (el) { el.classList.remove("is-invalid"); });
+    $$(".err").forEach(function (el) { el.hidden = true; });
+    state.modalidade = "presencial"; state.tipo = "primeira";
+    escolherPrimeiroLivre();
+    renderDias(); renderHorarios(); atualizaSetas();
+    irPara(1);
+  });
+
+  function registrar() {
+    // Só grava quando a página roda no servidor do projeto (npm start)
+    if (!window.__NUTRI_SERVER__) return;
+    var d = dados();
+    var corpo = { data: state.data, hora: state.hora, modalidade: state.modalidade, tipo: state.tipo, nome: d.nome, email: d.email, celular: d.celular, nascimento: d.nascimento, objetivos: d.objetivos, obs: d.obs };
+    try {
+      fetch("/api/agendamentos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) }).catch(function () {});
+    } catch (e) {}
+  }
+
+  /* ===== Quadro de detalhes ===== */
+  function atualizaResumo() {
+    $("#r-data").textContent = state.data && state.hora ? dataLonga(state.data, state.hora)
+      : state.data ? dataLonga(state.data) + ", escolha o horário" : "Escolha um dia e horário";
+    var online = state.modalidade === "online";
+    $("#r-local").textContent = online ? "Atendimento online" : CONFIG.endereco;
+    $("#r-end").innerHTML = online ? "Por videochamada. O link chega pelo WhatsApp." : esc(CONFIG.complemento) + "<br>" + esc(CONFIG.cidade);
+    $("#r-mapa").hidden = online;
+    $("#r-tipo").textContent = txtTipo();
+    $("#r-dur").textContent = txtMod() + " · cerca de " + CONFIG.duracao[state.tipo] + " min";
+    $("#r-mudar").hidden = state.step === 4;
+  }
+
+  /* ===== Navegação ===== */
+  function irPara(n) {
+    state.step = n;
+    $$(".panel").forEach(function (p) { p.hidden = +p.dataset.step !== n; });
+    $$(".step").forEach(function (li, i) {
+      var k = i + 1;
+      li.classList.toggle("is-active", k === n);
+      li.classList.toggle("is-done", k < n);
+      if (k === n) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+      $(".dot", li).innerHTML = k < n ? ICON_CHECK : String(k);
+    });
+    if (n === 3) renderRevisao();
+    if (n === 4) renderFinal();
+    atualizaResumo();
+    var topo = $(".stepper").getBoundingClientRect().top + window.scrollY - 12;
+    if (window.scrollY > topo) window.scrollTo({ top: topo, behavior: reduz ? "auto" : "smooth" });
+    var h = $('.panel[data-step="' + n + '"] .titulo');
+    if (h) h.focus({ preventScroll: true });
+  }
+
+  function avancar() {
+    if (state.step === 1) {
+      if (!state.data || !state.hora) { $("#err-horario").hidden = false; return; }
+      irPara(2);
+    } else if (state.step === 2) {
+      if (validar2()) irPara(3);
+    } else if (state.step === 3) {
+      if (!$("#aceite").checked) { $("#err-aceite").hidden = false; $("#aceite").focus(); return; }
+      registrar();
+      irPara(4);
+    }
+  }
+  $("#aceite").addEventListener("change", function () { if (this.checked) $("#err-aceite").hidden = true; });
+  $("#form").addEventListener("submit", function (e) { e.preventDefault(); avancar(); });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-ir]");
+    if (b) { e.preventDefault(); irPara(+b.dataset.ir); }
+  });
+
+  /* ===== Início ===== */
+  function escolherPrimeiroLivre() {
+    state.data = null; state.hora = null;
+    for (var i = 0; i < dias.length && !state.hora; i++) {
+      var d = dias[i];
+      for (var j = 0; j < d.horas.length; j++) {
+        if (!ocupado(d.iso, d.horas[j])) { state.data = d.iso; state.hora = d.horas[j]; break; }
+      }
+    }
+  }
+
+  function preencherTextos() {
+    document.title = "Agendar consulta · " + CONFIG.nomeCurto + ", nutricionista";
+    $("#marca-nome").textContent = CONFIG.nomeCurto;
+    $("#r-prof").textContent = CONFIG.nomeQuadro;
+    $("#r-crn").textContent = CONFIG.crn;
+    $("#rodape-nome").textContent = "© " + new Date().getFullYear() + " " + CONFIG.nomeCompleto + " · Nutricionista · " + CONFIG.crn;
+    $("#r-mapa").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(CONFIG.endereco + ", " + CONFIG.complemento.replace(" · ", ", ") + ", " + CONFIG.cidade);
+    $("#topo-wa").href = linkWhats("Olá, Ana Carolina! Tenho uma dúvida sobre a consulta.");
+  }
+
+  function prepararPrevia() {
+    if (!CONFIG.mostrarPrevia) $$("[data-previa]").forEach(function (el) { el.hidden = true; });
+  }
+
+  preencherTextos();
+  prepararPrevia();
+  escolherPrimeiroLivre();
+  renderDias();
+  renderHorarios();
+  atualizaResumo();
+  var sel = $('.dia[aria-pressed="true"]');
+  if (sel) $("#dias").scrollLeft = Math.max(0, sel.offsetLeft - $("#dias").offsetLeft - 4);
+  atualizaSetas();
+})();
+</script>
