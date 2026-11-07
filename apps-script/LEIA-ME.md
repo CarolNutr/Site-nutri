@@ -36,7 +36,7 @@ Pacientes.
 
 | Aba | O que tem |
 |---|---|
-| Pacientes | Um paciente por linha: cadastro, contato, objetivo, status, quem cadastrou, pasta no Drive, data da autorização (LGPD) e último acesso. **A coluna Token é o link pessoal: não compartilhe.** |
+| Pacientes | Um paciente por linha: cadastro, contato, objetivo, status, quem cadastrou, pasta no Drive, data da autorização (LGPD), último acesso e a próxima consulta (sábados, das 9h às 17h). **A coluna Token é o link pessoal: não compartilhe.** |
 | Fichas | Cada ficha e cada "como estou" com todas as respostas, para reabrir no site. |
 | Respostas | As mesmas respostas, uma por linha, fáceis de ler. |
 | Exames | Os exames enviados, com link para o arquivo no Drive. |

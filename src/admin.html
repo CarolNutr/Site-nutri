@@ -97,6 +97,8 @@ svg{flex:none}
 .duas{display:grid;gap:18px}
 @media (min-width:640px){.duas{grid-template-columns:1fr 1fr}}
 .campo{display:grid;gap:7px;min-width:0}
+fieldset.grupo-consulta{border:0;margin:0;padding:0;display:grid;gap:8px}
+fieldset.grupo-consulta legend{padding:0;margin-bottom:2px}
 .lbl{font-weight:700;font-size:15px}
 .input,.select{width:100%;height:46px;border:1px solid var(--line);border-radius:6px;padding:0 14px;background:var(--bg);color:var(--ink);font-size:16px}
 .input:focus,.select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -284,6 +286,9 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   var STATUS = ["Novo", "Ficha respondida", "Em acompanhamento", "Pausado", "Alta"];
   var TIPOS_DOC = ["Plano alimentar", "Orientações", "Lista de compras", "Receitas", "Pedido de exame"];
   var TIPOS_OK = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+  // Atendimento só aos sábados, das 9h às 17h (o último horário começa às 16h)
+  var AGENDA = { dias: [6], horarios: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"], semanas: 12 };
+  var ENDERECO = "Av. Nossa Senhora de Copacabana, 540, sala 1105";
 
   /* ===== Pacientes de exemplo (só na prévia) ===== */
   var DEMO = (function () {
@@ -305,27 +310,27 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       return r;
     }
     return { pacientes: [
-      { id: "PEX0001", nome: "Maria Exemplo da Silva", email: "maria@exemplo.com", celular: "(21) 98765-4321", nascimento: "1991-03-14", objetivo: "Emagrecimento", status: "Em acompanhamento", cadastro: "2026-10-24", por: "Recepção", ultimoAcesso: "2026-11-07", consentimento: "2026-10-24", anotacoes: "Trabalha fora o dia todo, prefere refeições práticas. Rever lanche da tarde no retorno.",
+      { id: "PEX0001", consulta: "2026-11-14 09:00", nome: "Maria Exemplo da Silva", email: "maria@exemplo.com", celular: "(21) 98765-4321", nascimento: "1991-03-14", objetivo: "Emagrecimento", status: "Em acompanhamento", cadastro: "2026-10-24", por: "Recepção", ultimoAcesso: "2026-11-07", consentimento: "2026-10-24", anotacoes: "Trabalha fora o dia todo, prefere refeições práticas. Rever lanche da tarde no retorno.",
         ficha: { data: "2026-10-25", respostas: ficha("Sim", "Não", "Não", "74,2", "1,63", "Sim: Whey protein") }, fichasAnteriores: [],
         checkins: [{ data: "2026-11-01", tipo: "Como estou", respostas: como("73,1", 4, "Segui em parte") }, { data: "2026-11-07", tipo: "Como estou", respostas: como("72,4", 4, "Segui quase tudo", "Estou sentindo menos fome à noite.") }],
         exames: [{ id: "x1", data: "2026-10-25", nome: "Hemograma completo.pdf", descricao: "Hemograma" }, { id: "x2", data: "2026-10-25", nome: "Perfil lipidico.pdf", descricao: "Colesterol e triglicerídeos" }],
         documentos: [{ id: "d1", data: "2026-10-31", titulo: "Plano alimentar - novembro", tipo: "Plano alimentar" }] },
-      { id: "PEX0002", nome: "João Pedro Exemplo", email: "joao@exemplo.com", celular: "(21) 99812-3344", nascimento: "1998-07-02", objetivo: "Ganho de massa muscular", status: "Ficha respondida", cadastro: "2026-11-05", por: "Recepção", ultimoAcesso: "2026-11-06", consentimento: "2026-11-05", anotacoes: "",
+      { id: "PEX0002", consulta: "2026-11-14 10:00", nome: "João Pedro Exemplo", email: "joao@exemplo.com", celular: "(21) 99812-3344", nascimento: "1998-07-02", objetivo: "Ganho de massa muscular", status: "Ficha respondida", cadastro: "2026-11-05", por: "Recepção", ultimoAcesso: "2026-11-06", consentimento: "2026-11-05", anotacoes: "",
         ficha: { data: "2026-11-06", respostas: ficha("Sim", "Não", "Não", "68,0", "1,78", "Sim: Creatina e whey") }, fichasAnteriores: [], checkins: [],
         exames: [{ id: "x3", data: "2026-11-06", nome: "Exames de sangue.pdf", descricao: "Check-up completo" }], documentos: [] },
-      { id: "PEX0003", nome: "Fernanda Exemplo Costa", email: "fernanda@exemplo.com", celular: "(21) 97001-2233", nascimento: "1987-11-20", objetivo: "", status: "Novo", cadastro: "2026-11-07", por: "Recepção", ultimoAcesso: "", consentimento: "", anotacoes: "",
+      { id: "PEX0003", consulta: "2026-11-14 11:00", nome: "Fernanda Exemplo Costa", email: "fernanda@exemplo.com", celular: "(21) 97001-2233", nascimento: "1987-11-20", objetivo: "", status: "Novo", cadastro: "2026-11-07", por: "Recepção", ultimoAcesso: "", consentimento: "", anotacoes: "",
         ficha: null, fichasAnteriores: [], checkins: [], exames: [], documentos: [] },
-      { id: "PEX0004", nome: "Luciana Exemplo Rocha", email: "luciana@exemplo.com", celular: "(21) 96543-1100", nascimento: "1994-05-09", objetivo: "Gestação e amamentação", status: "Em acompanhamento", cadastro: "2026-10-10", por: "Ana Carolina", ultimoAcesso: "2026-11-04", consentimento: "2026-10-10", anotacoes: "Gestante, 24 semanas.",
+      { id: "PEX0004", consulta: "2026-11-21 09:00", nome: "Luciana Exemplo Rocha", email: "luciana@exemplo.com", celular: "(21) 96543-1100", nascimento: "1994-05-09", objetivo: "Gestação e amamentação", status: "Em acompanhamento", cadastro: "2026-10-10", por: "Ana Carolina", ultimoAcesso: "2026-11-04", consentimento: "2026-10-10", anotacoes: "Gestante, 24 semanas.",
         ficha: { data: "2026-10-11", respostas: ficha("Sim", "Sim: Ácido fólico", "Não", "63,5", "1,60", "Sim: Vitamina D") }, fichasAnteriores: [],
         checkins: [{ data: "2026-10-28", tipo: "Como estou", respostas: como("64,1", 5, "Segui quase tudo") }],
         exames: [{ id: "x4", data: "2026-10-11", nome: "Hemograma.pdf", descricao: "Hemograma" }, { id: "x5", data: "2026-10-11", nome: "Glicemia.jpg", descricao: "Glicemia em jejum" }, { id: "x6", data: "2026-11-04", nome: "Ferritina.pdf", descricao: "Ferritina" }],
         documentos: [{ id: "d2", data: "2026-10-14", titulo: "Plano alimentar - gestação", tipo: "Plano alimentar" }, { id: "d3", data: "2026-10-14", titulo: "Lista de compras", tipo: "Lista de compras" }] },
-      { id: "PEX0005", nome: "Ricardo Exemplo Alves", email: "ricardo@exemplo.com", celular: "(21) 98100-7788", nascimento: "1972-01-30", objetivo: "Diabetes, colesterol ou pressão", status: "Pausado", cadastro: "2026-09-12", por: "Recepção", ultimoAcesso: "2026-10-02", consentimento: "2026-09-12", anotacoes: "Pediu pausa por viagem. Retomar em dezembro.",
+      { id: "PEX0005", consulta: "", nome: "Ricardo Exemplo Alves", email: "ricardo@exemplo.com", celular: "(21) 98100-7788", nascimento: "1972-01-30", objetivo: "Diabetes, colesterol ou pressão", status: "Pausado", cadastro: "2026-09-12", por: "Recepção", ultimoAcesso: "2026-10-02", consentimento: "2026-09-12", anotacoes: "Pediu pausa por viagem. Retomar em dezembro.",
         ficha: { data: "2026-09-13", respostas: ficha("Sim", "Sim: Metformina 500 mg", "Sim: Diabetes tipo 2", "92,0", "1,75", "Não") }, fichasAnteriores: [],
         checkins: [{ data: "2026-10-02", tipo: "Como estou", respostas: como("90,6", 3, "Segui em parte") }],
         exames: [{ id: "x7", data: "2026-09-13", nome: "Hemoglobina glicada.pdf", descricao: "Hemoglobina glicada" }],
         documentos: [{ id: "d4", data: "2026-09-20", titulo: "Plano alimentar - setembro", tipo: "Plano alimentar" }] },
-      { id: "PEX0006", nome: "Beatriz Exemplo Lima", email: "beatriz@exemplo.com", celular: "(21) 99456-2020", nascimento: "2000-09-17", objetivo: "Reeducação alimentar", status: "Alta", cadastro: "2026-08-03", por: "Recepção", ultimoAcesso: "2026-10-20", consentimento: "2026-08-03", anotacoes: "",
+      { id: "PEX0006", consulta: "", nome: "Beatriz Exemplo Lima", email: "beatriz@exemplo.com", celular: "(21) 99456-2020", nascimento: "2000-09-17", objetivo: "Reeducação alimentar", status: "Alta", cadastro: "2026-08-03", por: "Recepção", ultimoAcesso: "2026-10-20", consentimento: "2026-08-03", anotacoes: "",
         ficha: { data: "2026-08-04", respostas: ficha("Não", "Não", "Não", "61,0", "1,66", "Não") }, fichasAnteriores: [],
         checkins: [], exames: [], documentos: [{ id: "d5", data: "2026-08-10", titulo: "Orientações gerais", tipo: "Orientações" }] }
     ]};
@@ -360,10 +365,60 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   }
   function esperar(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function linkWhats(cel, t) { var d = digitos(cel); if (d.length <= 11) d = "55" + d; return "https://wa.me/" + d + "?text=" + encodeURIComponent(t); }
-  function msgLink(nome, link, novo) {
+  var DIAS_SEMANA = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
+  function partesConsulta(c) {
+    var m = String(c || "").match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/);
+    return m ? { dia: m[1] + "-" + m[2] + "-" + m[3], hora: m[4] + ":" + m[5], d: new Date(+m[1], m[2] - 1, +m[3]) } : null;
+  }
+  function horaCurta(h) { var x = h.split(":"); return Number(x[0]) + "h" + (x[1] !== "00" ? x[1] : ""); }
+  function consultaExtenso(c) { var x = partesConsulta(c); return x ? DIAS_SEMANA[x.d.getDay()] + ", " + dataCurta(x.dia) + " às " + horaCurta(x.hora) : ""; }
+  function consultaFutura(c) { var x = partesConsulta(c); return !!x && x.dia >= hojeISO(); }
+  function proximosDias() {
+    var out = [], d = new Date(); d.setHours(0, 0, 0, 0);
+    while (out.length < AGENDA.semanas) {
+      if (AGENDA.dias.indexOf(d.getDay()) >= 0) out.push(d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()));
+      d.setDate(d.getDate() + 1);
+    }
+    return out;
+  }
+  function ocupados(dia, exceto) {
+    return (S.lista || []).filter(function (p) { return p.id !== exceto && p.consulta && p.consulta.indexOf(dia + " ") === 0; }).map(function (p) { return p.consulta.slice(11); });
+  }
+  // Campos "dia" e "horário" da consulta. pre = prefixo dos ids; atual = consulta já marcada.
+  function htmlConsulta(pre, atual, exceto, obrigatoria) {
+    var x = partesConsulta(atual), dias = proximosDias();
+    if (x && dias.indexOf(x.dia) < 0) dias.unshift(x.dia);
+    var opDias = (obrigatoria ? '<option value="" disabled' + (x ? "" : " selected") + ">Escolha o sábado</option>" : '<option value="">Sem consulta marcada</option>') +
+      dias.map(function (d) { var dt = new Date(d + "T12:00:00"); return '<option value="' + d + '"' + (x && x.dia === d ? " selected" : "") + ">" + DIAS_SEMANA[dt.getDay()].replace(/^./, function (l) { return l.toUpperCase(); }) + ", " + dataBR(d) + "</option>"; }).join("");
+    return '<div class="duas"><div class="campo"><label class="lbl" for="' + pre + '-dia">Dia</label><select class="select" id="' + pre + '-dia" data-consulta="' + pre + '" data-exceto="' + esc(exceto || "") + '">' + opDias + "</select></div>" +
+      '<div class="campo"><label class="lbl" for="' + pre + '-hora">Horário</label><select class="select" id="' + pre + '-hora">' + opHoras(x ? x.dia : "", x ? x.hora : "", exceto) + "</select></div></div>";
+  }
+  function opHoras(dia, escolhida, exceto) {
+    if (!dia) return '<option value="">Escolha o dia primeiro</option>';
+    var oc = ocupados(dia, exceto);
+    return '<option value=""' + (escolhida ? "" : " selected") + ">Escolha o horário</option>" + AGENDA.horarios.map(function (h) {
+      var tomado = oc.indexOf(h) >= 0;
+      return '<option value="' + h + '"' + (h === escolhida && !tomado ? " selected" : "") + (tomado ? " disabled" : "") + ">" + h + (tomado ? " · ocupado" : "") + "</option>";
+    }).join("");
+  }
+  function atualizarHoras(pre) {
+    var dia = $("#" + pre + "-dia"), hora = $("#" + pre + "-hora");
+    if (!dia || !hora) return;
+    hora.innerHTML = opHoras(dia.value, hora.value, dia.dataset.exceto);
+  }
+  function lerConsulta(pre) {
+    var dia = $("#" + pre + "-dia").value, hora = $("#" + pre + "-hora").value;
+    return { dia: dia, hora: hora, valor: dia && hora ? dia + " " + hora : "" };
+  }
+  function linkMapa() { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ENDERECO + ", Copacabana, Rio de Janeiro - RJ"); }
+  function msgLembrete(nome, consulta) {
+    return "Olá, " + String(nome).split(" ")[0] + "! Passando para lembrar da sua consulta com a nutricionista Ana Carolina Pereira: " + consultaExtenso(consulta) + ", na " + ENDERECO + ", Copacabana. Até lá!";
+  }
+  function msgLink(nome, link, novo, consulta) {
     var primeiro = String(nome).split(" ")[0];
     return "Olá, " + primeiro + "! Aqui é do consultório da nutricionista Ana Carolina Pereira. " +
       (novo ? "Seu cadastro está pronto. " : "") +
+      (consultaFutura(consulta) ? "Sua consulta está marcada para " + consultaExtenso(consulta) + ", na " + ENDERECO + ", Copacabana. " : "") +
       "Este é o link da sua área do paciente, onde você responde a ficha de saúde e envia seus exames:\n" + link +
       "\nPara entrar, use o e-mail e o celular do seu cadastro." + (novo ? " Mandamos o mesmo link para o seu e-mail." : "");
   }
@@ -388,6 +443,8 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     muitas_tentativas: "Muitas tentativas seguidas. Espere 10 minutos e tente de novo.",
     sessao_expirada: "Sua sessão terminou. Entre de novo.",
     email_ja_cadastrado: "Já existe um paciente com este e-mail.",
+    horario_ocupado: "Esse horário já está com outro paciente. Escolha outro.",
+    consulta_invalida: "Escolha um sábado e um horário entre 9h e 16h.",
     dados_invalidos: "Alguns dados estão incompletos. Confira e tente de novo.",
     sem_permissao: "Só a nutricionista pode ver ou mudar isso.",
     nao_encontrado: "Paciente não encontrado.",
@@ -419,13 +476,13 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       if (acao === "adminPacientes") return { ok: true, pacientes: DEMO.pacientes.map(function (p) {
         var ult = p.exames.reduce(function (m, e) { return e.data > m ? e.data : m; }, "");
         var uc = p.checkins.reduce(function (m, e) { return e.data > m ? e.data : m; }, "");
-        return { id: p.id, nome: p.nome, email: p.email, celular: p.celular, nascimento: p.nascimento, objetivo: p.objetivo, status: p.status, cadastro: p.cadastro, por: p.por, ultimoAcesso: p.ultimoAcesso, ficha: p.ficha ? p.ficha.data : "", checkins: p.checkins.length, ultimoCheckin: uc, exames: p.exames.length, ultimoExame: ult };
+        return { id: p.id, nome: p.nome, email: p.email, celular: p.celular, nascimento: p.nascimento, objetivo: p.objetivo, status: p.status, cadastro: p.cadastro, por: p.por, ultimoAcesso: p.ultimoAcesso, consulta: p.consulta, ficha: p.ficha ? p.ficha.data : "", checkins: p.checkins.length, ultimoCheckin: uc, exames: p.exames.length, ultimoExame: ult };
       }) };
       if (acao === "adminPaciente") {
         var p = achar(c.id);
         if (!p) return { ok: false, erro: "nao_encontrado" };
         var copia = JSON.parse(JSON.stringify(p));
-        var out = { ok: true, veSaude: S.veSaude, paciente: { link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo", id: copia.id, nome: copia.nome, email: copia.email, celular: copia.celular, nascimento: copia.nascimento, objetivo: copia.objetivo, status: copia.status, cadastro: copia.cadastro, por: copia.por, ultimoAcesso: copia.ultimoAcesso, consentimento: copia.consentimento, pasta: "", anotacoes: S.veSaude ? copia.anotacoes : "" } };
+        var out = { ok: true, veSaude: S.veSaude, paciente: { link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo", id: copia.id, nome: copia.nome, email: copia.email, celular: copia.celular, nascimento: copia.nascimento, objetivo: copia.objetivo, status: copia.status, cadastro: copia.cadastro, por: copia.por, ultimoAcesso: copia.ultimoAcesso, consulta: copia.consulta, consentimento: copia.consentimento, pasta: "", anotacoes: S.veSaude ? copia.anotacoes : "" } };
         if (S.veSaude) { out.ficha = copia.ficha; out.fichasAnteriores = copia.fichasAnteriores; out.checkins = copia.checkins; out.exames = copia.exames; out.documentos = copia.documentos; }
         return out;
       }
@@ -434,14 +491,16 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         if (!q) return { ok: false, erro: "nao_encontrado" };
         if ((c.objetivo !== undefined || c.anotacoes !== undefined) && !S.veSaude) return { ok: false, erro: "sem_permissao" };
         if (c.email !== undefined && DEMO.pacientes.some(function (o) { return o.id !== q.id && o.email === String(c.email).toLowerCase(); })) return { ok: false, erro: "email_ja_cadastrado" };
-        ["nome", "email", "nascimento", "status", "objetivo", "anotacoes"].forEach(function (k) { if (c[k] !== undefined) q[k] = k === "email" ? String(c[k]).toLowerCase() : c[k]; });
+        if (c.consulta && DEMO.pacientes.some(function (o) { return o.id !== q.id && o.consulta === c.consulta; })) return { ok: false, erro: "horario_ocupado" };
+        ["nome", "email", "nascimento", "status", "objetivo", "anotacoes", "consulta"].forEach(function (k) { if (c[k] !== undefined) q[k] = k === "email" ? String(c[k]).toLowerCase() : c[k]; });
         if (c.celular !== undefined) q.celular = mascaraTel(c.celular);
         return { ok: true };
       }
       if (acao === "cadastrar") {
         if (DEMO.pacientes.some(function (o) { return o.email === String(c.email).toLowerCase(); })) return { ok: false, erro: "email_ja_cadastrado" };
+        if (c.consulta && DEMO.pacientes.some(function (o) { return o.consulta === c.consulta; })) return { ok: false, erro: "horario_ocupado" };
         var id = "PEX" + String(DEMO.pacientes.length + 1).padStart(4, "0");
-        DEMO.pacientes.unshift({ id: id, nome: c.nome, email: String(c.email).toLowerCase(), celular: mascaraTel(c.celular), nascimento: c.nascimento, objetivo: "", status: "Novo", cadastro: hojeISO(), por: S.por, ultimoAcesso: "", consentimento: "", anotacoes: "", ficha: null, fichasAnteriores: [], checkins: [], exames: [], documentos: [] });
+        DEMO.pacientes.unshift({ id: id, consulta: c.consulta || "", nome: c.nome, email: String(c.email).toLowerCase(), celular: mascaraTel(c.celular), nascimento: c.nascimento, objetivo: "", status: "Novo", cadastro: hojeISO(), por: S.por, ultimoAcesso: "", consentimento: "", anotacoes: "", ficha: null, fichasAnteriores: [], checkins: [], exames: [], documentos: [] });
         return { ok: true, id: id, link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo" };
       }
       if (acao === "adminReenviar") return { ok: true };
@@ -568,6 +627,12 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     if (!p.exames) return '<span class="muted">0</span>';
     return p.exames + (p.ultimoExame && p.ultimoExame >= diasAtras(7) ? '<span class="novo">novo</span>' : "");
   }
+  function celConsulta(p) {
+    var x = partesConsulta(p.consulta);
+    if (!x) return '<span class="muted">Sem consulta</span>';
+    if (x.dia < hojeISO()) return '<span class="muted">' + dataCurta(x.dia) + " (já passou)</span>";
+    return "<b>" + dataCurta(x.dia) + "</b> às " + horaCurta(x.hora);
+  }
   function renderResultado() {
     var l = filtrados(), box = $("#resultado");
     if (!S.lista.length) { box.innerHTML = '<p class="vazio-txt">Nenhum paciente ainda. <a class="link" href="#cadastrar">Cadastre o primeiro</a>.</p>'; return; }
@@ -575,12 +640,12 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     var obj = function (p) { return p.objetivo ? '<span class="obj">' + esc(p.objetivo) + "</span>" : '<span class="obj-vazio">A definir</span>'; };
     var ficha = function (p) { return p.ficha ? "Respondida em " + dataCurta(p.ficha) : '<span class="muted">Pendente</span>'; };
     box.innerHTML =
-      '<div class="tabela-wrap"><table><thead><tr><th>Paciente</th><th>Objetivo</th><th>Situação</th><th>Ficha</th><th>Exames</th><th>Último acesso</th><th>Cadastro</th><th class="col-mais"><span class="sr-only">Opções</span></th></tr></thead><tbody>' +
+      '<div class="tabela-wrap"><table><thead><tr><th>Paciente</th><th>Objetivo</th><th>Situação</th><th>Ficha</th><th>Exames</th><th>Último acesso</th><th>Consulta</th><th class="col-mais"><span class="sr-only">Opções</span></th></tr></thead><tbody>' +
       l.map(function (p) {
-        return '<tr class="linha" data-ir="#p-' + esc(p.id) + '"><td><a class="p-nome" href="#p-' + esc(p.id) + '">' + esc(p.nome) + '</a><span class="p-sub">' + esc(p.email) + "</span></td><td>" + obj(p) + "</td><td>" + pillStatus(p.status) + "</td><td>" + ficha(p) + '</td><td class="num">' + htmlExamesCel(p) + '</td><td class="num">' + (p.ultimoAcesso ? dataBR(p.ultimoAcesso) : '<span class="muted">Ainda não entrou</span>') + '</td><td class="num">' + dataBR(p.cadastro) + '</td><td class="col-mais">' + botaoMais(p) + "</td></tr>";
+        return '<tr class="linha" data-ir="#p-' + esc(p.id) + '"><td><a class="p-nome" href="#p-' + esc(p.id) + '">' + esc(p.nome) + '</a><span class="p-sub">' + esc(p.email) + "</span></td><td>" + obj(p) + "</td><td>" + pillStatus(p.status) + "</td><td>" + ficha(p) + '</td><td class="num">' + htmlExamesCel(p) + '</td><td class="num">' + (p.ultimoAcesso ? dataBR(p.ultimoAcesso) : '<span class="muted">Ainda não entrou</span>') + '</td><td class="num">' + celConsulta(p) + '</td><td class="col-mais">' + botaoMais(p) + "</td></tr>";
       }).join("") + "</tbody></table></div>" +
       '<ul class="cartoes">' + l.map(function (p) {
-        return '<li class="cartao-li"><a class="cartao-p" href="#p-' + esc(p.id) + '"><span class="linha1"><span><span class="p-nome">' + esc(p.nome) + '</span><span class="p-sub">' + esc(p.celular) + "</span></span>" + pillStatus(p.status) + '</span><span class="meta"><span>' + obj(p) + "</span><span>Ficha: " + (p.ficha ? "respondida" : "pendente") + "</span><span>Exames: " + htmlExamesCel(p) + "</span></span></a>" + botaoMais(p) + "</li>";
+        return '<li class="cartao-li"><a class="cartao-p" href="#p-' + esc(p.id) + '"><span class="linha1"><span><span class="p-nome">' + esc(p.nome) + '</span><span class="p-sub">' + esc(p.celular) + "</span></span>" + pillStatus(p.status) + '</span><span class="meta"><span>' + obj(p) + "</span><span>Ficha: " + (p.ficha ? "respondida" : "pendente") + "</span><span>Exames: " + htmlExamesCel(p) + "</span>" + (consultaFutura(p.consulta) ? "<span>Consulta: " + esc(consultaExtenso(p.consulta)) + "</span>" : "") + "</span></a>" + botaoMais(p) + "</li>";
       }).join("") + "</ul>";
   }
 
@@ -588,8 +653,9 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   function renderCadastro() {
     var c = S.cadastrado;
     if (c) {
-      $("#app").innerHTML = '<div class="sucesso"><span class="ok">' + I.check + '</span><header class="pag-head"><h1 class="h1" tabindex="-1">Cadastro de ' + esc(c.nome.split(" ")[0]) + ' feito</h1><p class="desc">O link da área do paciente foi para o e-mail <b>' + esc(c.email) + "</b>. Para garantir que chegue, mande também pelo WhatsApp.</p></header>" +
-        '<div class="det-acoes">' + (c.link ? '<a class="btn btn-wa-cheio" href="' + linkWhats(c.celular, msgLink(c.nome, c.link, true)) + '" target="_blank" rel="noopener">' + I.chat + " Mandar o link pelo WhatsApp</a>" : "") +
+      $("#app").innerHTML = '<div class="sucesso"><span class="ok">' + I.check + '</span><header class="pag-head"><h1 class="h1" tabindex="-1">Cadastro de ' + esc(c.nome.split(" ")[0]) + ' feito</h1><p class="desc">O link da área do paciente foi para o e-mail <b>' + esc(c.email) + "</b>. Para garantir que chegue, mande também pelo WhatsApp.</p>" +
+        (c.consulta ? '<p class="chip-i" style="justify-self:start">Consulta: ' + esc(consultaExtenso(c.consulta)) + "</p>" : "") + "</header>" +
+        '<div class="det-acoes">' + (c.link ? '<a class="btn btn-wa-cheio" href="' + linkWhats(c.celular, msgLink(c.nome, c.link, true, c.consulta)) + '" target="_blank" rel="noopener">' + I.chat + " Mandar o link pelo WhatsApp</a>" : "") +
         '<a class="btn-sec" href="#p-' + esc(c.id) + '">Ver paciente</a></div>' +
         '<button type="button" class="btn" data-acao="cadastrar-outro">' + I.mais + " Cadastrar outro paciente</button></div>";
       if (!CONFIG.api) $("#app").insertAdjacentHTML("beforeend", '<p class="nota-previa">Prévia: nenhum e-mail foi enviado de verdade.</p>');
@@ -604,10 +670,12 @@ dialog.confirma::backdrop{background:var(--backdrop)}
           '<div class="campo" data-bloco="celular"><label class="lbl" for="c-cel">Celular (WhatsApp)</label><div class="phone"><span class="ddi">' + FLAG + ' +55</span><input class="input" id="c-cel" type="tel" inputmode="numeric" autocomplete="off" placeholder="(21) 99999-9999"></div><p class="q-erro" hidden></p></div>' +
           '<div class="campo" data-bloco="nascimento"><label class="lbl" for="c-nasc">Data de nascimento</label><input class="input" id="c-nasc" type="date" min="1900-01-01" max="' + hojeISO() + '"><p class="q-erro" hidden></p></div>' +
         "</div>" +
+        '<fieldset class="campo grupo-consulta" data-bloco="consulta"><legend class="lbl">Consulta</legend><p class="muted" style="margin:0;font-size:14px">Atendimento aos sábados, das 9h às 17h. Horário ocupado aparece bloqueado.</p>' + htmlConsulta("c", "", "", true) + '<p class="q-erro" hidden></p></fieldset>' +
         '<div id="aviso-cad"></div>' +
         '<div><button type="submit" class="btn" id="btn-cad">Cadastrar e enviar e-mail</button></div>' +
       "</form>";
     focar();
+    if (!S.lista) chamar("adminPacientes").then(function (r) { if (r && r.ok) { S.lista = r.pacientes; atualizarHoras("c"); } });
   }
   function errosContato(v) {
     var m = {};
@@ -637,19 +705,26 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   function cadastrar() {
     var form = $("#form-cad");
     var v = { nome: $("#c-nome").value.trim().replace(/\s+/g, " "), email: $("#c-email").value.trim().toLowerCase(), celular: $("#c-cel").value, nascimento: $("#c-nasc").value };
-    if (!mostrarErros(errosContato(v), form)) return;
+    var cons = lerConsulta("c"), m = errosContato(v);
+    if (!cons.dia) m.consulta = "Escolha o dia da consulta.";
+    else if (!cons.hora) m.consulta = "Escolha o horário da consulta.";
+    if (!mostrarErros(m, form)) return;
     var b = $("#btn-cad"); b.disabled = true; b.textContent = "Cadastrando…";
     $("#aviso-cad").innerHTML = "";
-    chamar("cadastrar", { nome: v.nome, email: v.email, celular: digitos(v.celular), nascimento: v.nascimento }).then(function (r) {
+    chamar("cadastrar", { nome: v.nome, email: v.email, celular: digitos(v.celular), nascimento: v.nascimento, consulta: cons.valor }).then(function (r) {
       if (seExpirou(r)) return;
       if (!r.ok) {
         b.disabled = false; b.textContent = "Cadastrar e enviar e-mail";
         if (r.erro === "email_ja_cadastrado") mostrarErros({ email: msgErro(r.erro) }, form);
+        else if (r.erro === "horario_ocupado" || r.erro === "consulta_invalida") {
+          mostrarErros({ consulta: msgErro(r.erro) }, form);
+          chamar("adminPacientes").then(function (x) { if (x && x.ok) { S.lista = x.pacientes; atualizarHoras("c"); } });
+        }
         else $("#aviso-cad").innerHTML = '<p class="aviso" role="alert">' + esc(msgErro(r.erro)) + "</p>";
         return;
       }
       S.lista = null;
-      S.cadastrado = { id: r.id, nome: v.nome, email: v.email, celular: v.celular, link: r.link || "" };
+      S.cadastrado = { id: r.id, nome: v.nome, email: v.email, celular: v.celular, link: r.link || "", consulta: cons.valor };
       renderCadastro();
     });
   }
@@ -663,6 +738,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       if (!r.ok) { $("#app").innerHTML = '<a class="voltar" href="#pacientes">‹ Pacientes</a><p class="aviso" role="alert">' + esc(msgErro(r.erro)) + "</p>"; return; }
       S.atual = r;
       renderPaciente();
+      if (!S.lista) chamar("adminPacientes").then(function (x) { if (x && x.ok) { S.lista = x.pacientes; atualizarHoras("a"); } });
     });
   }
   function pesos(d) {
@@ -725,6 +801,8 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     var objetivos = OBJETIVOS.slice();
     if (p.objetivo && objetivos.indexOf(p.objetivo) < 0) objetivos.push(p.objetivo);
     var acompanhamento = '<section class="cartao is-destaque" aria-labelledby="t-acomp"><h2 class="h2" id="t-acomp">Acompanhamento</h2>' +
+      '<fieldset class="campo grupo-consulta" data-bloco="consulta"><legend class="lbl">Próxima consulta</legend>' + htmlConsulta("a", p.consulta, p.id, false) + '<p class="q-erro" hidden></p>' +
+      (consultaFutura(p.consulta) ? '<a class="link" href="' + linkWhats(p.celular, msgLembrete(p.nome, p.consulta)) + '" target="_blank" rel="noopener">Lembrar a consulta pelo WhatsApp</a>' : "") + "</fieldset>" +
       '<div class="campo"><label class="lbl" for="a-status">Situação</label><select class="select" id="a-status">' + STATUS.map(function (s) { return "<option" + (s === p.status ? " selected" : "") + ">" + esc(s) + "</option>"; }).join("") + "</select></div>" +
       (d.veSaude ? '<div class="campo"><label class="lbl" for="a-objetivo">Objetivo</label><select class="select" id="a-objetivo"><option value="">A definir</option>' + objetivos.map(function (o) { return "<option" + (o === p.objetivo ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select></div>" : "") +
       '<div class="det-acoes"><button type="button" class="btn" data-acao="salvar-acomp">Salvar</button><span class="ok-msg" id="ok-acomp" role="status"></span></div></section>';
@@ -738,13 +816,13 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       '<section class="cartao" aria-labelledby="t-cad"><h2 class="h2" id="t-cad">Cadastro</h2><dl class="kv">' +
         "<dt>E-mail</dt><dd>" + esc(p.email) + "</dd><dt>Celular</dt><dd>" + esc(p.celular) + "</dd><dt>Nascimento</dt><dd>" + (p.nascimento ? dataBR(p.nascimento) : "—") + "</dd>" +
         "<dt>Cadastro</dt><dd>" + dataBR(p.cadastro) + (p.por ? " · " + esc(p.por) : "") + "</dd><dt>Último acesso</dt><dd>" + (p.ultimoAcesso ? dataBR(p.ultimoAcesso) : "Ainda não entrou") + "</dd><dt>LGPD</dt><dd>" + (p.consentimento ? "Autorizou em " + dataBR(p.consentimento) : "Ainda não autorizou") + "</dd>" +
-      '</dl><div class="det-acoes"><button type="button" class="btn-sec" data-acao="editar">Editar cadastro</button>' + (p.link ? '<a class="btn-sec btn-wa" href="' + linkWhats(p.celular, msgLink(p.nome, p.link, false)) + '" target="_blank" rel="noopener">' + I.chat + " Link pelo WhatsApp</a>" : "") + '<button type="button" class="btn-sec" data-acao="reenviar">Reenviar e-mail</button></div>' +
+      '</dl><div class="det-acoes"><button type="button" class="btn-sec" data-acao="editar">Editar cadastro</button>' + (p.link ? '<a class="btn-sec btn-wa" href="' + linkWhats(p.celular, msgLink(p.nome, p.link, false, p.consulta)) + '" target="_blank" rel="noopener">' + I.chat + " Link pelo WhatsApp</a>" : "") + '<button type="button" class="btn-sec" data-acao="reenviar">Reenviar e-mail</button></div>' +
       (d.veSaude && p.pasta ? '<a class="link" href="' + esc(p.pasta) + '" target="_blank" rel="noopener">Abrir pasta no Google Drive</a>' : "") +
       '<div><button type="button" class="link link-perigo" data-acao="pedir-remover" data-id="' + esc(p.id) + '">Remover paciente</button></div>' + "</section>";
 
     $("#app").innerHTML =
       '<a class="voltar" href="#pacientes">‹ Pacientes</a>' +
-      '<div class="head-linha"><header class="det-head"><h1 class="h1" tabindex="-1">' + esc(p.nome) + '</h1><div class="det-chips">' + (ida !== null ? '<span class="chip-i">' + ida + " anos</span>" : "") + (p.objetivo ? '<span class="chip-i">' + esc(p.objetivo) + "</span>" : "") + pillStatus(p.status) + "</div></header>" +
+      '<div class="head-linha"><header class="det-head"><h1 class="h1" tabindex="-1">' + esc(p.nome) + '</h1><div class="det-chips">' + (ida !== null ? '<span class="chip-i">' + ida + " anos</span>" : "") + (p.objetivo ? '<span class="chip-i">' + esc(p.objetivo) + "</span>" : "") + pillStatus(p.status) + (consultaFutura(p.consulta) ? '<span class="chip-i">Consulta: ' + esc(consultaExtenso(p.consulta)) + "</span>" : "") + "</div></header>" +
       '<div class="det-acoes"><a class="btn-sec btn-wa" href="' + linkWhats(p.celular, "Olá, " + p.nome.split(" ")[0] + "!") + '" target="_blank" rel="noopener">' + I.chat + " WhatsApp</a></div></div>" +
       '<div class="det"><div class="principal">' + principal + '</div><aside class="lado">' + acompanhamento + cadastro + "</aside></div>";
     focar();
@@ -898,6 +976,9 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   });
   document.addEventListener("change", function (e) {
     if (e.target.id === "f-objetivo") { S.filtro.objetivo = e.target.value; renderResultado(); }
+    if (e.target.dataset.consulta) atualizarHoras(e.target.dataset.consulta);
+    var bc = e.target.closest('[data-bloco="consulta"]');
+    if (bc && bc.classList.contains("is-erro")) { bc.classList.remove("is-erro"); $(".q-erro", bc).hidden = true; }
   });
   document.addEventListener("click", function (e) {
     if (!e.target.closest("#pop") && !e.target.closest(".mais")) fecharMenu();
@@ -916,9 +997,14 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     else if (a === "editar") { S.editando = true; renderPaciente(); }
     else if (a === "cancelar-edicao") { S.editando = false; renderPaciente(); }
     else if (a === "salvar-acomp") {
-      var campos = { status: $("#a-status").value };
+      var campos = { status: $("#a-status").value }, ca = lerConsulta("a");
       if ($("#a-objetivo")) campos.objetivo = $("#a-objetivo").value;
-      atualizar(campos, $("#ok-acomp"), b).then(function (r) { if (r && r.ok) { renderPaciente(); toast("Acompanhamento salvo."); } });
+      if (ca.dia && !ca.hora) { mostrarErros({ consulta: "Escolha o horário da consulta." }, $(".lado")); return; }
+      campos.consulta = ca.valor;
+      atualizar(campos, $("#ok-acomp"), b).then(function (r) {
+        if (r && r.ok) { renderPaciente(); toast("Acompanhamento salvo."); }
+        else if (r && (r.erro === "horario_ocupado" || r.erro === "consulta_invalida")) mostrarErros({ consulta: msgErro(r.erro) }, $(".lado"));
+      });
     }
     else if (a === "salvar-anotacoes") atualizar({ anotacoes: $("#anotacoes").value }, $("#ok-anot"), b);
     else if (a === "reenviar") {

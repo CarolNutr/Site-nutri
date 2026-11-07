@@ -244,6 +244,9 @@ svg{flex:none}
 /* Cartões e avisos */
 .cartao{border:1px solid var(--line);border-radius:14px;padding:20px 22px;display:grid;gap:14px}
 .cartao.is-destaque{background:var(--soft);border-color:transparent}
+.consulta-card{gap:6px}
+.consulta-card .linha-form{margin-top:8px}
+.consulta-quando{font-family:var(--font-brand);font-size:26px;font-weight:600;line-height:1.2}
 .aviso{display:grid;gap:10px;padding:14px 16px;border-radius:10px;background:var(--error-soft);border:1px solid var(--error);font-size:15px}
 .aviso p{margin:0}
 .toast{position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom, 0px) + 24px);background:var(--ink);color:var(--on-brand);padding:12px 20px;border-radius:999px;font-weight:700;font-size:15px;max-width:calc(100vw - 32px);text-align:center}
@@ -337,7 +340,7 @@ svg{flex:none}
   /* ===== Paciente de exemplo (só na prévia) ===== */
   var DEMO = {
     email: "maria@exemplo.com", celular: "21987654321",
-    paciente: { nome: "Maria Exemplo da Silva", objetivo: "Emagrecimento", cadastro: "2026-10-31" },
+    paciente: { nome: "Maria Exemplo da Silva", objetivo: "Emagrecimento", cadastro: "2026-10-31", consulta: "2026-11-14 09:00" },
     ficha: null,
     checkins: [],
     exames: [{ data: "2026-11-05", nome: "Hemograma completo.pdf", descricao: "Hemograma" }],
@@ -683,12 +686,27 @@ svg{flex:none}
     return '<header class="pag-head"><span class="eyebrow">Área do paciente</span><h1 class="h1" tabindex="-1">Olá, ' + esc(primeiroNome()) + "</h1>" +
       '<div class="chips-info">' + (P.paciente.objetivo ? '<span class="chip-info">Objetivo: <b>' + esc(P.paciente.objetivo) + "</b></span>" : "") + '<span class="chip-info">Paciente desde ' + dataBR(P.paciente.cadastro) + "</span></div></header>" +
       (!CONFIG.api ? '<p class="nota-previa">Prévia com a paciente de exemplo. Pode testar à vontade: nada é enviado de verdade.</p>' : "") +
+      htmlConsulta(P.paciente.consulta) +
       '<section class="bloco"><h2 class="h2">Para fazer</h2><ul class="tarefas">' + tarefas.map(function (t) {
         return '<li class="tarefa ' + t.cls + '"><span class="t-ico">' + t.ico + '</span><div class="t-txt"><strong>' + t.t + "</strong><span>" + esc(t.d) + '</span></div><a class="btn-sec t-acao" href="' + t.h + '">' + t.a + "</a></li>";
       }).join("") + "</ul></section>" +
       '<section class="bloco"><div class="bloco-top"><h2 class="h2">Da nutricionista</h2><a class="link" href="#nutricionista">Ver tudo</a></div>' + (docs.length ? htmlDocs(docs) : '<p class="vazio-txt">Quando a ' + esc(CONFIG.nomeCurto) + " enviar seu plano alimentar ou orientações, eles aparecem aqui.</p>") + "</section>" +
       '<section class="bloco"><div class="bloco-top"><h2 class="h2">Últimas atualizações</h2><a class="link" href="#acompanhamento">Ver acompanhamento</a></div>' + htmlTempo(evs) + "</section>" +
       '<p class="ajuda-m">Precisa de ajuda? <a href="' + linkWhats("Olá! Sou paciente e preciso de ajuda com a área do paciente.") + '" target="_blank" rel="noopener">Chamar no WhatsApp</a></p>';
+  }
+
+  /* Próxima consulta */
+  function htmlConsulta(c) {
+    var m = String(c || "").match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/);
+    if (!m || m[1] + "-" + m[2] + "-" + m[3] < hojeISO()) return "";
+    var d = new Date(+m[1], m[2] - 1, +m[3]);
+    var dia = d.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+    var quando = dia.charAt(0).toUpperCase() + dia.slice(1) + ", às " + Number(m[4]) + "h" + (m[5] !== "00" ? m[5] : "");
+    var end = "Av. Nossa Senhora de Copacabana, 540, sala 1105";
+    return '<section class="cartao is-destaque consulta-card" aria-labelledby="t-consulta"><span class="eyebrow" id="t-consulta">Sua próxima consulta</span>' +
+      '<strong class="consulta-quando">' + esc(quando) + '</strong><span class="meta">' + end + " · Copacabana, Rio de Janeiro</span>" +
+      '<div class="linha-form"><a class="btn-sec" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(end + ", Copacabana, Rio de Janeiro - RJ") + '" target="_blank" rel="noopener">Ver no mapa</a>' +
+      '<a class="btn-sec" href="' + linkWhats("Olá! Preciso remarcar minha consulta de " + quando.toLowerCase() + ".") + '" target="_blank" rel="noopener">' + I.chat + " Precisa remarcar?</a></div></section>";
   }
 
   /* Ficha de saúde */
