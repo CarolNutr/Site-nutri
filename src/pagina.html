@@ -8,10 +8,10 @@
 /* Layout: faixa verde no topo; abaixo, formulário em etapas à esquerda e quadro de detalhes fixo à direita (no celular o quadro vem logo abaixo das etapas). Tema único claro, todo branco. */
 :root{
   --bg:#ffffff;
-  --ink:#2f2a38;
-  --muted:#857e91;
-  --line:#e2dee9;
-  --soft:#f6f4f9;
+  --ink:#2c2f26;
+  --muted:#727667;
+  --line:#e0e2d7;
+  --soft:#f5f6f0;
   --brand:#5d6e35;       /* verde musgo */
   --on-brand:#ffffff;
   --on-brand-line:rgba(255,255,255,.6);
@@ -19,26 +19,19 @@
   --cta-hover:#4a5928;
   --wa:#1f9a52;
   --wa-hover:#18833f;
-  --accent:#8a3db5;
-  --accent-soft:#f4ebfa;
-  --card:#8a3db5;
-  --card-2:#7a31a5;
-  --card-ink:#ffffff;
-  --card-muted:rgba(255,255,255,.8);
-  --card-line:rgba(255,255,255,.2);
-  --slot-off:#c4bdcc;
-  --error:#e0533b;
-  --shadow:rgba(40,25,55,.22);
-  --font-ui:"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
-  --font-brand:"Fraunces",Georgia,"Times New Roman",serif;
-  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
-  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
-}
-:root[data-cor="verde"]{
   --accent:#56672f;
   --accent-soft:#eef1e3;
   --card:#5d6e35;
   --card-2:#4d5c2b;
+  --card-ink:#ffffff;
+  --card-muted:rgba(255,255,255,.82);
+  --card-line:rgba(255,255,255,.22);
+  --slot-off:#c0c3b4;
+  --error:#d4492f;
+  --font-ui:"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-brand:"Fraunces",Georgia,"Times New Roman",serif;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -124,8 +117,11 @@ svg{flex:none}
 .dias-nav{display:flex;align-items:center;gap:6px}
 .mes{font-weight:700;color:var(--ink);font-size:15px}
 .seta{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg);display:grid;place-items:center;cursor:pointer;color:var(--ink)}
-.seta:hover{border-color:var(--accent);color:var(--accent)}
-.dias{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity;scrollbar-width:thin}
+.seta:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.seta:disabled{opacity:.35;cursor:default}
+.sem-rolagem .seta{display:none}
+.dias{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 6px;scroll-snap-type:x proximity;scrollbar-width:none}
+.dias::-webkit-scrollbar{display:none}
 .dia{flex:0 0 auto;width:70px;padding:10px 0 9px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);display:grid;justify-items:center;gap:1px;cursor:pointer;scroll-snap-align:start;color:var(--ink)}
 .dia:hover:not(:disabled){border-color:var(--accent)}
 .dia .dw{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
@@ -212,13 +208,6 @@ svg{flex:none}
 .rodape{border-top:1px solid var(--line);color:var(--muted);font-size:14px}
 .rodape-in{max-width:1180px;margin:0 auto;padding-block:22px;padding-left:var(--gutter-l);padding-right:var(--gutter-r);display:flex;justify-content:space-between;gap:8px 24px;flex-wrap:wrap}
 
-/* Barra da prévia (some quando o site for ao ar) */
-.previa{position:fixed;z-index:20;left:calc(env(safe-area-inset-left, 0px) + 16px);bottom:calc(env(safe-area-inset-bottom, 0px) + 16px);display:flex;align-items:center;gap:4px;padding:6px 6px 6px 14px;background:var(--ink);color:var(--on-brand);border-radius:999px;font-size:13px;box-shadow:0 8px 28px var(--shadow);max-width:calc(100vw - 32px)}
-.previa-txt{font-weight:600;margin-right:4px;white-space:nowrap}
-.previa button{border:0;border-radius:999px;padding:6px 12px;background:transparent;color:var(--on-brand);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
-.previa button[aria-pressed="true"]{background:var(--on-brand);color:var(--ink)}
-.previa i{width:10px;height:10px;border-radius:50%;display:block}
-.tem-previa{padding-bottom:72px}
 @media (max-width:640px){.topo-link{display:none}.logo-nome{font-size:21px}.titulo{font-size:24px}.step-nome{font-size:13px}.wrap{padding-block:24px 56px}}
 @media (prefers-reduced-motion:no-preference){
   .slot,.dia,.opt-box,.chip span,.btn,.seta{transition:background-color .15s ease,border-color .15s ease,color .15s ease}
@@ -293,7 +282,7 @@ svg{flex:none}
       <section class="panel" data-step="1" aria-labelledby="t1">
         <div class="head">
           <h1 class="titulo" id="t1" tabindex="-1">Agendar consulta</h1>
-          <p class="sub">Escolha como quer ser atendido e o melhor dia e horário para você.</p>
+          <p class="sub">Os atendimentos são aos sábados, das 9h às 17h. Escolha como quer ser atendido e o melhor horário para você.</p>
         </div>
 
         <div class="field">
@@ -443,12 +432,6 @@ svg{flex:none}
   </div>
 </footer>
 
-<div class="previa" id="previa" role="group" aria-label="Opções da prévia">
-  <span class="previa-txt">Prévia · cor do quadro</span>
-  <button type="button" data-cor="roxo" aria-pressed="true"><i style="background:#8a3db5"></i>Roxo</button>
-  <button type="button" data-cor="verde" aria-pressed="false"><i style="background:#5d6e35"></i>Musgo</button>
-</div>
-
 <script>
 (function () {
   "use strict";
@@ -465,15 +448,11 @@ svg{flex:none}
     whatsapp: "5521900000000",          // DDI + DDD + número, só dígitos (exemplo)
     duracao: { primeira: 60, retorno: 40 },
     // Horários por dia da semana (0 = domingo ... 6 = sábado)
+    // Só sábados, das 9h às 17h (último horário começa às 16h para terminar às 17h)
     agenda: {
-      1: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
-      2: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
-      3: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"],
-      4: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
-      5: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
-      6: ["08:00", "09:00", "10:00", "11:00"]
+      6: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"]
     },
-    diasNaAgenda: 18,
+    diasNaAgenda: 8,                    // quantos sábados aparecem para escolher
     objetivos: ["Emagrecimento", "Ganho de massa muscular", "Reeducação alimentar", "Saúde intestinal", "Gestação e amamentação", "Nutrição esportiva", "Diabetes ou colesterol", "Alimentação vegetariana"],
     mostrarPrevia: true
   };
@@ -582,6 +561,14 @@ svg{flex:none}
   }
   $("#dias-ant").addEventListener("click", function () { rolarDias(-1); });
   $("#dias-prox").addEventListener("click", function () { rolarDias(1); });
+  function atualizaSetas() {
+    var box = $("#dias"), max = box.scrollWidth - box.clientWidth;
+    $("#dias-ant").disabled = box.scrollLeft <= 2;
+    $("#dias-prox").disabled = box.scrollLeft >= max - 2;
+    $(".dias-nav").classList.toggle("sem-rolagem", max <= 2);
+  }
+  $("#dias").addEventListener("scroll", atualizaSetas, { passive: true });
+  window.addEventListener("resize", atualizaSetas);
 
   $$('input[name="modalidade"], input[name="tipo"]').forEach(function (r) {
     r.addEventListener("change", function () { state[r.name] = r.value; atualizaResumo(); });
@@ -736,7 +723,7 @@ svg{flex:none}
     $$(".err").forEach(function (el) { el.hidden = true; });
     state.modalidade = "presencial"; state.tipo = "primeira";
     escolherPrimeiroLivre();
-    renderDias(); renderHorarios();
+    renderDias(); renderHorarios(); atualizaSetas();
     irPara(1);
   });
 
@@ -824,18 +811,7 @@ svg{flex:none}
   }
 
   function prepararPrevia() {
-    if (!CONFIG.mostrarPrevia) {
-      $("#previa").hidden = true;
-      $$("[data-previa]").forEach(function (el) { el.hidden = true; });
-      return;
-    }
-    document.body.classList.add("tem-previa");
-    $$("#previa button").forEach(function (b) {
-      b.addEventListener("click", function () {
-        document.documentElement.setAttribute("data-cor", b.dataset.cor);
-        $$("#previa button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-      });
-    });
+    if (!CONFIG.mostrarPrevia) $$("[data-previa]").forEach(function (el) { el.hidden = true; });
   }
 
   preencherTextos();
@@ -846,5 +822,6 @@ svg{flex:none}
   atualizaResumo();
   var sel = $('.dia[aria-pressed="true"]');
   if (sel) $("#dias").scrollLeft = Math.max(0, sel.offsetLeft - $("#dias").offsetLeft - 4);
+  atualizaSetas();
 })();
 </script>
