@@ -1,6 +1,6 @@
 // Servidorzinho do site de agendamento (sem dependências).
 //   npm start        -> abre em http://localhost:3000 (agendamento) e /paciente/ (área do paciente)
-//   npm run build    -> gera a pasta dist/ para hospedar como site estático
+//   npm run build    -> gera a pasta docs/ (o GitHub Pages publica dela)
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -10,6 +10,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const PAGINAS = {
   "/": "agendamento.html",
   "/paciente/": "paciente.html",
+  "/admin/": "admin.html",
 };
 const DADOS = path.join(__dirname, "data", "agendamentos.json");
 
@@ -106,11 +107,12 @@ const servidor = http.createServer((req, res) => {
 
 if (process.argv[2] === "build") {
   for (const [caminho, arquivo] of Object.entries(PAGINAS)) {
-    const destino = path.join(__dirname, "dist", caminho, "index.html");
+    const destino = path.join(__dirname, "docs", caminho, "index.html");
     fs.mkdirSync(path.dirname(destino), { recursive: true });
     fs.writeFileSync(destino, montarHtml(arquivo, { servidor: false }));
     console.log("Gerado:", destino);
   }
+  fs.writeFileSync(path.join(__dirname, "docs", ".nojekyll"), "");
 } else {
   servidor.listen(PORT, () => console.log(`Site no ar em http://localhost:${PORT}`));
 }

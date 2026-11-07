@@ -13,11 +13,14 @@
 
 // ===================== Ajuste aqui =====================
 // Endereço da área do paciente (o link que vai no e-mail).
-const URL_AREA_PACIENTE = "https://SEU-SITE/paciente/";
+const URL_AREA_PACIENTE = "https://carolnutr.github.io/Site-nutri/paciente/";
 // Senha do painel das administradoras (a mesma para a Ana Carolina e para a recepção).
 const SENHA_ADMIN = "TROQUE-ESTA-SENHA";
 // Quem pode aparecer na coluna "Cadastrado por" (o painel pergunta quem está usando).
 const ADMINISTRADORAS = ["Ana Carolina", "Recepção"];
+// A recepção vê só os dados do cadastro. Ficha, exames, acompanhamento e anotações
+// ficam só com a nutricionista. Troque para true se a recepção também deve ver tudo.
+const RECEPCAO_VE_SAUDE = false;
 const NOME_REMETENTE = "Ana Carolina Pereira · Nutricionista";
 const NOME_PASTA = "Pacientes · Nutri Ana Carolina";
 const MAX_ARQUIVO_MB = 10;
@@ -25,15 +28,17 @@ const MAX_ARQUIVO_MB = 10;
 
 const VERSAO = 1;
 const HORAS_SESSAO = 6;
+const HORAS_SESSAO_ADMIN = 12;
+const STATUS = ["Novo", "Ficha respondida", "Em acompanhamento", "Pausado", "Alta"];
 const ABAS = {
-  Pacientes: ["ID", "Cadastro", "Nome", "E-mail", "Celular", "Nascimento", "Objetivo", "Status", "Cadastrado por", "Token", "Pasta", "Consentimento em", "Último acesso"],
+  Pacientes: ["ID", "Cadastro", "Nome", "E-mail", "Celular", "Nascimento", "Objetivo", "Status", "Cadastrado por", "Token", "Pasta", "Consentimento em", "Último acesso", "Anotações (só a nutricionista)"],
   Fichas: ["Data", "Paciente", "Tipo", "Valores (JSON)"],
   Respostas: ["Data", "Paciente", "Nome", "Tipo", "Seção", "Pergunta", "Resposta"],
   Exames: ["Data", "Paciente", "Nome", "Arquivo", "Descrição", "Link", "ID no Drive"],
   Documentos: ["ID", "Data", "Paciente", "Título", "Tipo", "Link", "ID no Drive"]
 };
 // Posição das colunas da aba Pacientes (começando em 0)
-const P = { id: 0, cadastro: 1, nome: 2, email: 3, celular: 4, nascimento: 5, objetivo: 6, status: 7, por: 8, token: 9, pasta: 10, consentimento: 11, acesso: 12 };
+const P = { id: 0, cadastro: 1, nome: 2, email: 3, celular: 4, nascimento: 5, objetivo: 6, status: 7, por: 8, token: 9, pasta: 10, consentimento: 11, acesso: 12, anotacoes: 13 };
 const TIPOS_OK = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 
 // ---------------------------------------------------------------- Entrada
@@ -56,6 +61,13 @@ function doPost(e) {
       case "arquivo": return saida(salvarExame(c));
       case "documento": return saida(baixarDocumento(c));
       // Administradoras
+      case "adminEntrar": return saida(adminEntrar(c));
+      case "adminPacientes": return saida(adminPacientes(c));
+      case "adminPaciente": return saida(adminPaciente(c));
+      case "adminAtualizar": return saida(adminAtualizar(c));
+      case "adminReenviar": return saida(adminReenviar(c));
+      case "adminArquivo": return saida(adminArquivo(c));
+      case "adminDocumento": return saida(adminDocumento(c));
       case "cadastrar": return saida(cadastrar(c));
       default: return saida({ ok: false, erro: "acao_desconhecida" });
     }
@@ -71,10 +83,24 @@ function saida(obj) {
 
 // ---------------------------------------------------------------- Administradoras
 
-function senhaAdminOk(senha) {
-  if (SENHA_ADMIN === "TROQUE-ESTA-SENHA") return false; // a senha de exemplo não vale
-  if (!tentativaPermitida("admin", 20)) return false;
-  return String(senha || "") === SENHA_ADMIN;
+function adminEntrar(c) {
+  if (SENHA_ADMIN === "TROQUE-ESTA-SENHA") return { ok: false, erro: "senha_nao_configurada" };
+  const cache = CacheService.getScriptCache();
+  const erros = Number(cache.get("t_admin_erros") || 0);
+  if (erros >= 10) return { ok: false, erro: "muitas_tentativas" };
+  if (String(c.senha || "") !== SENHA_ADMIN) {
+    cache.put("t_admin_erros", String(erros + 1), 600);
+    return { ok: false, erro: "senha_invalida" };
+  }
+  const por = ADMINISTRADORAS.indexOf(c.por) >= 0 ? c.por : "Recepção";
+  const sessao = Utilities.getUuid();
+  cache.put("adm_" + sessao, por, HORAS_SESSAO_ADMIN * 3600);
+  return { ok: true, sessao: sessao, por: por, veSaude: veSaude(por) };
+}
+function veSaude(por) { return por === "Ana Carolina" || RECEPCAO_VE_SAUDE; }
+function adminDaSessao(c) {
+  const por = CacheService.getScriptCache().get("adm_" + texto(c.sessao, 60));
+  return por ? { por: por, veSaude: veSaude(por) } : null;
 }
 
 /**
@@ -83,8 +109,9 @@ function senhaAdminOk(senha) {
  * Objetivo e status ficam com a nutricionista (painel).
  */
 function cadastrar(c) {
-  if (!senhaAdminOk(c.senha)) return { ok: false, erro: "senha_invalida" };
-  const admin = ADMINISTRADORAS.indexOf(c.por) >= 0 ? c.por : "Administradora";
+  const adm = adminDaSessao(c);
+  if (!adm) return { ok: false, erro: "sessao_expirada" };
+  const admin = adm.por;
   const nome = texto(c.nome, 120);
   const email = texto(c.email, 120).toLowerCase();
   const celular = celularNormal(c.celular);
@@ -111,6 +138,7 @@ function cadastrar(c) {
     linha[P.pasta] = pasta.getUrl();
     linha[P.consentimento] = "";
     linha[P.acesso] = "";
+    linha[P.anotacoes] = "";
     aba("Pacientes").appendRow(linha);
     enviarEmailDeAcesso(nome, email, token);
     return { ok: true, id: id };
@@ -236,6 +264,177 @@ function baixarDocumento(c) {
   return { ok: true, nome: blob.getName(), tipo: blob.getContentType(), base64: Utilities.base64Encode(blob.getBytes()) };
 }
 
+// ---------------------------------------------------------------- Painel das administradoras
+
+function adminPacientes(c) {
+  const adm = adminDaSessao(c);
+  if (!adm) return { ok: false, erro: "sessao_expirada" };
+  const sh = aba("Pacientes");
+  const n = sh.getLastRow();
+  const linhas = n < 2 ? [] : sh.getRange(2, 1, n - 1, ABAS.Pacientes.length).getValues();
+  const exames = {};
+  const se = aba("Exames");
+  if (se.getLastRow() > 1) se.getRange(2, 1, se.getLastRow() - 1, 2).getValues().forEach(function (l) {
+    const e = exames[l[1]] = exames[l[1]] || { n: 0, ultimo: "" };
+    const d = dataISO(l[0]);
+    e.n++; if (d > e.ultimo) e.ultimo = d;
+  });
+  const fichas = {};
+  const sf = aba("Fichas");
+  if (sf.getLastRow() > 1) sf.getRange(2, 1, sf.getLastRow() - 1, 3).getValues().forEach(function (l) {
+    const f = fichas[l[1]] = fichas[l[1]] || { ficha: "", checkins: 0, ultimoCheckin: "" };
+    const d = dataISO(l[0]);
+    if (l[2] === "Ficha") { if (d > f.ficha) f.ficha = d; }
+    else { f.checkins++; if (d > f.ultimoCheckin) f.ultimoCheckin = d; }
+  });
+  return {
+    ok: true,
+    pacientes: linhas.filter(function (v) { return v[P.id]; }).map(function (v) {
+      const id = v[P.id], f = fichas[id] || {}, e = exames[id] || {};
+      return {
+        id: id, nome: String(v[P.nome]), email: String(v[P.email]), celular: String(v[P.celular]),
+        nascimento: nascISO(v[P.nascimento]), objetivo: String(v[P.objetivo] || ""), status: String(v[P.status] || "Novo"),
+        cadastro: dataISO(v[P.cadastro]), por: String(v[P.por] || ""), ultimoAcesso: dataISO(v[P.acesso]),
+        ficha: f.ficha || "", checkins: f.checkins || 0, ultimoCheckin: f.ultimoCheckin || "",
+        exames: e.n || 0, ultimoExame: e.ultimo || ""
+      };
+    })
+  };
+}
+
+function adminPaciente(c) {
+  const adm = adminDaSessao(c);
+  if (!adm) return { ok: false, erro: "sessao_expirada" };
+  const p = acharPaciente(function (l) { return l[P.id] === texto(c.id, 20); });
+  if (!p) return { ok: false, erro: "nao_encontrado" };
+  const v = p.valores, id = v[P.id];
+  const out = {
+    ok: true, veSaude: adm.veSaude,
+    paciente: {
+      id: id, nome: String(v[P.nome]), email: String(v[P.email]), celular: String(v[P.celular]),
+      nascimento: nascISO(v[P.nascimento]), objetivo: String(v[P.objetivo] || ""), status: String(v[P.status] || "Novo"),
+      cadastro: dataISO(v[P.cadastro]), por: String(v[P.por] || ""), ultimoAcesso: dataISO(v[P.acesso]),
+      consentimento: dataISO(v[P.consentimento]),
+      pasta: adm.veSaude ? String(v[P.pasta] || "") : "",
+      anotacoes: adm.veSaude ? String(v[P.anotacoes] || "") : ""
+    }
+  };
+  if (!adm.veSaude) return out;
+  // Respostas agrupadas por envio (mesma data e hora, mesmo tipo)
+  const grupos = {}, ordem = [];
+  linhasDoPaciente("Respostas", 1, id).forEach(function (l) {
+    const chave = (l[0] instanceof Date ? l[0].getTime() : String(l[0])) + "|" + l[3];
+    if (!grupos[chave]) { grupos[chave] = { data: dataISO(l[0]), tipo: String(l[3]), respostas: [] }; ordem.push(chave); }
+    grupos[chave].respostas.push({ secao: String(l[4]), pergunta: String(l[5]), resposta: String(l[6]) });
+  });
+  const envios = ordem.map(function (k) { return grupos[k]; });
+  const fichas = envios.filter(function (e) { return e.tipo === "Ficha"; });
+  out.ficha = fichas.length ? fichas[fichas.length - 1] : null;
+  out.fichasAnteriores = fichas.slice(0, -1).map(function (f) { return f.data; });
+  out.checkins = envios.filter(function (e) { return e.tipo === "Como estou"; });
+  out.exames = linhasDoPaciente("Exames", 1, id).map(function (l) { return { id: String(l[6]), data: dataISO(l[0]), nome: String(l[3]), descricao: String(l[4] || "") }; });
+  out.documentos = linhasDoPaciente("Documentos", 2, id).map(function (l) { return { id: String(l[6]), data: dataISO(l[1]), titulo: String(l[3]), tipo: String(l[4] || "") }; });
+  return out;
+}
+
+/** Edita cadastro e acompanhamento. Objetivo e anotações só a nutricionista. */
+function adminAtualizar(c) {
+  const adm = adminDaSessao(c);
+  if (!adm) return { ok: false, erro: "sessao_expirada" };
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const p = acharPaciente(function (l) { return l[P.id] === texto(c.id, 20); });
+    if (!p) return { ok: false, erro: "nao_encontrado" };
+    const mudar = [];
+    if (c.nome !== undefined) {
+      const nome = texto(c.nome, 120);
+      if (nome.split(" ").length < 2) return { ok: false, erro: "dados_invalidos" };
+      mudar.push([P.nome, seguro(nome)]);
+    }
+    if (c.email !== undefined) {
+      const email = texto(c.email, 120).toLowerCase();
+      if (!emailValido(email)) return { ok: false, erro: "dados_invalidos" };
+      if (acharPaciente(function (l) { return String(l[P.email]).toLowerCase() === email && l[P.id] !== p.valores[P.id]; })) return { ok: false, erro: "email_ja_cadastrado" };
+      mudar.push([P.email, seguro(email)]);
+    }
+    if (c.celular !== undefined) {
+      const cel = celularNormal(c.celular);
+      if (cel.length < 10) return { ok: false, erro: "dados_invalidos" };
+      mudar.push([P.celular, "'" + formatarCelular(cel)]);
+    }
+    if (c.nascimento !== undefined) {
+      if (!dataValida(c.nascimento)) return { ok: false, erro: "dados_invalidos" };
+      mudar.push([P.nascimento, "'" + dataBR(c.nascimento)]);
+    }
+    if (c.status !== undefined) {
+      if (STATUS.indexOf(c.status) < 0) return { ok: false, erro: "dados_invalidos" };
+      mudar.push([P.status, c.status]);
+    }
+    if (c.objetivo !== undefined || c.anotacoes !== undefined) {
+      if (!adm.veSaude) return { ok: false, erro: "sem_permissao" };
+      if (c.objetivo !== undefined) mudar.push([P.objetivo, seguro(texto(c.objetivo, 120))]);
+      if (c.anotacoes !== undefined) mudar.push([P.anotacoes, seguro(textoLongo(c.anotacoes, 20000))]);
+    }
+    const sh = aba("Pacientes");
+    mudar.forEach(function (m) { sh.getRange(p.linha, m[0] + 1).setValue(m[1]); });
+    return { ok: true };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function adminReenviar(c) {
+  const adm = adminDaSessao(c);
+  if (!adm) return { ok: false, erro: "sessao_expirada" };
+  const p = acharPaciente(function (l) { return l[P.id] === texto(c.id, 20); });
+  if (!p) return { ok: false, erro: "nao_encontrado" };
+  if (!tentativaPermitida("reenviar_adm_" + p.valores[P.id], 5)) return { ok: false, erro: "muitas_tentativas" };
+  enviarEmailDeAcesso(String(p.valores[P.nome]), String(p.valores[P.email]), p.valores[P.token]);
+  return { ok: true };
+}
+
+/** Abre um exame ou documento de paciente (só arquivos registrados na planilha). */
+function adminArquivo(c) {
+  const adm = adminDaSessao(c);
+  if (!adm) return { ok: false, erro: "sessao_expirada" };
+  if (!adm.veSaude) return { ok: false, erro: "sem_permissao" };
+  const id = texto(c.id, 80);
+  const registrado = [["Exames", 7], ["Documentos", 7]].some(function (a) {
+    const sh = aba(a[0]);
+    if (sh.getLastRow() < 2) return false;
+    return sh.getRange(2, a[1], sh.getLastRow() - 1, 1).getValues().some(function (l) { return String(l[0]) === id; });
+  });
+  if (!id || !registrado) return { ok: false, erro: "nao_encontrado" };
+  const blob = DriveApp.getFileById(id).getBlob();
+  if (blob.getBytes().length > 20 * 1024 * 1024) return { ok: false, erro: "arquivo_grande" };
+  return { ok: true, nome: blob.getName(), tipo: blob.getContentType(), base64: Utilities.base64Encode(blob.getBytes()) };
+}
+
+/** A nutricionista envia um plano, orientação ou pedido de exame para a área do paciente. */
+function adminDocumento(c) {
+  const adm = adminDaSessao(c);
+  if (!adm) return { ok: false, erro: "sessao_expirada" };
+  if (!adm.veSaude) return { ok: false, erro: "sem_permissao" };
+  const p = acharPaciente(function (l) { return l[P.id] === texto(c.id, 20); });
+  if (!p) return { ok: false, erro: "nao_encontrado" };
+  const titulo = texto(c.titulo, 120);
+  const tipoDoc = texto(c.tipoDoc, 40) || "Orientações";
+  const mime = String(c.mime || "").toLowerCase();
+  if (!titulo) return { ok: false, erro: "dados_invalidos" };
+  if (TIPOS_OK.indexOf(mime) < 0) return { ok: false, erro: "tipo_invalido" };
+  let bytes;
+  try { bytes = Utilities.base64Decode(String(c.base64 || "")); } catch (err) { return { ok: false, erro: "dados_invalidos" }; }
+  if (!bytes.length) return { ok: false, erro: "dados_invalidos" };
+  if (bytes.length > 15 * 1024 * 1024) return { ok: false, erro: "arquivo_grande" };
+  const ext = mime === "application/pdf" ? ".pdf" : mime === "image/png" ? ".png" : mime === "image/webp" ? ".webp" : mime.indexOf("hei") >= 0 ? ".heic" : ".jpg";
+  const arquivo = subpasta(p, "Da nutricionista").createFile(Utilities.newBlob(bytes, mime, titulo.replace(/[\\/:*?"<>|]/g, "_") + ext));
+  const docId = novoId("D"), agora = new Date();
+  aba("Documentos").appendRow([docId, agora, p.valores[P.id], seguro(titulo), seguro(tipoDoc), arquivo.getUrl(), arquivo.getId()]);
+  if (p.valores[P.status] === "Novo" || p.valores[P.status] === "Ficha respondida") aba("Pacientes").getRange(p.linha, P.status + 1).setValue("Em acompanhamento");
+  return { ok: true, documento: { id: arquivo.getId(), data: dataISO(agora), titulo: titulo, tipo: tipoDoc } };
+}
+
 // ---------------------------------------------------------------- Menu da planilha
 
 function onOpen() {
@@ -291,7 +490,8 @@ function tipoDoTitulo(t) {
 
 /** Para testar o e-mail pelo editor: troque os dados e rode esta função. */
 function testarCadastro() {
-  console.log(cadastrar({ senha: SENHA_ADMIN, por: "Recepção", nome: "Paciente Teste", email: Session.getActiveUser().getEmail(), celular: "21999999999", nascimento: "1990-01-01" }));
+  const s = adminEntrar({ senha: SENHA_ADMIN, por: "Recepção" });
+  console.log(cadastrar({ sessao: s.sessao, nome: "Paciente Teste", email: Session.getActiveUser().getEmail(), celular: "21999999999", nascimento: "1990-01-01" }));
 }
 
 // ---------------------------------------------------------------- E-mail
@@ -392,6 +592,11 @@ function dataValida(s) { return /^\d{4}-\d{2}-\d{2}$/.test(String(s)); }
 function dataBR(iso) { return String(iso).split("-").reverse().join("/"); }
 function fuso() { return Session.getScriptTimeZone() || "America/Sao_Paulo"; }
 function dataISO(v) { return v instanceof Date ? Utilities.formatDate(v, fuso(), "yyyy-MM-dd") : String(v || ""); }
+function nascISO(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, fuso(), "yyyy-MM-dd");
+  const m = String(v || "").match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  return m ? m[3] + "-" + m[2] + "-" + m[1] : "";
+}
 function lerJSON(s) { try { return JSON.parse(s); } catch (e) { return {}; } }
 function novoId(prefixo) { return prefixo + Utilities.getUuid().replace(/-/g, "").slice(0, 8).toUpperCase(); }
 function escHtml(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }

@@ -12,7 +12,8 @@ e-mail com o link sai do Gmail dela (até 100 e-mails por dia numa conta Gmail c
 2. Na planilha, abra **Extensões › Apps Script**.
 3. Apague o que estiver lá, cole todo o conteúdo de `Codigo.gs` e clique em **Salvar**.
 4. No começo do código, troque:
-   - `URL_AREA_PACIENTE`: o endereço da área do paciente, quando o site estiver no ar.
+   - `URL_AREA_PACIENTE`: o endereço da área do paciente. Já vem com o do GitHub Pages;
+     troque se ela tiver um domínio próprio.
    - `SENHA_ADMIN`: a senha do painel, a mesma para a Ana Carolina e para a recepção. A senha de exemplo não funciona.
 5. No editor, escolha a função **configurar** e clique em **Executar**. O Google pede
    autorização (Planilhas, Drive e Gmail): aceite com a conta da Ana Carolina.
@@ -21,7 +22,7 @@ e-mail com o link sai do Gmail dela (até 100 e-mails por dia numa conta Gmail c
    - Executar como: **Eu**
    - Quem pode acessar: **Qualquer pessoa**
 7. Copie o link que termina em `/exec` e cole em `CONFIG.api`, no começo do script de
-   `src/paciente.html` (e, depois, no painel das administradoras).
+   `src/paciente.html` e de `src/admin.html`. Depois rode `npm run build` e suba no GitHub.
 
 Toda vez que mudar o código, use **Implantar › Gerenciar implantações › Editar › Nova
 versão**. Assim o link `/exec` continua o mesmo.
@@ -42,12 +43,21 @@ Pacientes.
 | Exames | Os exames enviados, com link para o arquivo no Drive. |
 | Documentos | Planos e orientações publicados para o paciente. |
 
-## Mandar o plano alimentar (até o painel ficar pronto)
+## Mandar o plano alimentar
 
-1. No Drive, abra a pasta do paciente › **Da nutricionista** e coloque o PDF. O nome do
-   arquivo vira o título (ex.: "Plano alimentar - novembro.pdf").
-2. Na planilha, use o menu **Nutri › Publicar documentos das pastas**.
-3. O documento aparece na área do paciente, em "Da nutricionista".
+O jeito normal é pelo painel: abra o paciente e use "Enviar para a paciente".
+
+Também dá pelo Drive: coloque o PDF na pasta do paciente › **Da nutricionista** (o nome
+do arquivo vira o título) e use o menu da planilha **Nutri › Publicar documentos das pastas**.
+
+## Painel da equipe
+
+- A senha é a mesma para a Ana Carolina e para a recepção (`SENHA_ADMIN`). Ao entrar,
+  o painel pergunta quem está usando.
+- A recepção cadastra e vê os dados do cadastro. Ficha, exames, evolução, documentos e
+  anotações ficam só com a nutricionista (`RECEPCAO_VE_SAUDE = false`).
+- Depois de 10 senhas erradas em 10 minutos, o painel bloqueia por 10 minutos.
+- **Nunca coloque a senha real no GitHub.** Ela fica só no Apps Script.
 
 ## Segurança
 

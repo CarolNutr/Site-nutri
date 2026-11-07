@@ -1,26 +1,53 @@
 # Sites da nutricionista Ana Carolina Pereira
 
-São três sites com a mesma cara (verde musgo, fundo branco):
+Ana Carolina dos Santos Pereira · Nutricionista · CRN-4 23101599
+Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro – RJ
 
-| Site | Arquivo | Para quem | Situação |
-|---|---|---|---|
-| Agendamento | `src/agendamento.html` | Quem quer marcar consulta. Termina no WhatsApp. | Prévia aprovada em partes |
-| Área do paciente | `src/paciente.html` | Pacientes já cadastrados na recepção. Ficha de saúde, exames, plano alimentar e acompanhamento. | Prévia, perguntas de exemplo |
-| Painel das administradoras | (próxima etapa) | Recepção e nutricionista. Cadastro de pacientes e acesso a tudo de cada um. | A fazer |
+## Links
 
-Prévias para mostrar:
-- Agendamento: https://claude.ai/artifact/DoySCW9ouY7vRERUYRLmr3
-- Área do paciente: https://claude.ai/artifact/HuTBMtEwN7ETgTkmDCP7kd
+| Site | Endereço | Para quem |
+|---|---|---|
+| Agendamento | https://carolnutr.github.io/Site-nutri/ | Quem quer marcar consulta. Termina no WhatsApp. |
+| Área do paciente | https://carolnutr.github.io/Site-nutri/paciente/ | Pacientes cadastrados na recepção (o link pessoal chega por e-mail). |
+| Painel da equipe | https://carolnutr.github.io/Site-nutri/admin/ | Ana Carolina e recepção. |
+
+Enquanto a planilha não estiver ligada (`CONFIG.api` vazio), a área do paciente e o
+painel abrem em modo prévia, com pacientes de exemplo, e nada é salvo.
 
 ## Como funciona
 
 1. A pessoa marca pelo site de agendamento e confirma pelo WhatsApp.
-2. Na recepção, uma administradora cadastra nome, e-mail e celular no painel.
+2. Na recepção, cadastram nome, e-mail, celular e data de nascimento no painel.
 3. Na hora, a pessoa recebe um e-mail com o link pessoal da área do paciente.
-4. Ela entra confirmando o e-mail e o celular, responde a ficha e envia os exames.
-5. Tudo fica na planilha do Google e no Drive da Ana Carolina (`apps-script/`).
+4. Ela entra confirmando e-mail e celular, responde a ficha de saúde e envia os exames.
+5. A Ana Carolina vê tudo no painel, define o objetivo e a situação, e envia o plano
+   alimentar e as orientações, que aparecem na área do paciente.
+6. Tudo fica na planilha do Google e no Drive da Ana Carolina (`apps-script/`).
 
-## Rodar no computador
+No painel, a recepção vê só os dados do cadastro. Ficha, exames, evolução e anotações
+ficam só com a nutricionista (dá para mudar em `RECEPCAO_VE_SAUDE`, no código da planilha).
+
+## Pastas
+
+- `src/`: as páginas (é aqui que se mexe).
+  - `agendamento.html`, `paciente.html`, `admin.html`
+- `docs/`: o site pronto, gerado a partir de `src/`. O GitHub Pages publica esta pasta.
+- `apps-script/`: código da planilha e o passo a passo para ligar (`LEIA-ME.md`).
+- `server.js`: servidor para testar no computador e gerar a pasta `docs/`.
+
+## Onde mexer
+
+- Dados da nutricionista, WhatsApp e horários: objeto `CONFIG` no começo do `<script>` de cada página.
+- Perguntas da ficha: lista `SECOES` em `src/paciente.html`.
+- Link da planilha: `CONFIG.api` em `src/paciente.html` e `src/admin.html`.
+
+Depois de mexer em `src/`, gere o site de novo e suba:
+
+```bash
+npm run build
+```
+
+## Testar no computador
 
 ```bash
 npm start
@@ -28,21 +55,4 @@ npm start
 
 - Agendamento: http://localhost:3000
 - Área do paciente: http://localhost:3000/paciente/
-
-Sem o link da planilha (`CONFIG.api` vazio), a área do paciente abre com uma paciente de
-exemplo e nada é enviado.
-
-## Onde mexer
-
-- Dados da nutricionista, WhatsApp e horários: objeto `CONFIG` no começo do `<script>` de cada página.
-- Perguntas da ficha: lista `SECOES` em `src/paciente.html`. Tipos: `texto`, `texto-longo`, `numero`, `escolha`, `multi`, `escala`.
-- Planilha e e-mail: `apps-script/Codigo.gs` e `apps-script/LEIA-ME.md`.
-
-## Publicar como site estático
-
-```bash
-npm run build
-```
-
-Gera a pasta `dist/` (agendamento na raiz e área do paciente em `paciente/`), que pode ir
-para o GitHub Pages ou qualquer hospedagem estática.
+- Painel: http://localhost:3000/admin/
