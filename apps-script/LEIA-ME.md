@@ -11,10 +11,9 @@ e-mail com o link sai do Gmail dela (até 100 e-mails por dia numa conta Gmail c
 1. No Google Drive da Ana Carolina, crie uma planilha nova chamada **Pacientes · Nutri**.
 2. Na planilha, abra **Extensões › Apps Script**.
 3. Apague o que estiver lá, cole todo o conteúdo de `Codigo.gs` e clique em **Salvar**.
-4. No começo do código, troque:
-   - `URL_AREA_PACIENTE`: o endereço da área do paciente. Já vem com o do GitHub Pages;
-     troque se ela tiver um domínio próprio.
-   - `SENHA_ADMIN`: a senha do painel, a mesma para a Ana Carolina e para a recepção. A senha de exemplo não funciona.
+4. Não precisa trocar nada no código: o endereço da área do paciente (GitHub Pages) e a
+   senha do painel já estão prontos. Se ela tiver um domínio próprio, troque
+   `URL_AREA_PACIENTE`.
 5. No editor, escolha a função **configurar** e clique em **Executar**. O Google pede
    autorização (Planilhas, Drive e Gmail): aceite com a conta da Ana Carolina.
    Isso cria as abas e a pasta **Pacientes · Nutri Ana Carolina** no Drive.
@@ -52,12 +51,14 @@ do arquivo vira o título) e use o menu da planilha **Nutri › Publicar documen
 
 ## Painel da equipe
 
-- A senha é a mesma para a Ana Carolina e para a recepção (`SENHA_ADMIN`). Ao entrar,
-  o painel pergunta quem está usando.
+- A senha é a mesma para a Ana Carolina e para a recepção. Ao entrar, o painel pergunta
+  quem está usando.
+- No código fica só a senha embaralhada (`SENHA_ADMIN_HASH`), porque o repositório é
+  público. Para trocar a senha, use a função `gerarHashDaSenha` (instruções no código).
 - A recepção cadastra e vê os dados do cadastro. Ficha, exames, evolução, documentos e
   anotações ficam só com a nutricionista (`RECEPCAO_VE_SAUDE = false`).
 - Depois de 10 senhas erradas em 10 minutos, o painel bloqueia por 10 minutos.
-- **Nunca coloque a senha real no GitHub.** Ela fica só no Apps Script.
+- **Nunca escreva a senha de verdade no código do GitHub.**
 
 ## Segurança
 

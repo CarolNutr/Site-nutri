@@ -14,8 +14,11 @@
 // ===================== Ajuste aqui =====================
 // Endereço da área do paciente (o link que vai no e-mail).
 const URL_AREA_PACIENTE = "https://carolnutr.github.io/Site-nutri/paciente/";
-// Senha do painel das administradoras (a mesma para a Ana Carolina e para a recepção).
-const SENHA_ADMIN = "TROQUE-ESTA-SENHA";
+// Senha do painel (a mesma para a Ana Carolina e para a recepção).
+// O código fica público no GitHub, então a senha não aparece aqui: fica só a versão
+// embaralhada dela (hash). Para trocar a senha, veja a função gerarHashDaSenha.
+const SENHA_ADMIN_HASH = "34e35a716c4d17a44e67f0877e52b6d38b6a4399eb0c8cab04ec72a9aa3158ce";
+const SAL_SENHA = "nutri-ana-carolina";
 // Quem pode aparecer na coluna "Cadastrado por" (o painel pergunta quem está usando).
 const ADMINISTRADORAS = ["Ana Carolina", "Recepção"];
 // A recepção vê só os dados do cadastro. Ficha, exames, acompanhamento e anotações
@@ -84,11 +87,11 @@ function saida(obj) {
 // ---------------------------------------------------------------- Administradoras
 
 function adminEntrar(c) {
-  if (SENHA_ADMIN === "TROQUE-ESTA-SENHA") return { ok: false, erro: "senha_nao_configurada" };
+  if (!SENHA_ADMIN_HASH) return { ok: false, erro: "senha_nao_configurada" };
   const cache = CacheService.getScriptCache();
   const erros = Number(cache.get("t_admin_erros") || 0);
   if (erros >= 10) return { ok: false, erro: "muitas_tentativas" };
-  if (String(c.senha || "") !== SENHA_ADMIN) {
+  if (hashSenha(String(c.senha || "")) !== SENHA_ADMIN_HASH) {
     cache.put("t_admin_erros", String(erros + 1), 600);
     return { ok: false, erro: "senha_invalida" };
   }
@@ -97,6 +100,22 @@ function adminEntrar(c) {
   cache.put("adm_" + sessao, por, HORAS_SESSAO_ADMIN * 3600);
   return { ok: true, sessao: sessao, por: por, veSaude: veSaude(por) };
 }
+function hashSenha(senha) {
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, SAL_SENHA + ":" + senha, Utilities.Charset.UTF_8);
+  return bytes.map(function (b) { return ((b + 256) % 256).toString(16).padStart(2, "0"); }).join("");
+}
+
+/**
+ * Para trocar a senha do painel: escreva a nova senha entre as aspas abaixo, rode esta
+ * função no editor, copie o código que aparece no registro para SENHA_ADMIN_HASH,
+ * apague a senha daqui e implante uma nova versão.
+ */
+function gerarHashDaSenha() {
+  const novaSenha = "";
+  if (!novaSenha) { console.log("Escreva a nova senha entre as aspas primeiro."); return; }
+  console.log(hashSenha(novaSenha));
+}
+
 function veSaude(por) { return por === "Ana Carolina" || RECEPCAO_VE_SAUDE; }
 function adminDaSessao(c) {
   const por = CacheService.getScriptCache().get("adm_" + texto(c.sessao, 60));
@@ -490,8 +509,9 @@ function tipoDoTitulo(t) {
 
 /** Para testar o e-mail pelo editor: troque os dados e rode esta função. */
 function testarCadastro() {
-  const s = adminEntrar({ senha: SENHA_ADMIN, por: "Recepção" });
-  console.log(cadastrar({ sessao: s.sessao, nome: "Paciente Teste", email: Session.getActiveUser().getEmail(), celular: "21999999999", nascimento: "1990-01-01" }));
+  const sessao = Utilities.getUuid();
+  CacheService.getScriptCache().put("adm_" + sessao, "Recepção", 600);
+  console.log(cadastrar({ sessao: sessao, nome: "Paciente Teste", email: Session.getActiveUser().getEmail(), celular: "21999999999", nascimento: "1990-01-01" }));
 }
 
 // ---------------------------------------------------------------- E-mail
