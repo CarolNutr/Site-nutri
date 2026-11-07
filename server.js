@@ -6,6 +6,11 @@ const fs = require("fs");
 const path = require("path");
 
 const PORT = Number(process.env.PORT) || 3000;
+// O site de agendamento está guardado: não vai para o site publicado (docs/), mas o
+// código fica em src/agendamento.html. Para colocar no ar de novo, troque para true e
+// rode "npm run build". Enquanto isso, o endereço principal leva à área do paciente.
+const PUBLICAR_AGENDAMENTO = false;
+
 // Endereço no site -> arquivo em src/
 const PAGINAS = {
   "/": "agendamento.html",
@@ -46,6 +51,25 @@ function montarHtml(arquivo, { servidor, caminho = "/" }) {
     "<body>",
     corpo.trim(),
     "</body>",
+    "</html>",
+    "",
+  ].join("\n");
+}
+
+function paginaQueLevaParaPaciente() {
+  return [
+    "<!doctype html>",
+    '<html lang="pt-BR">',
+    "<head>",
+    '<meta charset="utf-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1">',
+    '<meta name="robots" content="noindex">',
+    '<meta http-equiv="refresh" content="0; url=paciente/">',
+    icones("/"),
+    "<title>Ana Carolina Pereira · Nutricionista</title>",
+    "<style>body{margin:0;font-family:system-ui,sans-serif;background:#fff;color:#2c2f26;display:grid;place-items:center;min-height:100vh}a{color:#56672f;font-weight:700}</style>",
+    "</head>",
+    '<body><p><a href="paciente/">Abrir a área do paciente</a></p></body>',
     "</html>",
     "",
   ].join("\n");
@@ -129,6 +153,11 @@ if (process.argv[2] === "build") {
   for (const [caminho, arquivo] of Object.entries(PAGINAS)) {
     const destino = path.join(__dirname, "docs", caminho, "index.html");
     fs.mkdirSync(path.dirname(destino), { recursive: true });
+    if (arquivo === "agendamento.html" && !PUBLICAR_AGENDAMENTO) {
+      fs.writeFileSync(destino, paginaQueLevaParaPaciente());
+      console.log("Agendamento guardado; endereço principal leva à área do paciente:", destino);
+      continue;
+    }
     fs.writeFileSync(destino, montarHtml(arquivo, { servidor: false, caminho }));
     console.log("Gerado:", destino);
   }

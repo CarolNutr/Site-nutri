@@ -7,12 +7,20 @@ Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro �
 
 | Site | Endereço | Para quem |
 |---|---|---|
-| Agendamento | https://carolnutr.github.io/Site-nutri/ | Quem quer marcar consulta. Termina no WhatsApp. |
+| Agendamento | Guardado, fora do ar (ver abaixo) | Quem quer marcar consulta. Termina no WhatsApp. |
 | Área do paciente | https://carolnutr.github.io/Site-nutri/paciente/ | Pacientes cadastrados na recepção (o link pessoal chega por e-mail). |
 | Painel da equipe | https://carolnutr.github.io/Site-nutri/admin/ | Ana Carolina e recepção. |
 
 Enquanto a planilha não estiver ligada (`CONFIG.api` vazio), a área do paciente e o
 painel abrem em modo prévia, com pacientes de exemplo, e nada é salvo.
+
+O endereço principal (https://carolnutr.github.io/Site-nutri/) leva à área do paciente.
+
+### Site de agendamento guardado
+
+O código continua em `src/agendamento.html`, mas não vai para o site publicado. Para
+colocar no ar de novo, troque `PUBLICAR_AGENDAMENTO` para `true` no começo de `server.js`
+e rode `npm run build`. Ele volta no endereço principal.
 
 ## Como funciona
 
