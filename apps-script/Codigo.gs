@@ -337,7 +337,7 @@ function adminPacientes(c) {
         id: id, nome: String(v[P.nome]), email: String(v[P.email]), celular: String(v[P.celular]),
         nascimento: nascISO(v[P.nascimento]), objetivo: String(v[P.objetivo] || ""), status: String(v[P.status] || "Novo"),
         cadastro: dataISO(v[P.cadastro]), por: String(v[P.por] || ""), ultimoAcesso: dataISO(v[P.acesso]),
-        consulta: String(v[P.consulta] || ""), modalidade: modalidadeDe(v),
+        consulta: String(v[P.consulta] || ""), modalidade: modalidadeDe(v), meet: String(v[P.meet] || ""),
         ficha: f.ficha || "", checkins: f.checkins || 0, ultimoCheckin: f.ultimoCheckin || "",
         exames: e.n || 0, ultimoExame: e.ultimo || ""
       };
