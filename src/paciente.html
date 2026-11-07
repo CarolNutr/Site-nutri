@@ -686,7 +686,7 @@ svg{flex:none}
     return '<header class="pag-head"><span class="eyebrow">Área do paciente</span><h1 class="h1" tabindex="-1">Olá, ' + esc(primeiroNome()) + "</h1>" +
       '<div class="chips-info">' + (P.paciente.objetivo ? '<span class="chip-info">Objetivo: <b>' + esc(P.paciente.objetivo) + "</b></span>" : "") + '<span class="chip-info">Paciente desde ' + dataBR(P.paciente.cadastro) + "</span></div></header>" +
       (!CONFIG.api ? '<p class="nota-previa">Prévia com a paciente de exemplo. Pode testar à vontade: nada é enviado de verdade.</p>' : "") +
-      htmlConsulta(P.paciente.consulta, P.paciente.modalidade) +
+      htmlConsulta(P.paciente.consulta, P.paciente.modalidade, P.paciente.meet) +
       '<section class="bloco"><h2 class="h2">Para fazer</h2><ul class="tarefas">' + tarefas.map(function (t) {
         return '<li class="tarefa ' + t.cls + '"><span class="t-ico">' + t.ico + '</span><div class="t-txt"><strong>' + t.t + "</strong><span>" + esc(t.d) + '</span></div><a class="btn-sec t-acao" href="' + t.h + '">' + t.a + "</a></li>";
       }).join("") + "</ul></section>" +
@@ -696,7 +696,7 @@ svg{flex:none}
   }
 
   /* Próxima consulta */
-  function htmlConsulta(c, mod) {
+  function htmlConsulta(c, mod, meet) {
     var m = String(c || "").match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/);
     if (!m || m[1] + "-" + m[2] + "-" + m[3] < hojeISO()) return "";
     var d = new Date(+m[1], m[2] - 1, +m[3]);
@@ -705,8 +705,8 @@ svg{flex:none}
     var end = "Av. Nossa Senhora de Copacabana, 540, sala 1105";
     var online = mod === "Online";
     return '<section class="cartao is-destaque consulta-card" aria-labelledby="t-consulta"><span class="eyebrow" id="t-consulta">Sua próxima consulta' + (online ? " · online" : "") + "</span>" +
-      '<strong class="consulta-quando">' + esc(quando) + '</strong><span class="meta">' + (online ? "Por videochamada. O link da chamada chega pelo WhatsApp perto do horário." : end + " · Copacabana, Rio de Janeiro") + "</span>" +
-      '<div class="linha-form">' + (online ? "" : '<a class="btn-sec" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(end + ", Copacabana, Rio de Janeiro - RJ") + '" target="_blank" rel="noopener">Ver no mapa</a>') +
+      '<strong class="consulta-quando">' + esc(quando) + '</strong><span class="meta">' + (online ? (meet ? "Pelo Google Meet. Na hora da consulta, é só tocar em Entrar na consulta." : "Por videochamada. O link da chamada chega pelo WhatsApp perto do horário.") : end + " · Copacabana, Rio de Janeiro") + "</span>" +
+      '<div class="linha-form">' + (online ? (meet ? '<a class="btn" href="' + esc(meet) + '" target="_blank" rel="noopener">Entrar na consulta</a>' : "") : '<a class="btn-sec" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(end + ", Copacabana, Rio de Janeiro - RJ") + '" target="_blank" rel="noopener">Ver no mapa</a>') +
       '<a class="btn-sec" href="' + linkWhats("Olá! Preciso remarcar minha consulta de " + quando.toLowerCase() + ".") + '" target="_blank" rel="noopener">' + I.chat + " Precisa remarcar?</a></div></section>";
   }
 

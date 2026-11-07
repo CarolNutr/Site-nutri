@@ -26,6 +26,25 @@ e-mail com o link sai do Gmail dela (até 100 e-mails por dia numa conta Gmail c
 Toda vez que mudar o código, use **Implantar › Gerenciar implantações › Editar › Nova
 versão**. Assim o link `/exec` continua o mesmo.
 
+## Consultas na Google Agenda e link do Google Meet
+
+Cada consulta marcada no painel vira um evento na Google Agenda da Ana Carolina, com
+lembrete 1 hora antes. A consulta online ganha um link do Google Meet, que vai no e-mail,
+nas mensagens de WhatsApp do painel e no botão "Entrar na consulta" da área do paciente.
+O paciente também recebe o convite do Google Agenda por e-mail.
+
+Para funcionar, ative o serviço da agenda uma vez:
+
+1. No Apps Script, na coluna da esquerda, ao lado de **Serviços**, clique no **+**.
+2. Escolha **Google Calendar API** e clique em **Adicionar**.
+3. Rode a função **configurar** de novo e aceite a autorização da agenda.
+4. Implante uma nova versão (**Implantar › Gerenciar implantações › lápis › Nova versão**).
+
+Se trocar a consulta de dia, horário ou de presencial para online, o evento antigo é
+cancelado (o paciente recebe o aviso) e um novo é criado. Consultas que já passaram ficam
+na agenda como histórico. Para não mandar convite ao paciente, troque
+`CONVIDAR_PACIENTE` para `false`.
+
 ## Testar o e-mail
 
 No editor, rode a função **testarCadastro**. Ela cadastra um "Paciente Teste" com o seu
@@ -36,7 +55,7 @@ Pacientes.
 
 | Aba | O que tem |
 |---|---|
-| Pacientes | Um paciente por linha: cadastro, contato, objetivo, status, quem cadastrou, pasta no Drive, data da autorização (LGPD), último acesso, a próxima consulta e o tipo de atendimento (presencial aos sábados, das 9h às 17h; online às segundas e quintas, das 17h às 21h). A agenda fica em `AGENDA`, no começo do código. **A coluna Token é o link pessoal: não compartilhe.** |
+| Pacientes | Um paciente por linha: cadastro, contato, objetivo, status, quem cadastrou, pasta no Drive, data da autorização (LGPD), último acesso, a próxima consulta, o tipo de atendimento, o evento na agenda e o link do Meet (presencial aos sábados, das 9h às 17h; online às segundas e quintas, das 17h às 21h). A agenda fica em `AGENDA`, no começo do código. **A coluna Token é o link pessoal: não compartilhe.** |
 | Fichas | Cada ficha e cada "como estou" com todas as respostas, para reabrir no site. |
 | Respostas | As mesmas respostas, uma por linha, fáceis de ler. |
 | Exames | Os exames enviados, com link para o arquivo no Drive. |

@@ -320,7 +320,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         checkins: [{ data: "2026-11-01", tipo: "Como estou", respostas: como("73,1", 4, "Segui em parte") }, { data: "2026-11-07", tipo: "Como estou", respostas: como("72,4", 4, "Segui quase tudo", "Estou sentindo menos fome à noite.") }],
         exames: [{ id: "x1", data: "2026-10-25", nome: "Hemograma completo.pdf", descricao: "Hemograma" }, { id: "x2", data: "2026-10-25", nome: "Perfil lipidico.pdf", descricao: "Colesterol e triglicerídeos" }],
         documentos: [{ id: "d1", data: "2026-10-31", titulo: "Plano alimentar - novembro", tipo: "Plano alimentar" }] },
-      { id: "PEX0002", consulta: "2026-11-16 18:00", modalidade: "Online", nome: "João Pedro Exemplo", email: "joao@exemplo.com", celular: "(21) 99812-3344", nascimento: "1998-07-02", objetivo: "Ganho de massa muscular", status: "Ficha respondida", cadastro: "2026-11-05", por: "Recepção", ultimoAcesso: "2026-11-06", consentimento: "2026-11-05", anotacoes: "",
+      { id: "PEX0002", consulta: "2026-11-16 18:00", modalidade: "Online", meet: "https://meet.google.com/exe-mplo-abc", nome: "João Pedro Exemplo", email: "joao@exemplo.com", celular: "(21) 99812-3344", nascimento: "1998-07-02", objetivo: "Ganho de massa muscular", status: "Ficha respondida", cadastro: "2026-11-05", por: "Recepção", ultimoAcesso: "2026-11-06", consentimento: "2026-11-05", anotacoes: "",
         ficha: { data: "2026-11-06", respostas: ficha("Sim", "Não", "Não", "68,0", "1,78", "Sim: Creatina e whey") }, fichasAnteriores: [], checkins: [],
         exames: [{ id: "x3", data: "2026-11-06", nome: "Exames de sangue.pdf", descricao: "Check-up completo" }], documentos: [] },
       { id: "PEX0003", consulta: "2026-11-14 11:00", nome: "Fernanda Exemplo Costa", email: "fernanda@exemplo.com", celular: "(21) 97001-2233", nascimento: "1987-11-20", objetivo: "", status: "Novo", cadastro: "2026-11-07", por: "Recepção", ultimoAcesso: "", consentimento: "", anotacoes: "",
@@ -429,15 +429,18 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     return { dia: dia, hora: hora, modalidade: modoAtual(pre), valor: dia && hora ? dia + " " + hora : "" };
   }
   function rotuloConsulta(c, mod) { return consultaExtenso(c) + (mod === "Online" ? " · online" : ""); }
-  function onde(mod) { return mod === "Online" ? "por videochamada. O link da chamada vai por aqui perto do horário" : "na " + ENDERECO + ", Copacabana"; }
-  function msgLembrete(nome, consulta, mod) {
-    return "Olá, " + String(nome).split(" ")[0] + "! Passando para lembrar da sua consulta" + (mod === "Online" ? " online" : "") + " com a nutricionista Ana Carolina Pereira: " + consultaExtenso(consulta) + ", " + onde(mod) + ". Até lá!";
+  function onde(mod, meet) {
+    if (mod !== "Online") return "na " + ENDERECO + ", Copacabana";
+    return meet ? "pelo Google Meet. Na hora, é só entrar por este link: " + meet : "por videochamada. O link da chamada vai por aqui perto do horário";
   }
-  function msgLink(nome, link, novo, consulta, mod) {
+  function msgLembrete(nome, consulta, mod, meet) {
+    return "Olá, " + String(nome).split(" ")[0] + "! Passando para lembrar da sua consulta" + (mod === "Online" ? " online" : "") + " com a nutricionista Ana Carolina Pereira: " + consultaExtenso(consulta) + ", " + onde(mod, meet) + (mod === "Online" && meet ? "\n" : ". ") + "Até lá!";
+  }
+  function msgLink(nome, link, novo, consulta, mod, meet) {
     var primeiro = String(nome).split(" ")[0];
     return "Olá, " + primeiro + "! Aqui é do consultório da nutricionista Ana Carolina Pereira. " +
       (novo ? "Seu cadastro está pronto. " : "") +
-      (consultaFutura(consulta) ? "Sua consulta" + (mod === "Online" ? " online" : "") + " está marcada para " + consultaExtenso(consulta) + ", " + onde(mod) + ". " : "") +
+      (consultaFutura(consulta) ? "Sua consulta" + (mod === "Online" ? " online" : "") + " está marcada para " + consultaExtenso(consulta) + ", " + onde(mod, meet) + (mod === "Online" && meet ? "\n" : ". ") : "") +
       "Este é o link da sua área do paciente, onde você responde a ficha de saúde e envia seus exames:\n" + link +
       "\nPara entrar, use o e-mail e o celular do seu cadastro." + (novo ? " Mandamos o mesmo link para o seu e-mail." : "");
   }
@@ -501,7 +504,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         var p = achar(c.id);
         if (!p) return { ok: false, erro: "nao_encontrado" };
         var copia = JSON.parse(JSON.stringify(p));
-        var out = { ok: true, veSaude: S.veSaude, paciente: { link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo", id: copia.id, nome: copia.nome, email: copia.email, celular: copia.celular, nascimento: copia.nascimento, objetivo: copia.objetivo, status: copia.status, cadastro: copia.cadastro, por: copia.por, ultimoAcesso: copia.ultimoAcesso, consulta: copia.consulta, modalidade: copia.modalidade || (copia.consulta ? "Presencial" : ""), consentimento: copia.consentimento, pasta: "", anotacoes: S.veSaude ? copia.anotacoes : "" } };
+        var out = { ok: true, veSaude: S.veSaude, paciente: { link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo", id: copia.id, nome: copia.nome, email: copia.email, celular: copia.celular, nascimento: copia.nascimento, objetivo: copia.objetivo, status: copia.status, cadastro: copia.cadastro, por: copia.por, ultimoAcesso: copia.ultimoAcesso, consulta: copia.consulta, meet: copia.meet || "", modalidade: copia.modalidade || (copia.consulta ? "Presencial" : ""), consentimento: copia.consentimento, pasta: "", anotacoes: S.veSaude ? copia.anotacoes : "" } };
         if (S.veSaude) { out.ficha = copia.ficha; out.fichasAnteriores = copia.fichasAnteriores; out.checkins = copia.checkins; out.exames = copia.exames; out.documentos = copia.documentos; }
         return out;
       }
@@ -511,7 +514,9 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         if ((c.objetivo !== undefined || c.anotacoes !== undefined) && !S.veSaude) return { ok: false, erro: "sem_permissao" };
         if (c.email !== undefined && DEMO.pacientes.some(function (o) { return o.id !== q.id && o.email === String(c.email).toLowerCase(); })) return { ok: false, erro: "email_ja_cadastrado" };
         if (c.consulta && DEMO.pacientes.some(function (o) { return o.id !== q.id && o.consulta === c.consulta; })) return { ok: false, erro: "horario_ocupado" };
+        var mudouConsulta = c.consulta !== undefined && (c.consulta !== q.consulta || c.modalidade !== q.modalidade);
         ["nome", "email", "nascimento", "status", "objetivo", "anotacoes", "consulta", "modalidade"].forEach(function (k) { if (c[k] !== undefined) q[k] = k === "email" ? String(c[k]).toLowerCase() : c[k]; });
+        if (mudouConsulta) { q.meet = c.consulta && c.modalidade === "Online" ? "https://meet.google.com/exe-mplo-" + Math.random().toString(36).slice(2, 5) : ""; return { ok: true, meet: q.meet }; }
         if (c.celular !== undefined) q.celular = mascaraTel(c.celular);
         return { ok: true };
       }
@@ -520,7 +525,9 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         if (c.consulta && DEMO.pacientes.some(function (o) { return o.consulta === c.consulta; })) return { ok: false, erro: "horario_ocupado" };
         var id = "PEX" + String(DEMO.pacientes.length + 1).padStart(4, "0");
         DEMO.pacientes.unshift({ id: id, consulta: c.consulta || "", modalidade: c.consulta ? c.modalidade : "", nome: c.nome, email: String(c.email).toLowerCase(), celular: mascaraTel(c.celular), nascimento: c.nascimento, objetivo: "", status: "Novo", cadastro: hojeISO(), por: S.por, ultimoAcesso: "", consentimento: "", anotacoes: "", ficha: null, fichasAnteriores: [], checkins: [], exames: [], documentos: [] });
-        return { ok: true, id: id, link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo" };
+        var meetNovo = c.consulta && c.modalidade === "Online" ? "https://meet.google.com/exe-mplo-" + Math.random().toString(36).slice(2, 5) : "";
+        DEMO.pacientes[0].meet = meetNovo;
+        return { ok: true, id: id, link: "https://carolnutr.github.io/Site-nutri/paciente/?p=exemplo", meet: meetNovo };
       }
       if (acao === "adminReenviar") return { ok: true };
       if (acao === "adminRemover") { DEMO.pacientes = DEMO.pacientes.filter(function (x) { return x.id !== c.id; }); return { ok: true }; }
@@ -673,8 +680,10 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     var c = S.cadastrado;
     if (c) {
       $("#app").innerHTML = '<div class="sucesso"><span class="ok">' + I.check + '</span><header class="pag-head"><h1 class="h1" tabindex="-1">Cadastro de ' + esc(c.nome.split(" ")[0]) + ' feito</h1><p class="desc">O link da área do paciente foi para o e-mail <b>' + esc(c.email) + "</b>. Para garantir que chegue, mande também pelo WhatsApp.</p>" +
-        (c.consulta ? '<p class="chip-i" style="justify-self:start">Consulta: ' + esc(rotuloConsulta(c.consulta, c.modalidade)) + "</p>" : "") + "</header>" +
-        '<div class="det-acoes">' + (c.link ? '<a class="btn btn-wa-cheio" href="' + linkWhats(c.celular, msgLink(c.nome, c.link, true, c.consulta, c.modalidade)) + '" target="_blank" rel="noopener">' + I.chat + " Mandar o link pelo WhatsApp</a>" : "") +
+        (c.consulta ? '<p class="chip-i" style="justify-self:start">Consulta: ' + esc(rotuloConsulta(c.consulta, c.modalidade)) + "</p>" : "") +
+        (c.meet ? '<p class="desc" style="font-size:15px">Link do Google Meet: <a class="link" href="' + esc(c.meet) + '" target="_blank" rel="noopener">' + esc(c.meet) + "</a></p>" : "") +
+        (c.aviso === "agenda" ? '<p class="aviso">A consulta foi salva, mas não entrou na Google Agenda' + (c.modalidade === "Online" ? " e o link do Meet não foi criado" : "") + ". Confira se o serviço Google Calendar API está ativado na planilha (LEIA-ME).</p>" : "") + "</header>" +
+        '<div class="det-acoes">' + (c.link ? '<a class="btn btn-wa-cheio" href="' + linkWhats(c.celular, msgLink(c.nome, c.link, true, c.consulta, c.modalidade, c.meet)) + '" target="_blank" rel="noopener">' + I.chat + " Mandar o link pelo WhatsApp</a>" : "") +
         '<a class="btn-sec" href="#p-' + esc(c.id) + '">Ver paciente</a></div>' +
         '<button type="button" class="btn" data-acao="cadastrar-outro">' + I.mais + " Cadastrar outro paciente</button></div>";
       if (!CONFIG.api) $("#app").insertAdjacentHTML("beforeend", '<p class="nota-previa">Prévia: nenhum e-mail foi enviado de verdade.</p>');
@@ -743,7 +752,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
         return;
       }
       S.lista = null;
-      S.cadastrado = { id: r.id, nome: v.nome, email: v.email, celular: v.celular, link: r.link || "", consulta: cons.valor, modalidade: cons.modalidade };
+      S.cadastrado = { id: r.id, nome: v.nome, email: v.email, celular: v.celular, link: r.link || "", consulta: cons.valor, modalidade: cons.modalidade, meet: r.meet || "", aviso: r.aviso || "" };
       renderCadastro();
     });
   }
@@ -821,7 +830,8 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     if (p.objetivo && objetivos.indexOf(p.objetivo) < 0) objetivos.push(p.objetivo);
     var acompanhamento = '<section class="cartao is-destaque" aria-labelledby="t-acomp"><h2 class="h2" id="t-acomp">Acompanhamento</h2>' +
       '<fieldset class="campo grupo-consulta" data-bloco="consulta"><legend class="lbl">Próxima consulta</legend>' + htmlConsulta("a", p.consulta, p.modalidade, p.id, false) + '<p class="q-erro" hidden></p>' +
-      (consultaFutura(p.consulta) ? '<a class="link" href="' + linkWhats(p.celular, msgLembrete(p.nome, p.consulta, p.modalidade)) + '" target="_blank" rel="noopener">Lembrar a consulta pelo WhatsApp</a>' : "") + "</fieldset>" +
+      (consultaFutura(p.consulta) && p.modalidade === "Online" && p.meet ? '<a class="link" href="' + esc(p.meet) + '" target="_blank" rel="noopener">Abrir a chamada no Google Meet</a>' : "") +
+      (consultaFutura(p.consulta) ? '<a class="link" href="' + linkWhats(p.celular, msgLembrete(p.nome, p.consulta, p.modalidade, p.meet)) + '" target="_blank" rel="noopener">Lembrar a consulta pelo WhatsApp</a>' : "") + "</fieldset>" +
       '<div class="campo"><label class="lbl" for="a-status">Situação</label><select class="select" id="a-status">' + STATUS.map(function (s) { return "<option" + (s === p.status ? " selected" : "") + ">" + esc(s) + "</option>"; }).join("") + "</select></div>" +
       (d.veSaude ? '<div class="campo"><label class="lbl" for="a-objetivo">Objetivo</label><select class="select" id="a-objetivo"><option value="">A definir</option>' + objetivos.map(function (o) { return "<option" + (o === p.objetivo ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select></div>" : "") +
       '<div class="det-acoes"><button type="button" class="btn" data-acao="salvar-acomp">Salvar</button><span class="ok-msg" id="ok-acomp" role="status"></span></div></section>';
@@ -835,7 +845,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       '<section class="cartao" aria-labelledby="t-cad"><h2 class="h2" id="t-cad">Cadastro</h2><dl class="kv">' +
         "<dt>E-mail</dt><dd>" + esc(p.email) + "</dd><dt>Celular</dt><dd>" + esc(p.celular) + "</dd><dt>Nascimento</dt><dd>" + (p.nascimento ? dataBR(p.nascimento) : "—") + "</dd>" +
         "<dt>Cadastro</dt><dd>" + dataBR(p.cadastro) + (p.por ? " · " + esc(p.por) : "") + "</dd><dt>Último acesso</dt><dd>" + (p.ultimoAcesso ? dataBR(p.ultimoAcesso) : "Ainda não entrou") + "</dd><dt>LGPD</dt><dd>" + (p.consentimento ? "Autorizou em " + dataBR(p.consentimento) : "Ainda não autorizou") + "</dd>" +
-      '</dl><div class="det-acoes"><button type="button" class="btn-sec" data-acao="editar">Editar cadastro</button>' + (p.link ? '<a class="btn-sec btn-wa" href="' + linkWhats(p.celular, msgLink(p.nome, p.link, false, p.consulta, p.modalidade)) + '" target="_blank" rel="noopener">' + I.chat + " Link pelo WhatsApp</a>" : "") + '<button type="button" class="btn-sec" data-acao="reenviar">Reenviar e-mail</button></div>' +
+      '</dl><div class="det-acoes"><button type="button" class="btn-sec" data-acao="editar">Editar cadastro</button>' + (p.link ? '<a class="btn-sec btn-wa" href="' + linkWhats(p.celular, msgLink(p.nome, p.link, false, p.consulta, p.modalidade, p.meet)) + '" target="_blank" rel="noopener">' + I.chat + " Link pelo WhatsApp</a>" : "") + '<button type="button" class="btn-sec" data-acao="reenviar">Reenviar e-mail</button></div>' +
       (d.veSaude && p.pasta ? '<a class="link" href="' + esc(p.pasta) + '" target="_blank" rel="noopener">Abrir pasta no Google Drive</a>' : "") +
       '<div><button type="button" class="link link-perigo" data-acao="pedir-remover" data-id="' + esc(p.id) + '">Remover paciente</button></div>' + "</section>";
 
@@ -1023,7 +1033,11 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       campos.consulta = ca.valor;
       campos.modalidade = ca.valor ? ca.modalidade : "";
       atualizar(campos, $("#ok-acomp"), b).then(function (r) {
-        if (r && r.ok) { renderPaciente(); toast("Acompanhamento salvo."); }
+        if (r && r.ok) {
+          if (r.meet !== undefined) S.atual.paciente.meet = r.meet;
+          renderPaciente();
+          toast(r.aviso === "agenda" ? "Salvo, mas a consulta não entrou na Google Agenda. Veja o LEIA-ME." : "Acompanhamento salvo.");
+        }
         else if (r && (r.erro === "horario_ocupado" || r.erro === "consulta_invalida")) mostrarErros({ consulta: msgErro(r.erro) }, $(".lado"));
       });
     }

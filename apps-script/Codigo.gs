@@ -27,6 +27,12 @@ const RECEPCAO_VE_SAUDE = false;
 const NOME_REMETENTE = "Ana Carolina Pereira · Nutricionista";
 const NOME_PASTA = "Pacientes · Nutri Ana Carolina";
 const MAX_ARQUIVO_MB = 10;
+// Google Agenda: cada consulta vira um evento na agenda da Ana Carolina, e a consulta
+// online ganha um link do Google Meet. Precisa do serviço "Google Calendar API" (LEIA-ME).
+const USAR_GOOGLE_AGENDA = true;
+const CONVIDAR_PACIENTE = true;          // o paciente recebe o convite do Google Agenda por e-mail
+const DURACAO_CONSULTA_MIN = 60;
+const ENDERECO_CONSULTORIO = "Av. Nossa Senhora de Copacabana, 540, sala 1105 - Copacabana, Rio de Janeiro - RJ";
 // =======================================================
 
 const VERSAO = 1;
@@ -34,14 +40,14 @@ const HORAS_SESSAO = 6;
 const HORAS_SESSAO_ADMIN = 12;
 const STATUS = ["Novo", "Ficha respondida", "Em acompanhamento", "Pausado", "Alta"];
 const ABAS = {
-  Pacientes: ["ID", "Cadastro", "Nome", "E-mail", "Celular", "Nascimento", "Objetivo", "Status", "Cadastrado por", "Token", "Pasta", "Consentimento em", "Último acesso", "Anotações (só a nutricionista)", "Próxima consulta", "Atendimento"],
+  Pacientes: ["ID", "Cadastro", "Nome", "E-mail", "Celular", "Nascimento", "Objetivo", "Status", "Cadastrado por", "Token", "Pasta", "Consentimento em", "Último acesso", "Anotações (só a nutricionista)", "Próxima consulta", "Atendimento", "Evento na agenda", "Link da chamada"],
   Fichas: ["Data", "Paciente", "Tipo", "Valores (JSON)"],
   Respostas: ["Data", "Paciente", "Nome", "Tipo", "Seção", "Pergunta", "Resposta"],
   Exames: ["Data", "Paciente", "Nome", "Arquivo", "Descrição", "Link", "ID no Drive"],
   Documentos: ["ID", "Data", "Paciente", "Título", "Tipo", "Link", "ID no Drive"]
 };
 // Posição das colunas da aba Pacientes (começando em 0)
-const P = { id: 0, cadastro: 1, nome: 2, email: 3, celular: 4, nascimento: 5, objetivo: 6, status: 7, por: 8, token: 9, pasta: 10, consentimento: 11, acesso: 12, anotacoes: 13, consulta: 14, modalidade: 15 };
+const P = { id: 0, cadastro: 1, nome: 2, email: 3, celular: 4, nascimento: 5, objetivo: 6, status: 7, por: 8, token: 9, pasta: 10, consentimento: 11, acesso: 12, anotacoes: 13, consulta: 14, modalidade: 15, evento: 16, meet: 17 };
 // Agenda (0 = domingo ... 6 = sábado) e horários de início das consultas.
 //  Presencial: sábados, das 9h às 17h.  Online: segundas e quintas, das 17h às 21h.
 const AGENDA = {
@@ -172,9 +178,12 @@ function cadastrar(c) {
     linha[P.anotacoes] = "";
     linha[P.consulta] = consulta ? "'" + consulta : "";
     linha[P.modalidade] = consulta ? modalidade : "";
+    const ag = sincronizarAgenda({ id: id, nome: nome, email: email, celular: formatarCelular(celular), consulta: consulta, modalidade: modalidade });
+    linha[P.evento] = ag.evento;
+    linha[P.meet] = ag.meet;
     aba("Pacientes").appendRow(linha);
-    enviarEmailDeAcesso(nome, email, token, consulta, modalidade);
-    return { ok: true, id: id, link: linkDeAcesso(token) };
+    enviarEmailDeAcesso(nome, email, token, consulta, modalidade, ag.meet);
+    return { ok: true, id: id, link: linkDeAcesso(token), meet: ag.meet, aviso: ag.aviso };
   } finally {
     lock.releaseLock();
   }
@@ -208,7 +217,7 @@ function reenviarLink(c) {
   const email = texto(c.email, 120).toLowerCase();
   if (!emailValido(email) || !tentativaPermitida("reenviar_" + email, 3)) return { ok: true };
   const p = acharPaciente(function (l) { return String(l[P.email]).toLowerCase() === email; });
-  if (p) enviarEmailDeAcesso(String(p.valores[P.nome]), email, p.valores[P.token], String(p.valores[P.consulta] || ""), String(p.valores[P.modalidade] || ""));
+  if (p) enviarEmailDeAcesso(String(p.valores[P.nome]), email, p.valores[P.token], String(p.valores[P.consulta] || ""), String(p.valores[P.modalidade] || ""), String(p.valores[P.meet] || ""));
   return { ok: true };
 }
 
@@ -228,7 +237,7 @@ function portal(c) {
   const ultimaFicha = fichas.filter(function (l) { return l[2] === "Ficha"; }).pop();
   return {
     ok: true,
-    paciente: { nome: String(p.valores[P.nome]), objetivo: String(p.valores[P.objetivo] || ""), cadastro: dataISO(p.valores[P.cadastro]), consulta: String(p.valores[P.consulta] || ""), modalidade: modalidadeDe(p.valores) },
+    paciente: { nome: String(p.valores[P.nome]), objetivo: String(p.valores[P.objetivo] || ""), cadastro: dataISO(p.valores[P.cadastro]), consulta: String(p.valores[P.consulta] || ""), modalidade: modalidadeDe(p.valores), meet: String(p.valores[P.meet] || "") },
     ficha: ultimaFicha ? { data: dataISO(ultimaFicha[0]), valores: lerJSON(ultimaFicha[3]) } : null,
     checkins: fichas.filter(function (l) { return l[2] === "Como estou"; }).map(function (l) { return { data: dataISO(l[0]), valores: lerJSON(l[3]) }; }),
     exames: linhasDoPaciente("Exames", 1, id).map(function (l) { return { data: dataISO(l[0]), nome: String(l[3]), descricao: String(l[4] || "") }; }),
@@ -348,7 +357,7 @@ function adminPaciente(c) {
       id: id, nome: String(v[P.nome]), email: String(v[P.email]), celular: String(v[P.celular]),
       nascimento: nascISO(v[P.nascimento]), objetivo: String(v[P.objetivo] || ""), status: String(v[P.status] || "Novo"),
       cadastro: dataISO(v[P.cadastro]), por: String(v[P.por] || ""), ultimoAcesso: dataISO(v[P.acesso]),
-      consulta: String(v[P.consulta] || ""), modalidade: modalidadeDe(v),
+      consulta: String(v[P.consulta] || ""), modalidade: modalidadeDe(v), meet: String(v[P.meet] || ""),
       consentimento: dataISO(v[P.consentimento]),
       pasta: adm.veSaude ? String(v[P.pasta] || "") : "",
       anotacoes: adm.veSaude ? String(v[P.anotacoes] || "") : "",
@@ -383,6 +392,7 @@ function adminAtualizar(c) {
     const p = acharPaciente(function (l) { return l[P.id] === texto(c.id, 20); });
     if (!p) return { ok: false, erro: "nao_encontrado" };
     const mudar = [];
+    let sinc = null;
     if (c.nome !== undefined) {
       const nome = texto(c.nome, 120);
       if (nome.split(" ").length < 2) return { ok: false, erro: "dados_invalidos" };
@@ -410,6 +420,8 @@ function adminAtualizar(c) {
       if (consulta && horarioOcupado(consulta, p.valores[P.id])) return { ok: false, erro: "horario_ocupado" };
       mudar.push([P.consulta, consulta ? "'" + consulta : ""]);
       mudar.push([P.modalidade, consulta ? modalidade : ""]);
+      const antes = String(p.valores[P.consulta] || "") + "|" + String(p.valores[P.modalidade] || "");
+      if (antes !== consulta + "|" + (consulta ? modalidade : "")) sinc = { consulta: consulta, modalidade: modalidade };
     }
     if (c.status !== undefined) {
       if (STATUS.indexOf(c.status) < 0) return { ok: false, erro: "dados_invalidos" };
@@ -422,7 +434,15 @@ function adminAtualizar(c) {
     }
     const sh = aba("Pacientes");
     mudar.forEach(function (m) { sh.getRange(p.linha, m[0] + 1).setValue(m[1]); });
-    return { ok: true };
+    if (!sinc) return { ok: true };
+    const v = sh.getRange(p.linha, 1, 1, ABAS.Pacientes.length).getValues()[0];
+    const ag = sincronizarAgenda({
+      id: v[P.id], nome: String(v[P.nome]), email: String(v[P.email]), celular: String(v[P.celular]),
+      consulta: sinc.consulta, modalidade: sinc.modalidade,
+      eventoAntigo: String(p.valores[P.evento] || ""), consultaAntiga: String(p.valores[P.consulta] || "")
+    });
+    sh.getRange(p.linha, P.evento + 1, 1, 2).setValues([[ag.evento, ag.meet]]);
+    return { ok: true, meet: ag.meet, aviso: ag.aviso };
   } finally {
     lock.releaseLock();
   }
@@ -434,7 +454,7 @@ function adminReenviar(c) {
   const p = acharPaciente(function (l) { return l[P.id] === texto(c.id, 20); });
   if (!p) return { ok: false, erro: "nao_encontrado" };
   if (!tentativaPermitida("reenviar_adm_" + p.valores[P.id], 5)) return { ok: false, erro: "muitas_tentativas" };
-  enviarEmailDeAcesso(String(p.valores[P.nome]), String(p.valores[P.email]), p.valores[P.token], String(p.valores[P.consulta] || ""), String(p.valores[P.modalidade] || ""));
+  enviarEmailDeAcesso(String(p.valores[P.nome]), String(p.valores[P.email]), p.valores[P.token], String(p.valores[P.consulta] || ""), String(p.valores[P.modalidade] || ""), String(p.valores[P.meet] || ""));
   return { ok: true };
 }
 
@@ -460,6 +480,7 @@ function adminRemover(c) {
     });
     const m = String(p.valores[P.pasta] || "").match(/folders\/([\w-]+)/);
     if (m) { try { DriveApp.getFolderById(m[1]).setTrashed(true); } catch (e) {} }
+    cancelarEvento(String(p.valores[P.evento] || ""), String(p.valores[P.consulta] || ""));
     apagarLinha(aba("Pacientes"), p.linha);
     console.log("Paciente removido por " + adm.por + ": " + id);
     return { ok: true };
@@ -529,6 +550,64 @@ function configurar() {
   Object.keys(ABAS).forEach(aba);
   pastaRaiz();
   MailApp.getRemainingDailyQuota();
+  if (USAR_GOOGLE_AGENDA) {
+    try { Calendar.CalendarList.get("primary"); console.log("Google Agenda ligada."); }
+    catch (e) { console.log("Falta ativar o serviço Google Calendar API (Serviços › +). Veja o LEIA-ME."); }
+  }
+}
+
+// ---------------------------------------------------------------- Google Agenda e Meet
+
+/**
+ * Cria o evento da consulta na agenda da Ana Carolina (com link do Meet se for online) e
+ * cancela o evento anterior, se ele ainda não tinha acontecido. Se a agenda falhar, a
+ * consulta continua salva na planilha e o painel mostra um aviso.
+ */
+function sincronizarAgenda(d) {
+  const out = { evento: "", meet: "", aviso: "" };
+  if (!USAR_GOOGLE_AGENDA) return out;
+  try {
+    cancelarEvento(d.eventoAntigo, d.consultaAntiga);
+    if (!d.consulta) return out;
+    const online = d.modalidade === "Online";
+    const partes = d.consulta.split(" "), dia = partes[0], hora = partes[1];
+    const minutos = Number(hora.slice(0, 2)) * 60 + Number(hora.slice(3, 5)) + DURACAO_CONSULTA_MIN;
+    const fim = ("0" + Math.floor(minutos / 60)).slice(-2) + ":" + ("0" + (minutos % 60)).slice(-2);
+    const ev = {
+      summary: (online ? "Consulta online · " : "Consulta · ") + d.nome,
+      description: "Paciente: " + d.nome + "\nCelular: " + d.celular + (online ? "\nAtendimento online pelo Google Meet." : "") + "\nPainel: " + URL_AREA_PACIENTE.replace(/paciente\/?$/, "admin/") + "#p-" + d.id,
+      start: { dateTime: dia + "T" + hora + ":00", timeZone: "America/Sao_Paulo" },
+      end: { dateTime: dia + "T" + fim + ":00", timeZone: "America/Sao_Paulo" },
+      reminders: { useDefault: false, overrides: [{ method: "popup", minutes: 60 }] }
+    };
+    if (!online) ev.location = ENDERECO_CONSULTORIO;
+    if (CONVIDAR_PACIENTE && d.email) ev.attendees = [{ email: d.email, displayName: d.nome }];
+    if (online) ev.conferenceData = { createRequest: { requestId: Utilities.getUuid(), conferenceSolutionKey: { type: "hangoutsMeet" } } };
+    const criado = Calendar.Events.insert(ev, "primary", { conferenceDataVersion: 1, sendUpdates: CONVIDAR_PACIENTE ? "all" : "none" });
+    out.evento = criado.id;
+    if (online) {
+      out.meet = linkMeet(criado);
+      for (let i = 0; i < 3 && !out.meet; i++) { Utilities.sleep(1500); out.meet = linkMeet(Calendar.Events.get("primary", criado.id)); }
+    }
+  } catch (err) {
+    console.error("Google Agenda: " + (err && err.message ? err.message : err));
+    out.aviso = "agenda";
+  }
+  return out;
+}
+
+function linkMeet(ev) {
+  if (ev.hangoutLink) return ev.hangoutLink;
+  const pontos = (ev.conferenceData && ev.conferenceData.entryPoints) || [];
+  for (let i = 0; i < pontos.length; i++) if (pontos[i].entryPointType === "video") return pontos[i].uri;
+  return "";
+}
+
+/** Cancela o evento só se a consulta ainda não passou (as antigas ficam no histórico). */
+function cancelarEvento(evento, consulta) {
+  if (!USAR_GOOGLE_AGENDA || !evento || !consulta) return;
+  if (String(consulta).slice(0, 10) < Utilities.formatDate(new Date(), fuso(), "yyyy-MM-dd")) return;
+  try { Calendar.Events.remove("primary", evento, { sendUpdates: CONVIDAR_PACIENTE ? "all" : "none" }); } catch (e) {}
 }
 
 /**
@@ -585,12 +664,12 @@ function linkDeAcesso(token) {
  * E-mail com o link da área do paciente. Escrito como uma mensagem normal do consultório
  * (texto simples, assinatura completa, sem cara de aviso automático) para não cair no spam.
  */
-function enviarEmailDeAcesso(nome, email, token, consulta, modalidade) {
+function enviarEmailDeAcesso(nome, email, token, consulta, modalidade, meet) {
   const primeiro = String(nome).split(" ")[0];
   const link = linkDeAcesso(token);
   const online = modalidade === "Online";
   const quando = consulta && consultaValida(consulta, online ? "Online" : "Presencial") ? consultaPorExtenso(consulta) : "";
-  const local = online ? "Consulta online, por videochamada. O link da chamada chega pelo WhatsApp perto do horário." : "Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro";
+  const local = online ? (meet ? "Pelo Google Meet: " + meet : "Consulta online, por videochamada. O link da chamada chega pelo WhatsApp perto do horário.") : "Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro";
   const assinatura = ["Ana Carolina dos Santos Pereira", "Nutricionista · CRN-4 23101599", "Av. Nossa Senhora de Copacabana, 540, sala 1105 · Copacabana, Rio de Janeiro", "WhatsApp (21) 96693-7967"];
   const texto =
     "Olá, " + primeiro + "!\n\n" +
@@ -604,7 +683,7 @@ function enviarEmailDeAcesso(nome, email, token, consulta, modalidade) {
     '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#2c2f26;max-width:560px">' +
     "<p>Olá, " + escHtml(primeiro) + "!</p>" +
     "<p>Seu cadastro no consultório da nutricionista Ana Carolina Pereira está pronto.</p>" +
-    (quando ? '<p style="padding:12px 16px;background:#eef1e3;border-radius:8px"><b>Sua consulta' + (online ? " online" : "") + ": " + escHtml(quando) + "</b><br>" + escHtml(local) + "</p>" : "") +
+    (quando ? '<p style="padding:12px 16px;background:#eef1e3;border-radius:8px"><b>Sua consulta' + (online ? " online" : "") + ": " + escHtml(quando) + "</b><br>" + (online && meet ? 'Pelo Google Meet: <a href="' + meet + '">' + escHtml(meet) + "</a>" : escHtml(local)) + "</p>" : "") +
     "<p>Pela sua área do paciente você responde a ficha de saúde, envia seus exames e recebe o plano alimentar:</p>" +
     '<p><a href="' + link + '" style="display:inline-block;background:#5d6e35;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;font-weight:bold">Abrir minha área do paciente</a></p>' +
     "<p>Para entrar, use o mesmo e-mail e celular que você informou na recepção. Guarde este e-mail para entrar outras vezes.</p>" +
