@@ -1,16 +1,20 @@
 // Servidorzinho do site de agendamento (sem dependências).
-//   npm start        -> abre em http://localhost:3000
-//   npm run build    -> gera dist/index.html para hospedar como site estático
+//   npm start        -> abre em http://localhost:3000 (agendamento) e /paciente/ (área do paciente)
+//   npm run build    -> gera a pasta dist/ para hospedar como site estático
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
 const PORT = Number(process.env.PORT) || 3000;
-const PAGINA = path.join(__dirname, "src", "pagina.html");
+// Endereço no site -> arquivo em src/
+const PAGINAS = {
+  "/": "agendamento.html",
+  "/paciente/": "paciente.html",
+};
 const DADOS = path.join(__dirname, "data", "agendamentos.json");
 
-function montarHtml({ servidor }) {
-  const fonte = fs.readFileSync(PAGINA, "utf8");
+function montarHtml(arquivo, { servidor }) {
+  const fonte = fs.readFileSync(path.join(__dirname, "src", arquivo), "utf8");
   const marca = "<!-- corpo -->";
   const i = fonte.indexOf(marca);
   const cabeca = i >= 0 ? fonte.slice(0, i) : "";
@@ -59,9 +63,15 @@ const CAMPOS = ["data", "hora", "modalidade", "tipo", "nome", "email", "celular"
 const servidor = http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost");
 
-  if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
+  let caminho = url.pathname.replace(/index\.html$/, "");
+  if (!caminho.endsWith("/")) caminho += "/";
+  if (req.method === "GET" && PAGINAS[caminho]) {
+    if (url.pathname !== caminho && !url.pathname.endsWith("index.html")) {
+      res.writeHead(301, { Location: caminho + url.search });
+      return res.end();
+    }
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
-    return res.end(montarHtml({ servidor: true }));
+    return res.end(montarHtml(PAGINAS[caminho], { servidor: true }));
   }
 
   if (url.pathname === "/api/agendamentos" && req.method === "GET") {
@@ -95,10 +105,12 @@ const servidor = http.createServer((req, res) => {
 });
 
 if (process.argv[2] === "build") {
-  const destino = path.join(__dirname, "dist", "index.html");
-  fs.mkdirSync(path.dirname(destino), { recursive: true });
-  fs.writeFileSync(destino, montarHtml({ servidor: false }));
-  console.log("Gerado:", destino);
+  for (const [caminho, arquivo] of Object.entries(PAGINAS)) {
+    const destino = path.join(__dirname, "dist", caminho, "index.html");
+    fs.mkdirSync(path.dirname(destino), { recursive: true });
+    fs.writeFileSync(destino, montarHtml(arquivo, { servidor: false }));
+    console.log("Gerado:", destino);
+  }
 } else {
   servidor.listen(PORT, () => console.log(`Site no ar em http://localhost:${PORT}`));
 }
