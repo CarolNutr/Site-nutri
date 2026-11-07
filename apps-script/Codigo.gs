@@ -14,11 +14,10 @@
 // ===================== Ajuste aqui =====================
 // Endereço da área do paciente (o link que vai no e-mail).
 const URL_AREA_PACIENTE = "https://SEU-SITE/paciente/";
-// Uma senha para cada administradora. O nome aparece na coluna "Cadastrado por".
-const SENHAS_ADMIN = {
-  "Ana Carolina": "TROQUE-ESTA-SENHA-1",
-  "Recepção": "TROQUE-ESTA-SENHA-2"
-};
+// Senha do painel das administradoras (a mesma para a Ana Carolina e para a recepção).
+const SENHA_ADMIN = "TROQUE-ESTA-SENHA";
+// Quem pode aparecer na coluna "Cadastrado por" (o painel pergunta quem está usando).
+const ADMINISTRADORAS = ["Ana Carolina", "Recepção"];
 const NOME_REMETENTE = "Ana Carolina Pereira · Nutricionista";
 const NOME_PASTA = "Pacientes · Nutri Ana Carolina";
 const MAX_ARQUIVO_MB = 10;
@@ -72,22 +71,24 @@ function saida(obj) {
 
 // ---------------------------------------------------------------- Administradoras
 
-function adminPelaSenha(senha) {
-  for (const nome in SENHAS_ADMIN) {
-    if (SENHAS_ADMIN[nome].indexOf("TROQUE-ESTA-SENHA") === 0) continue; // senha de exemplo não vale
-    if (String(senha || "") === SENHAS_ADMIN[nome]) return nome;
-  }
-  return null;
+function senhaAdminOk(senha) {
+  if (SENHA_ADMIN === "TROQUE-ESTA-SENHA") return false; // a senha de exemplo não vale
+  if (!tentativaPermitida("admin", 20)) return false;
+  return String(senha || "") === SENHA_ADMIN;
 }
 
-/** Cadastro feito pela recepção. Cria o paciente, a pasta no Drive e manda o e-mail com o link. */
+/**
+ * Cadastro feito pela recepção: nome, e-mail, celular e data de nascimento.
+ * Cria o paciente e a pasta no Drive e manda o e-mail com o link.
+ * Objetivo e status ficam com a nutricionista (painel).
+ */
 function cadastrar(c) {
-  const admin = adminPelaSenha(c.senha);
-  if (!admin) return { ok: false, erro: "senha_invalida" };
+  if (!senhaAdminOk(c.senha)) return { ok: false, erro: "senha_invalida" };
+  const admin = ADMINISTRADORAS.indexOf(c.por) >= 0 ? c.por : "Administradora";
   const nome = texto(c.nome, 120);
   const email = texto(c.email, 120).toLowerCase();
   const celular = celularNormal(c.celular);
-  if (nome.split(" ").length < 2 || !emailValido(email) || celular.length < 10) return { ok: false, erro: "dados_invalidos" };
+  if (nome.split(" ").length < 2 || !emailValido(email) || celular.length < 10 || !dataValida(c.nascimento)) return { ok: false, erro: "dados_invalidos" };
 
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
@@ -102,8 +103,8 @@ function cadastrar(c) {
     linha[P.nome] = seguro(nome);
     linha[P.email] = seguro(email);
     linha[P.celular] = "'" + formatarCelular(celular);
-    linha[P.nascimento] = c.nascimento && dataValida(c.nascimento) ? "'" + dataBR(c.nascimento) : "";
-    linha[P.objetivo] = seguro(texto(c.objetivo, 120));
+    linha[P.nascimento] = "'" + dataBR(c.nascimento);
+    linha[P.objetivo] = "";
     linha[P.status] = "Novo";
     linha[P.por] = admin;
     linha[P.token] = token;
@@ -290,8 +291,7 @@ function tipoDoTitulo(t) {
 
 /** Para testar o e-mail pelo editor: troque os dados e rode esta função. */
 function testarCadastro() {
-  const senha = Object.keys(SENHAS_ADMIN).map(function (k) { return SENHAS_ADMIN[k]; })[0];
-  console.log(cadastrar({ senha: senha, nome: "Paciente Teste", email: Session.getActiveUser().getEmail(), celular: "21999999999", objetivo: "Emagrecimento" }));
+  console.log(cadastrar({ senha: SENHA_ADMIN, por: "Recepção", nome: "Paciente Teste", email: Session.getActiveUser().getEmail(), celular: "21999999999", nascimento: "1990-01-01" }));
 }
 
 // ---------------------------------------------------------------- E-mail

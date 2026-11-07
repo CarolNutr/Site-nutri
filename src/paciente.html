@@ -161,6 +161,13 @@ svg{flex:none}
 .unid:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--accent-soft)}
 .unid .input{border:0;border-radius:0;box-shadow:none;flex:1;min-width:0}
 .unid span{display:grid;place-items:center;padding:0 14px;background:var(--soft);color:var(--muted);font-weight:700;border-left:1px solid var(--line)}
+.medidas{display:flex;flex-wrap:wrap;gap:16px 20px}
+.medida{display:grid;gap:6px}
+.medida .unid{width:180px}
+.detalhe{display:grid;gap:6px;max-width:520px}
+.lbl-det{font-weight:700;font-size:15px}
+.area-curta{min-height:64px}
+.q-nota{margin:0;padding:10px 14px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:15px;max-width:520px}
 
 /* Assistente da ficha */
 .prog{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}
@@ -298,33 +305,23 @@ svg{flex:none}
     maxArquivosPorVez: 10
   };
 
-  /* ===== Perguntas (EXEMPLO até chegarem as perguntas da Ana Carolina) =====
-     tipos: texto, texto-longo, numero, escolha, multi, escala */
+  /* ===== Perguntas da ficha (da Ana Carolina) =====
+     tipos: texto, texto-longo, numero, escolha, multi, escala, medidas.
+     Em "escolha": detalhe = campo que aparece quando a resposta é "Sim";
+     notaSe = aviso que aparece para uma resposta. */
   var SECOES = [
-    { id: "saude", titulo: "Saúde", desc: "Conte sobre sua saúde hoje. Isso ajuda a montar um plano seguro para você.", perguntas: [
-      { id: "peso", tipo: "numero", texto: "Qual é o seu peso atual?", unidade: "kg", min: 20, max: 400, exemplo: "68,5", ajuda: "Se não souber o exato, coloque o aproximado." },
-      { id: "altura", tipo: "numero", texto: "Qual é a sua altura?", unidade: "cm", min: 100, max: 250, exemplo: "165" },
-      { id: "condicoes", tipo: "multi", texto: "Você tem alguma destas condições?", opcoes: ["Diabetes", "Pressão alta", "Colesterol ou triglicerídeos altos", "Hipotireoidismo", "Gastrite ou refluxo", "Anemia", "Ovário policístico"], exclusiva: "Nenhuma", outro: true },
-      { id: "remedios", tipo: "texto-longo", texto: "Usa algum remédio ou suplemento? Quais?", opcional: true },
-      { id: "alergias", tipo: "texto", texto: "Tem alergia ou intolerância a algum alimento?", opcional: true, placeholder: "Ex.: lactose, glúten, camarão" }
-    ]},
-    { id: "rotina", titulo: "Rotina e hábitos", desc: "Como é o seu dia a dia.", perguntas: [
-      { id: "sono", tipo: "escolha", texto: "Quantas horas você dorme por noite?", opcoes: ["Menos de 5 horas", "5 a 6 horas", "7 a 8 horas", "Mais de 8 horas"] },
-      { id: "atividade", tipo: "escolha", texto: "Você pratica atividade física?", opcoes: ["Não pratico", "1 a 2 vezes por semana", "3 a 4 vezes por semana", "5 vezes ou mais"] },
-      { id: "agua", tipo: "escolha", texto: "Quanta água você bebe por dia?", opcoes: ["Menos de 1 litro", "1 a 2 litros", "Mais de 2 litros"] },
-      { id: "intestino", tipo: "escolha", texto: "Com que frequência seu intestino funciona?", opcoes: ["Todo dia", "Dia sim, dia não", "2 vezes por semana ou menos"] },
-      { id: "alcool", tipo: "escolha", texto: "Consome bebida alcoólica?", opcoes: ["Não", "Só em ocasiões especiais", "Toda semana"] },
-      { id: "estresse", tipo: "escala", texto: "Como está o seu nível de estresse?", rotulos: ["Tranquilo", "Muito alto"] }
-    ]},
-    { id: "alimentacao", titulo: "Alimentação", desc: "Sem julgamentos: conte como você come de verdade.", perguntas: [
-      { id: "refeicoes", tipo: "escolha", texto: "Quantas refeições você faz por dia?", opcoes: ["1 a 2", "3", "4 a 5", "6 ou mais"] },
-      { id: "fome", tipo: "escala", texto: "Como é a sua fome ao longo do dia?", rotulos: ["Quase não sinto", "Sinto muita fome"] },
-      { id: "beliscar", tipo: "escolha", texto: "Costuma beliscar entre as refeições?", opcoes: ["Quase nunca", "Às vezes", "Quase sempre"] },
-      { id: "gosta", tipo: "texto-longo", texto: "Quais alimentos você mais gosta?", opcional: true },
-      { id: "nao_come", tipo: "texto-longo", texto: "Tem algum alimento que você não come de jeito nenhum?", opcional: true },
-      { id: "ontem", tipo: "texto-longo", texto: "Conte o que você comeu ontem, do café da manhã até a noite.", opcional: true, ajuda: "Pode ser bem resumido." }
+    { id: "saude", titulo: "Sua saúde", desc: "Marque Sim ou Não e, quando for o caso, conte os detalhes.", perguntas: [
+      { id: "exames", tipo: "escolha", texto: "Possui exames bioquímicos recentes?", opcoes: ["Sim", "Não"], ajuda: "Exames de sangue, como hemograma, glicemia e colesterol.", notaSe: { Sim: "Depois de enviar a ficha, você anexa os exames na parte Meus exames." } },
+      { id: "medicamentos", tipo: "escolha", texto: "Faz uso de algum medicamento?", opcoes: ["Sim", "Não"], detalhe: "Qual(is)?" },
+      { id: "comorbidades", tipo: "escolha", texto: "Possui alguma comorbidade ou condição de saúde?", opcoes: ["Sim", "Não"], detalhe: "Qual(is)?", ajudaDetalhe: "Ex.: diabetes, pressão alta, hipotireoidismo" },
+      { id: "medidas", tipo: "medidas", texto: "Peso e altura atuais", ajuda: "Se não souber o exato, coloque o aproximado.", campos: [
+        { id: "peso", rotulo: "Peso", unidade: "kg", min: 20, max: 400, exemplo: "68,5" },
+        { id: "altura", rotulo: "Altura", unidade: "m", min: 1, max: 2.5, exemplo: "1,65" }
+      ]},
+      { id: "suplementos", tipo: "escolha", texto: "Faz uso de suplementos?", opcoes: ["Sim", "Não"], detalhe: "Quais?" }
     ]}
   ];
+  function totalPerguntas() { return SECOES.reduce(function (t, s) { return t + s.perguntas.length; }, 0); }
 
   var CHECKIN = { id: "checkin", titulo: "Como você está", perguntas: [
     { id: "peso_hoje", tipo: "numero", texto: "Qual é o seu peso hoje?", unidade: "kg", min: 20, max: 400, exemplo: "68,5", opcional: true },
@@ -441,8 +438,12 @@ svg{flex:none}
   }
   function vazio(v) { return v == null || (Array.isArray(v) ? !v.length : !String(v).trim()); }
   function fmt(q, vals) {
+    if (q.tipo === "medidas") {
+      return q.campos.filter(function (c) { return !vazio(vals[c.id]); }).map(function (c) { return c.rotulo + ": " + String(vals[c.id]).trim().replace(".", ",") + " " + c.unidade; }).join(" · ");
+    }
     var v = vals[q.id];
     if (vazio(v)) return "";
+    if (q.detalhe && v === "Sim") { var det = String(vals[q.id + "__detalhe"] || "").trim(); return det ? "Sim: " + det : "Sim"; }
     var outro = String(vals[q.id + "__outro"] || "").trim();
     var nomeOutro = function (x) { return x === "__outro" ? "Outro" + (outro ? ": " + outro : "") : x; };
     if (q.tipo === "multi") return v.map(nomeOutro).join(", ");
@@ -454,7 +455,19 @@ svg{flex:none}
   function errosSecao(sec, vals) {
     var m = {};
     sec.perguntas.forEach(function (q) {
+      if (q.tipo === "medidas") {
+        q.campos.some(function (c) {
+          var bruto = vals[c.id];
+          if (vazio(bruto)) { if (!q.opcional) m[q.id] = "Preencha o " + c.rotulo.toLowerCase() + " para continuar."; return !q.opcional; }
+          var n = parseFloat(String(bruto).replace(",", "."));
+          if (c.unidade === "m" && n >= 100 && n <= 250) { m[q.id] = "Escreva a altura em metros, por exemplo " + c.exemplo + "."; return true; }
+          if (isNaN(n) || n < c.min || n > c.max) { m[q.id] = "Confira o " + c.rotulo.toLowerCase() + ". Use só algarismos, por exemplo " + c.exemplo + "."; return true; }
+          return false;
+        });
+        return;
+      }
       var v = vals[q.id];
+      if (q.detalhe && v === "Sim" && !String(vals[q.id + "__detalhe"] || "").trim()) { m[q.id] = "Conte " + q.detalhe.toLowerCase().replace("?", "") + " no campo abaixo."; return; }
       if (vazio(v)) {
         if (!q.opcional) m[q.id] = (q.tipo === "escolha" || q.tipo === "multi" || q.tipo === "escala") ? "Escolha uma opção para continuar." : "Responda para continuar.";
         return;
@@ -494,6 +507,12 @@ svg{flex:none}
         return '<label class="pill"><input type="' + (multi ? "checkbox" : "radio") + '" name="' + id + '" id="' + id + "-" + i + '" value="' + esc(o) + '" data-q="' + q.id + '"' + (marcados.indexOf(o) >= 0 ? " checked" : "") + "><span>" + (o === "__outro" ? "Outro" : esc(o)) + "</span></label>";
       }).join("") + "</div>";
       if (q.outro) corpo += '<input class="input" id="' + id + '-outro" data-q-outro="' + q.id + '" placeholder="Qual?" aria-label="' + esc(q.texto) + ' Qual?" value="' + esc(vals[q.id + "__outro"] || "") + '"' + (marcados.indexOf("__outro") >= 0 ? "" : " hidden") + ">";
+      if (q.detalhe) corpo += '<div class="detalhe" id="' + id + '-det"' + (v === "Sim" ? "" : " hidden") + '><label class="lbl-det" for="' + id + '-detalhe">' + esc(q.detalhe) + '</label><textarea class="input area area-curta" id="' + id + '-detalhe" data-q-detalhe="' + q.id + '" rows="2"' + (q.ajudaDetalhe ? ' placeholder="' + esc(q.ajudaDetalhe) + '"' : "") + ">" + esc(vals[q.id + "__detalhe"] || "") + "</textarea></div>";
+      if (q.notaSe) Object.keys(q.notaSe).forEach(function (op) { corpo += '<p class="q-nota" data-nota="' + q.id + '" data-se="' + esc(op) + '"' + (v === op ? "" : " hidden") + ">" + esc(q.notaSe[op]) + "</p>"; });
+    } else if (q.tipo === "medidas") {
+      corpo = '<div class="medidas">' + q.campos.map(function (c) {
+        return '<div class="medida"><label class="lbl-det" for="q-' + c.id + '">' + esc(c.rotulo) + '</label><div class="unid"><input class="input" id="q-' + c.id + '" data-q="' + c.id + '" data-medida="' + q.id + '" inputmode="decimal" autocomplete="off" value="' + esc(vals[c.id] || "") + '" placeholder="' + esc(c.exemplo) + '"><span>' + esc(c.unidade) + "</span></div></div>";
+      }).join("") + "</div>";
     } else if (q.tipo === "escala") {
       corpo = '<div class="escala" role="radiogroup" aria-labelledby="' + id + '-l">' + [1, 2, 3, 4, 5].map(function (k) {
         return '<label class="pill"><input type="radio" name="' + id + '" value="' + k + '" data-q="' + q.id + '"' + (String(v) === String(k) ? " checked" : "") + ' aria-label="' + k + " de 5" + (k === 1 ? ", " + esc(q.rotulos[0]) : k === 5 ? ", " + esc(q.rotulos[1]) : "") + '"><span>' + k + "</span></label>";
@@ -546,11 +565,11 @@ svg{flex:none}
     return '<div class="acesso"><div class="acesso-card">' +
       '<header class="pag-head"><span class="eyebrow">Área do paciente</span><h1 class="h1" tabindex="-1">Confirme seus dados</h1>' +
       '<p class="desc">Para sua segurança, digite o e-mail e o celular que você informou na recepção.</p></header>' +
-      (previa ? '<p class="nota-previa">Prévia: esta é a tela que abre pelo link do e-mail. Já deixamos preenchidos os dados da paciente de exemplo. Marque a autorização e toque em Entrar.</p>' : "") +
+      (previa ? '<p class="nota-previa">Prévia: esta é a tela que abre pelo link do e-mail. Já deixamos tudo preenchido com a paciente de exemplo. É só tocar em Entrar.</p>' : "") +
       '<form class="campos" id="form-entrar" novalidate>' +
         '<div class="campo" data-bloco="email"><label class="lbl" for="e-email">E-mail</label><input class="input" id="e-email" type="email" inputmode="email" autocomplete="email" value="' + (previa ? DEMO.email : "") + '"><p class="q-erro" hidden></p></div>' +
         '<div class="campo" data-bloco="celular"><label class="lbl" for="e-cel">Celular</label><div class="phone"><span class="ddi">' + FLAG + ' +55</span><input class="input" id="e-cel" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(21) 99999-9999" value="' + (previa ? mascaraTel(DEMO.celular) : "") + '"></div><p class="q-erro" hidden></p></div>' +
-        '<div class="campo" data-bloco="aceite"><label class="check" for="e-aceite"><input type="checkbox" id="e-aceite"><span>Autorizo o uso das minhas informações de saúde e dos meus exames somente para o meu acompanhamento nutricional com a nutricionista Ana Carolina Pereira, conforme a LGPD.</span></label><p class="q-erro" hidden></p></div>' +
+        '<div class="campo" data-bloco="aceite"><label class="check" for="e-aceite"><input type="checkbox" id="e-aceite"' + (previa ? " checked" : "") + '><span>Autorizo o uso das minhas informações de saúde e dos meus exames somente para o meu acompanhamento nutricional com a nutricionista Ana Carolina Pereira, conforme a LGPD.</span></label><p class="q-erro" hidden></p></div>' +
         '<div id="aviso-entrar"></div>' +
         '<button type="submit" class="btn btn-cheio" id="btn-entrar">Entrar ' + I.seta + "</button>" +
       "</form>" +
@@ -650,14 +669,14 @@ svg{flex:none}
   function htmlInicio() {
     var P = S.P, fichaOk = !!P.ficha, nEx = P.exames.length;
     var tarefas = [
-      { cls: fichaOk ? "is-feito" : "is-pend", ico: fichaOk ? I.check : "", t: "Ficha de saúde", d: fichaOk ? "Respondida em " + dataBR(P.ficha.data) + ". Se algo mudou, você pode atualizar." : "Conte sobre sua saúde, rotina e alimentação. Leva uns 10 minutos.", a: fichaOk ? "Ver respostas" : "Responder agora", h: "#ficha" },
+      { cls: fichaOk ? "is-feito" : "is-pend", ico: fichaOk ? I.check : "", t: "Ficha de saúde", d: fichaOk ? "Respondida em " + dataBR(P.ficha.data) + ". Se algo mudou, você pode atualizar." : "São " + totalPerguntas() + " perguntas rápidas sobre a sua saúde.", a: fichaOk ? "Ver respostas" : "Responder agora", h: "#ficha" },
       { cls: nEx ? "is-feito" : "is-pend", ico: nEx ? I.check : "", t: "Exames", d: nEx ? nEx + (nEx === 1 ? " exame enviado" : " exames enviados") + ". Fez outros? Envie também." : "Envie seus exames de sangue e outros que a nutricionista pediu.", a: nEx ? "Enviar mais" : "Enviar exames", h: "#exames" },
       { cls: "", ico: I.grafico, t: "Como você está", d: P.checkins.length ? "Último registro em " + dataBR(P.checkins[P.checkins.length - 1].data) + ". Conte como foram os últimos dias." : "Conte como foram os últimos dias. A nutricionista acompanha por aqui.", a: "Contar", h: "#acompanhamento" }
     ];
     var docs = P.documentos.slice().sort(function (a, b) { return b.data < a.data ? -1 : 1; }).slice(0, 2);
     var evs = linhaDoTempo().slice(0, 3);
     return '<header class="pag-head"><span class="eyebrow">Área do paciente</span><h1 class="h1" tabindex="-1">Olá, ' + esc(primeiroNome()) + "</h1>" +
-      '<div class="chips-info"><span class="chip-info">Objetivo: <b>' + esc(P.paciente.objetivo || "a definir") + '</b></span><span class="chip-info">Paciente desde ' + dataBR(P.paciente.cadastro) + "</span></div></header>" +
+      '<div class="chips-info">' + (P.paciente.objetivo ? '<span class="chip-info">Objetivo: <b>' + esc(P.paciente.objetivo) + "</b></span>" : "") + '<span class="chip-info">Paciente desde ' + dataBR(P.paciente.cadastro) + "</span></div></header>" +
       (!CONFIG.api ? '<p class="nota-previa">Prévia com a paciente de exemplo. Pode testar à vontade: nada é enviado de verdade.</p>' : "") +
       '<section class="bloco"><h2 class="h2">Para fazer</h2><ul class="tarefas">' + tarefas.map(function (t) {
         return '<li class="tarefa ' + t.cls + '"><span class="t-ico">' + t.ico + '</span><div class="t-txt"><strong>' + t.t + "</strong><span>" + esc(t.d) + '</span></div><a class="btn-sec t-acao" href="' + t.h + '">' + t.a + "</a></li>";
@@ -672,17 +691,18 @@ svg{flex:none}
     if (S.wiz) return htmlWiz();
     if (P.ficha) {
       return '<header class="pag-head"><span class="eyebrow">Ficha de saúde</span><h1 class="h1" tabindex="-1">Suas respostas</h1><p class="desc">Respondida em ' + dataBR(P.ficha.data) + ". Se algo mudou na sua saúde ou na rotina, atualize para a nutricionista saber.</p></header>" +
-        '<div><button type="button" class="btn" data-acao="ficha-editar">Atualizar minhas respostas</button></div>' +
+        (P.ficha.valores && P.ficha.valores.exames === "Sim" && !P.exames.length ? '<section class="cartao is-destaque"><h2 class="h2">Anexe seus exames</h2><p class="q-ajuda" style="font-size:15px">Você disse que tem exames bioquímicos recentes. Anexe para a ' + esc(CONFIG.nomeCurto) + ' ver antes da consulta.</p><div><a class="btn" href="#exames">Anexar exames</a></div></section>' : "") +
+        '<div><button type="button" class="btn-sec" data-acao="ficha-editar">Atualizar minhas respostas</button></div>' +
         SECOES.map(function (s) { return htmlRevSecao(s, P.ficha.valores, null); }).join("");
     }
-    return '<header class="pag-head"><span class="eyebrow">Ficha de saúde</span><h1 class="h1" tabindex="-1">Conte um pouco sobre você</h1><p class="desc">Com estas respostas a ' + esc(CONFIG.nomeCurto) + " chega na consulta já conhecendo a sua rotina. Leva uns 10 minutos e você pode voltar e alterar depois.</p></header>" +
-      '<ul class="partes">' + SECOES.map(function (s) { return "<li>" + esc(s.titulo) + "<span>" + s.perguntas.length + " perguntas</span></li>"; }).join("") + "</ul>" +
+    return '<header class="pag-head"><span class="eyebrow">Ficha de saúde</span><h1 class="h1" tabindex="-1">Conte um pouco sobre você</h1><p class="desc">São só ' + totalPerguntas() + " perguntas rápidas. Com elas a " + esc(CONFIG.nomeCurto) + " chega na consulta já sabendo o principal sobre a sua saúde. Depois você pode alterar as respostas.</p></header>" +
+      (SECOES.length > 1 ? '<ul class="partes">' + SECOES.map(function (s) { return "<li>" + esc(s.titulo) + "<span>" + s.perguntas.length + " perguntas</span></li>"; }).join("") + "</ul>" : "") +
       '<div><button type="button" class="btn" data-acao="ficha-comecar">Começar a ficha ' + I.seta + "</button></div>";
   }
   function htmlWiz() {
     var w = S.wiz, total = SECOES.length, rev = w.passo === total;
     var pct = Math.round(((w.passo + (rev ? 0 : 0.5)) / total) * 100);
-    var topo = '<div class="wiz-top"><button type="button" class="btn-voltar" data-acao="wiz-sair">‹ Sair da ficha</button><span>' + (rev ? "Revisão" : "Parte " + (w.passo + 1) + " de " + total) + '</span></div><div class="prog" aria-hidden="true"><i style="width:' + pct + '%"></i></div>';
+    var topo = '<div class="wiz-top"><button type="button" class="btn-voltar" data-acao="wiz-sair">‹ Sair da ficha</button><span>' + (rev ? "Revisão" : total > 1 ? "Parte " + (w.passo + 1) + " de " + total : "Ficha de saúde") + '</span></div><div class="prog" aria-hidden="true"><i style="width:' + pct + '%"></i></div>';
     if (rev) {
       return topo + '<header class="pag-head"><h1 class="h1" tabindex="-1">Confira antes de enviar</h1><p class="desc">Se algo estiver errado, toque em Alterar.</p></header>' +
         SECOES.map(function (s, k) { return htmlRevSecao(s, w.valores, k); }).join("") +
@@ -726,7 +746,7 @@ svg{flex:none}
       S.wiz = null;
       renderPagina();
       window.scrollTo({ top: 0, behavior: reduz ? "auto" : "smooth" });
-      toast("Ficha enviada. Obrigada!");
+      toast(vals.exames === "Sim" && !S.P.exames.length ? "Ficha enviada. Agora anexe seus exames." : "Ficha enviada. Obrigada!");
     });
   }
 
@@ -957,6 +977,8 @@ svg{flex:none}
     var vals = valsDe(el);
     if (!vals) return;
     if (el.dataset.qOutro) { vals[el.dataset.qOutro + "__outro"] = el.value; limparErro(el.dataset.qOutro); return; }
+    if (el.dataset.qDetalhe) { vals[el.dataset.qDetalhe + "__detalhe"] = el.value; limparErro(el.dataset.qDetalhe); return; }
+    if (el.dataset.medida) { vals[el.dataset.q] = el.value; limparErro(el.dataset.medida); return; }
     if (!el.dataset.q) return;
     var qid = el.dataset.q, q = acharQ(qid);
     if (el.type === "checkbox") {
@@ -974,6 +996,11 @@ svg{flex:none}
       var o = $("#q-" + qid + "-outro"), marcado = [].concat(vals[qid] || []).indexOf("__outro") >= 0;
       if (o) { o.hidden = !marcado; if (marcado && el.value === "__outro" && e.type === "change") o.focus(); }
     }
+    if (q.detalhe) {
+      var dt = $("#q-" + qid + "-det");
+      if (dt) { dt.hidden = vals[qid] !== "Sim"; if (!dt.hidden && e.type === "change") $("textarea", dt).focus(); }
+    }
+    if (q.notaSe) $$('[data-nota="' + qid + '"]').forEach(function (n) { n.hidden = n.dataset.se !== vals[qid]; });
     limparErro(qid);
   }
   document.addEventListener("input", aoMudar);

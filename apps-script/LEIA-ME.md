@@ -13,7 +13,7 @@ e-mail com o link sai do Gmail dela (até 100 e-mails por dia numa conta Gmail c
 3. Apague o que estiver lá, cole todo o conteúdo de `Codigo.gs` e clique em **Salvar**.
 4. No começo do código, troque:
    - `URL_AREA_PACIENTE`: o endereço da área do paciente, quando o site estiver no ar.
-   - `SENHAS_ADMIN`: uma senha para cada administradora. As senhas de exemplo não funcionam.
+   - `SENHA_ADMIN`: a senha do painel, a mesma para a Ana Carolina e para a recepção. A senha de exemplo não funciona.
 5. No editor, escolha a função **configurar** e clique em **Executar**. O Google pede
    autorização (Planilhas, Drive e Gmail): aceite com a conta da Ana Carolina.
    Isso cria as abas e a pasta **Pacientes · Nutri Ana Carolina** no Drive.
