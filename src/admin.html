@@ -233,6 +233,24 @@ dialog.confirma::backdrop{background:var(--backdrop)}
 .btn-perigo:hover{background:var(--error-hover)}
 .link-perigo{color:var(--error)}
 
+/* Agenda */
+.agenda{display:grid;gap:14px}
+.dia-ag{border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:12px}
+.dia-ag.is-hoje{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand) inset}
+.dia-top{display:flex;align-items:baseline;gap:8px 12px;flex-wrap:wrap}
+.tag-modo{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:800;background:var(--accent-soft);color:var(--accent)}
+.tag-modo.is-online{background:var(--st-ficha-bg);color:var(--st-ficha)}
+.marcados{list-style:none;margin:0;padding:0;display:grid}
+.marcado{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.marcado:first-child{border-top:0;padding-top:2px}
+.m-hora{font-weight:800;font-variant-numeric:tabular-nums}
+.m-acoes{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.m-acoes .btn-sec{min-height:36px;padding:0 12px;font-size:14px}
+@media (max-width:600px){.marcado{grid-template-columns:52px minmax(0,1fr)}.m-acoes{grid-column:2;justify-content:flex-start}}
+.livres{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.livre{min-height:34px;padding:0 12px;border:1.5px dashed var(--line);border-radius:8px;background:var(--bg);font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);cursor:pointer}
+.livre:hover,.livre:focus-visible{border-style:solid;border-color:var(--brand);color:var(--accent);background:var(--accent-soft)}
+
 /* Toast e carregando */
 .toast{position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom, 0px) + 24px);background:var(--ink);color:var(--on-brand);padding:12px 20px;border-radius:999px;font-weight:700;font-size:15px;max-width:calc(100vw - 32px);text-align:center}
 .carregando{display:grid;justify-items:center;gap:14px;padding-block:72px;color:var(--muted);font-weight:700}
@@ -263,6 +281,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
 </header>
 <nav class="abas" id="abas" aria-label="Seções do painel" hidden>
   <div class="abas-in">
+    <a class="aba" href="#agenda" data-aba="agenda">Agenda</a>
     <a class="aba" href="#pacientes" data-aba="pacientes">Pacientes</a>
     <a class="aba" href="#cadastrar" data-aba="cadastrar">Cadastrar paciente</a>
   </div>
@@ -479,7 +498,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   function msgErro(c) { return ERROS[c] || ERROS.falha_interna; }
 
   /* ===== Estado ===== */
-  var S = { sessao: null, por: null, veSaude: false, lista: null, filtro: { busca: "", status: "Todos", objetivo: "" }, atual: null, editando: false, cadastrado: null, arqAviso: null };
+  var S = { sessao: null, por: null, veSaude: false, lista: null, filtro: { busca: "", status: "Todos", objetivo: "" }, atual: null, editando: false, cadastrado: null, arqAviso: null, agendaFiltro: "Todas", agendaSemanas: 4, preCadastro: null };
   function guardar(v) { try { if (v) sessionStorage.setItem("nutri:admin", JSON.stringify(v)); else sessionStorage.removeItem("nutri:admin"); } catch (e) {} }
   function ler() { try { return JSON.parse(sessionStorage.getItem("nutri:admin") || "null"); } catch (e) { return null; } }
 
@@ -498,7 +517,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       if (acao === "adminPacientes") return { ok: true, pacientes: DEMO.pacientes.map(function (p) {
         var ult = p.exames.reduce(function (m, e) { return e.data > m ? e.data : m; }, "");
         var uc = p.checkins.reduce(function (m, e) { return e.data > m ? e.data : m; }, "");
-        return { id: p.id, nome: p.nome, email: p.email, celular: p.celular, nascimento: p.nascimento, objetivo: p.objetivo, status: p.status, cadastro: p.cadastro, por: p.por, ultimoAcesso: p.ultimoAcesso, consulta: p.consulta, modalidade: p.modalidade || (p.consulta ? "Presencial" : ""), ficha: p.ficha ? p.ficha.data : "", checkins: p.checkins.length, ultimoCheckin: uc, exames: p.exames.length, ultimoExame: ult };
+        return { id: p.id, nome: p.nome, email: p.email, celular: p.celular, nascimento: p.nascimento, objetivo: p.objetivo, status: p.status, cadastro: p.cadastro, por: p.por, ultimoAcesso: p.ultimoAcesso, consulta: p.consulta, modalidade: p.modalidade || (p.consulta ? "Presencial" : ""), meet: p.meet || "", ficha: p.ficha ? p.ficha.data : "", checkins: p.checkins.length, ultimoCheckin: uc, exames: p.exames.length, ultimoExame: ult };
       }) };
       if (acao === "adminPaciente") {
         var p = achar(c.id);
@@ -569,7 +588,7 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       if (!r.ok) { btn.disabled = false; btn.textContent = "Entrar"; b.classList.add("is-erro"); $(".q-erro", b).textContent = msgErro(r.erro); $(".q-erro", b).hidden = false; return; }
       S.sessao = r.sessao; S.por = r.por; S.veSaude = !!r.veSaude;
       guardar({ sessao: S.sessao, por: S.por, veSaude: S.veSaude });
-      var destino = S.por === "Recepção" ? "#cadastrar" : "#pacientes";
+      var destino = S.por === "Recepção" ? "#agenda" : "#pacientes";
       if (location.hash === destino) rota(); else location.hash = destino;
     });
   }
@@ -589,11 +608,12 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     $("#avatar").textContent = iniciais(S.por);
     $("#topo-nome").textContent = S.por;
     var h = location.hash.replace("#", "");
-    if (!h) h = S.por === "Recepção" ? "cadastrar" : "pacientes";
+    if (!h) h = S.por === "Recepção" ? "agenda" : "pacientes";
     var aba = h.indexOf("p-") === 0 ? "pacientes" : h;
     $$(".aba").forEach(function (a) { if (a.dataset.aba === aba) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     S.arqAviso = null;
     if (h === "cadastrar") { S.cadastrado = null; renderCadastro(); }
+    else if (h === "agenda") carregarAgenda();
     else if (h.indexOf("p-") === 0) abrirPaciente(h.slice(2));
     else carregarLista();
     window.scrollTo(0, 0);
@@ -675,6 +695,72 @@ dialog.confirma::backdrop{background:var(--backdrop)}
       }).join("") + "</ul>";
   }
 
+  /* ===== Agenda ===== */
+  function carregarAgenda() {
+    if (S.lista) { renderAgenda(); return; }
+    carregando("Carregando a agenda…");
+    chamar("adminPacientes").then(function (r) {
+      if (seExpirou(r)) return;
+      if (!r.ok) { $("#app").innerHTML = '<p class="aviso" role="alert">' + esc(msgErro(r.erro)) + '</p><div><button type="button" class="btn" data-acao="recarregar">Tentar de novo</button></div>'; return; }
+      S.lista = r.pacientes;
+      renderAgenda();
+    });
+  }
+  // Dias de atendimento das próximas semanas, com quem está marcado e os horários livres
+  function diasDaAgenda() {
+    var modos = S.agendaFiltro === "Todas" ? ["Presencial", "Online"] : [S.agendaFiltro];
+    var hoje = hojeISO(), d = new Date(), fim = new Date();
+    d.setHours(0, 0, 0, 0); fim.setHours(0, 0, 0, 0); fim.setDate(fim.getDate() + S.agendaSemanas * 7);
+    var dias = [];
+    for (; d < fim; d.setDate(d.getDate() + 1)) {
+      var iso = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+      modos.forEach(function (m) { if (AGENDA[m].dias.indexOf(d.getDay()) >= 0) dias.push({ dia: iso, modo: m }); });
+    }
+    return dias.map(function (x) {
+      var marcados = S.lista.filter(function (p) { return p.consulta && p.consulta.indexOf(x.dia + " ") === 0; })
+        .sort(function (a, b) { return a.consulta < b.consulta ? -1 : 1; });
+      var tomados = marcados.map(function (p) { return p.consulta.slice(11); });
+      x.marcados = marcados;
+      x.livres = AGENDA[x.modo].horarios.filter(function (h) { return tomados.indexOf(h) < 0; });
+      x.hoje = x.dia === hoje;
+      return x;
+    });
+  }
+  function renderAgenda() {
+    var dias = diasDaAgenda();
+    var limite = new Date(); limite.setDate(limite.getDate() + S.agendaSemanas * 7);
+    var limiteISO = limite.getFullYear() + "-" + pad2(limite.getMonth() + 1) + "-" + pad2(limite.getDate());
+    var depois = S.lista.filter(function (p) { return p.consulta && p.consulta.slice(0, 10) >= limiteISO; }).length;
+    var total = dias.reduce(function (t, x) { return t + x.marcados.length; }, 0);
+    $("#app").innerHTML =
+      '<div class="head-linha"><header class="pag-head"><span class="eyebrow">Próximas ' + S.agendaSemanas + ' semanas</span><h1 class="h1" tabindex="-1">Agenda</h1>' +
+      '<p class="desc">' + total + (total === 1 ? " consulta marcada" : " consultas marcadas") + ". Toque num horário livre para cadastrar um paciente nele.</p></header>" +
+      '<a class="btn" href="#cadastrar">' + I.mais + " Cadastrar paciente</a></div>" +
+      (!CONFIG.api ? '<p class="nota-previa">Prévia com pacientes de exemplo.</p>' : "") +
+      '<div class="chips" role="group" aria-label="Filtrar a agenda">' + ["Todas", "Presencial", "Online"].map(function (f) {
+        return '<button type="button" class="chip-f" data-agenda-filtro="' + f + '" aria-pressed="' + (S.agendaFiltro === f) + '">' + (f === "Todas" ? "Todas" : f + " · " + AGENDA[f].texto.toLowerCase()) + "</button>";
+      }).join("") + "</div>" +
+      '<div class="agenda">' + (dias.length ? dias.map(htmlDiaAgenda).join("") : '<p class="vazio-txt">Nenhum dia de atendimento nesse período.</p>') + "</div>" +
+      '<div class="det-acoes"><button type="button" class="btn-sec" data-acao="mais-semanas">Ver mais 4 semanas</button>' +
+      (depois ? '<span class="muted">' + depois + (depois === 1 ? " consulta marcada depois disso" : " consultas marcadas depois disso") + "</span>" : "") + "</div>";
+    focar();
+  }
+  function htmlDiaAgenda(x) {
+    var n = x.marcados.length, cap = AGENDA[x.modo].horarios.length;
+    return '<section class="dia-ag' + (x.hoje ? " is-hoje" : "") + '" aria-label="' + esc(nomeDia(x.dia)) + '">' +
+      '<div class="dia-top"><h2 class="h2">' + (x.hoje ? "Hoje · " : "") + esc(nomeDia(x.dia).replace(/\/\d{4}$/, "")) + '</h2><span class="tag-modo' + (x.modo === "Online" ? " is-online" : "") + '">' + x.modo + '</span><span class="muted">' + n + " de " + cap + (n === 1 ? " marcado" : " marcados") + "</span></div>" +
+      (n ? '<ul class="marcados">' + x.marcados.map(function (p) {
+        var hora = p.consulta.slice(11);
+        return '<li class="marcado"><span class="m-hora">' + hora + '</span><div class="m-quem"><a class="p-nome" href="#p-' + esc(p.id) + '">' + esc(p.nome) + '</a><span class="p-sub">' + esc(p.celular) + (p.ficha ? " · ficha respondida" : " · ficha pendente") + "</span></div>" +
+          '<div class="m-acoes">' + (p.modalidade === "Online" && p.meet ? '<a class="btn-sec" href="' + esc(p.meet) + '" target="_blank" rel="noopener">Meet</a>' : "") +
+          '<a class="btn-sec btn-wa" href="' + linkWhats(p.celular, msgLembrete(p.nome, p.consulta, p.modalidade, p.meet)) + '" target="_blank" rel="noopener" aria-label="Lembrar ' + esc(p.nome) + ' pelo WhatsApp">' + I.chat + " Lembrar</a></div></li>";
+      }).join("") + "</ul>" : "") +
+      (x.livres.length ? '<div class="livres"><span class="muted">Livres:</span>' + x.livres.map(function (h) {
+        return '<button type="button" class="livre" data-acao="marcar-livre" data-dia="' + x.dia + '" data-hora="' + h + '" data-modo="' + x.modo + '" aria-label="Cadastrar paciente ' + esc(nomeDia(x.dia)) + " às " + h + '">' + h + "</button>";
+      }).join("") + "</div>" : '<p class="muted" style="margin:0">Dia cheio.</p>') +
+      "</section>";
+  }
+
   /* ===== Cadastrar ===== */
   function renderCadastro() {
     var c = S.cadastrado;
@@ -698,10 +784,11 @@ dialog.confirma::backdrop{background:var(--backdrop)}
           '<div class="campo" data-bloco="celular"><label class="lbl" for="c-cel">Celular (WhatsApp)</label><div class="phone"><span class="ddi">' + FLAG + ' +55</span><input class="input" id="c-cel" type="tel" inputmode="numeric" autocomplete="off" placeholder="(21) 99999-9999"></div><p class="q-erro" hidden></p></div>' +
           '<div class="campo" data-bloco="nascimento"><label class="lbl" for="c-nasc">Data de nascimento</label><input class="input" id="c-nasc" type="date" min="1900-01-01" max="' + hojeISO() + '"><p class="q-erro" hidden></p></div>' +
         "</div>" +
-        '<fieldset class="campo grupo-consulta" data-bloco="consulta"><legend class="lbl">Consulta</legend><p class="muted" style="margin:0;font-size:14px">Escolha presencial ou online. Horário ocupado aparece bloqueado.</p>' + htmlConsulta("c", "", "Presencial", "", true) + '<p class="q-erro" hidden></p></fieldset>' +
+        '<fieldset class="campo grupo-consulta" data-bloco="consulta"><legend class="lbl">Consulta</legend><p class="muted" style="margin:0;font-size:14px">Escolha presencial ou online. Horário ocupado aparece bloqueado.</p>' + htmlConsulta("c", S.preCadastro ? S.preCadastro.consulta : "", S.preCadastro ? S.preCadastro.modalidade : "Presencial", "", true) + '<p class="q-erro" hidden></p></fieldset>' +
         '<div id="aviso-cad"></div>' +
         '<div><button type="submit" class="btn" id="btn-cad">Cadastrar e enviar e-mail</button></div>' +
       "</form>";
+    S.preCadastro = null;
     focar();
     if (!S.lista) chamar("adminPacientes").then(function (r) { if (r && r.ok) { S.lista = r.pacientes; atualizarHoras("c"); } });
   }
@@ -1012,6 +1099,8 @@ dialog.confirma::backdrop{background:var(--backdrop)}
   });
   document.addEventListener("click", function (e) {
     if (!e.target.closest("#pop") && !e.target.closest(".mais")) fecharMenu();
+    var fa = e.target.closest("[data-agenda-filtro]");
+    if (fa) { S.agendaFiltro = fa.dataset.agendaFiltro; renderAgenda(); return; }
     var chip = e.target.closest(".chip-f");
     if (chip) { S.filtro.status = chip.dataset.status; renderChips(); renderResultado(); return; }
     var linha = e.target.closest("tr.linha");
@@ -1056,6 +1145,8 @@ dialog.confirma::backdrop{background:var(--backdrop)}
     else if (a === "pedir-remover") pedirRemover(b.dataset.id);
     else if (a === "cancelar-remover") fecharDialogo();
     else if (a === "confirmar-remover") remover(b);
+    else if (a === "mais-semanas") { S.agendaSemanas += 4; renderAgenda(); }
+    else if (a === "marcar-livre") { S.preCadastro = { consulta: b.dataset.dia + " " + b.dataset.hora, modalidade: b.dataset.modo }; location.hash = "#cadastrar"; }
   });
 
   /* ===== Início ===== */
